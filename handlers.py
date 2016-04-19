@@ -1,4 +1,17 @@
 import tornado.web
+import shutil
+import pwd
+import os
+
+ipynb_dir = './ipynbs'
+
+def get_ipynb_files(dir):
+    files_paths = []
+    for root, dirs, files in os.walk(dir):
+        for file in files:
+            if file[-5:] == 'ipynb':
+                files_paths.append(os.path.join(os.path.abspath(root), file))
+    return files_paths
 
 class RequestHandler(tornado.web.RequestHandler):
     def __init_(self):
@@ -32,9 +45,29 @@ class JupyterHandler(RequestHandler):
         resourcetype = self.get_or_error('resourcetype')
         resourceid = self.get_or_error('resourceid')
         if not (username and resourcetype and resourceid): return
+
+
+        # check to see if user exists
+        try:
+            userinfo = pwd.getpwnam(username)
+        except Exception, e:
+            self.write("<b>Encountered Error: </b> User '%s' does not exist on system" % username)
+            return
+
+        # save the user's home directory
+        user_dir = userinfo.pw_dir
+
+
+        # move files into user space
+        files = get_ipynb_files(ipynb_dir)
+        for file in files:
+            self.write('<b>Found file: </b> %s'%file)
+
+        return
         
-        url = "http://129.123.51.34/user/%s/notebooks/%s.ipynb" % (username, resourcetype)
-        self.redirect(url)
+
+#        url = "http://129.123.51.34/user/%s/notebooks/%s.ipynb" % (username, resourcetype)
+#        self.redirect(url)
 
 
 
