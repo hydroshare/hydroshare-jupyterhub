@@ -77,7 +77,7 @@ class JupyterHandler(RequestHandler):
             # todo: check if file exists, so that it is not overwritten
             shutil.copyfile(src, dst)
 
-            self.write('<b> Copied <b>%s</b> --> <b>%s</b><br>' % (src, dst))
+            self.write('<b>Copied: %s --> %s<br>' % (src, dst))
 
 
 
