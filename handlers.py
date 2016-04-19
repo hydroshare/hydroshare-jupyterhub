@@ -50,7 +50,7 @@ class JupyterHandler(RequestHandler):
         # check to see if user exists
         try:
             userinfo = pwd.getpwnam(username)
-        except Exception, e:
+        except Exception:
             self.write("<b>Encountered Error: </b> User '%s' does not exist on system" % username)
             return
 
