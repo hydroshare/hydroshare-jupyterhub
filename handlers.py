@@ -13,8 +13,7 @@ class RequestHandler(tornado.web.RequestHandler):
         """
         arg = self.get_argument(argname, default=None, strip=strip)
         if arg is None:
-            self.write('<h1>ERROR</h1>')
-            self.write('Could not find parameter "%s".  Please make sure that all required parameters have been provided' % argname)
+            self.write('<b>Encountered Error: </b> Could not find parameter "%s".  ' % argname)
             return 0
         return arg
 
