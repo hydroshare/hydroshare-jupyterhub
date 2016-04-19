@@ -27,7 +27,7 @@ class MainHandler(RequestHandler):
         self.write('Hello %s'%name)
 
 
-class JupyterHandler(tornado.web.RequestHandler):
+class JupyterHandler(RequestHandler):
     def get(self):
         username = self.get_or_error('username')
         resourcetype = self.get_or_error('resourcetype')
