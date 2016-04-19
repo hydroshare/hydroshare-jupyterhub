@@ -71,7 +71,7 @@ class JupyterHandler(RequestHandler):
           
             # make the destination directory if it doesn't already exist
             dirpath = os.path.dirname(dst) 
-            if not exists dirpath:
+            if not os.path.exists(dirpath):
                 os.makedirs(dirpath)
 
             # todo: check if file exists, so that it is not overwritten
