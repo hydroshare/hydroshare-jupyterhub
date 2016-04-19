@@ -1,6 +1,9 @@
 import inspect
 import shutil
 
+
+print ('utils imported')
+
 def save_script(fname):
 
     frame = inspect.stack()[1]
