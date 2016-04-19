@@ -68,7 +68,12 @@ class JupyterHandler(RequestHandler):
         for i in range(0, len(files)):
             src = files[i]
             dst = os.path.join(user_dir, relpaths[i])
-            
+          
+            # make the destination directory if it doesn't already exist
+            dirpath = os.path.dirname(dst) 
+            if not exists dirpath:
+                os.makedirs(dirpath)
+
             # todo: check if file exists, so that it is not overwritten
             shutil.copyfile(src, dst)
 
