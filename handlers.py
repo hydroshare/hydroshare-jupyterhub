@@ -2,6 +2,7 @@ import tornado.web
 import shutil
 import pwd
 import os
+import grp
 
 ipynb_dir = './ipynbs'
 
@@ -54,8 +55,10 @@ class JupyterHandler(RequestHandler):
             self.write("<b>Encountered Error: </b> User '%s' does not exist on system" % username)
             return
 
-        # save the user's home directory
+        # save the user's info
         user_dir = userinfo.pw_dir
+        uid = userinfo.pw_uid
+        gid = userinfo.pw_gid
 
 
         # move files into user space
@@ -76,6 +79,10 @@ class JupyterHandler(RequestHandler):
 
             # todo: check if file exists, so that it is not overwritten
             shutil.copyfile(src, dst)
+
+            # modify user permissions
+            os.chown(dst, uid, gid)
+
 
             self.write('<b>Copied: %s --> %s<br>' % (src, dst))
 
