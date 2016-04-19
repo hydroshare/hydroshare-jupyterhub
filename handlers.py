@@ -64,8 +64,17 @@ class JupyterHandler(RequestHandler):
             self.write('<b>Found file: </b> %s <br>'%file)
 
         relpaths = [os.path.relpath(p, '.') for p in files]
-        for file in relpaths:
-            self.write(file+'<br>')
+        
+        for i in range(0, len(files):
+            src = files[i]
+            dst = os.path.join(user_dir, relpaths[i])
+            
+            # todo: check if file exists, so that it is not overwritten
+            shutil.copyfile(src, dst)
+
+            self.write('<b> Copied <b>%s</b> --> <b>%s</b><br>' % (src, dst)
+
+
 
         return
         
