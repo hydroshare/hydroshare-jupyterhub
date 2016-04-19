@@ -65,7 +65,7 @@ class JupyterHandler(RequestHandler):
 
         relpaths = [os.path.relpath(p, '.') for p in files]
         
-        for i in range(0, len(files):
+        for i in range(0, len(files)):
             src = files[i]
             dst = os.path.join(user_dir, relpaths[i])
             
