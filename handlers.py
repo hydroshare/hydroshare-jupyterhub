@@ -33,7 +33,8 @@ class JupyterHandler(RequestHandler):
         resourceid = self.get_or_error('resourceid')
         if not (username and resourcetype and resourceid): return
         
-        self.redirect("http://129.123.51.34/user/%s/notebooks/%s.ipynb" % (username, resourcetype)
+        url = "http://129.123.51.34/user/%s/notebooks/%s.ipynb" % (username, resourcetype)
+        self.redirect(url)
 
 
 
