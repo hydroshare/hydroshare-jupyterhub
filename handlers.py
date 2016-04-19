@@ -21,7 +21,7 @@ class RequestHandler(tornado.web.RequestHandler):
 class MainHandler(RequestHandler):
     def get(self):
 
-        name = self.get_or_error('name', strip=True)
+        name = self.get_or_error('name')
         if not name: return 
 
         self.write('Hello %s'%name)
@@ -29,14 +29,12 @@ class MainHandler(RequestHandler):
 
 class JupyterHandler(tornado.web.RequestHandler):
     def get(self):
-        username = self.get_argument('notebook', default=None, strip=True)
-        resourcetype = self.get_argument('notebook', default=None, strip=True)
-        resourceid = self.get_argument('notebook', default=None, strip=True)
-        if notebook is None:
-            self.write('missing parameter: "notebook"')
-            return
+        username = self.get_or_error('username')
+        resourcetype = self.get_or_error('resourcetype')
+        resourceid = self.get_or_error('resourceid')
+        if not (username and resourcetype and resourceid): return
+        
         self.redirect("http://129.123.51.34/user/tony/notebooks/demos.ipynb")
-        #self.write('Redirect to notebook %s'%notebook)
 
 
 
