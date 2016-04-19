@@ -63,6 +63,10 @@ class JupyterHandler(RequestHandler):
         for file in files:
             self.write('<b>Found file: </b> %s'%file)
 
+        relpaths = [os.path.relpath(p, '.') for p in files]
+        for file in relpaths:
+            self.write(file)
+
         return
         
 
