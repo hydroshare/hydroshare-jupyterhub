@@ -76,6 +76,7 @@ class JupyterHandler(RequestHandler):
             dirpath = os.path.dirname(dst) 
             if not os.path.exists(dirpath):
                 os.makedirs(dirpath)
+                os.chown(dirpath, uid, gid)
 
             # todo: check if file exists, so that it is not overwritten
             shutil.copyfile(src, dst)
