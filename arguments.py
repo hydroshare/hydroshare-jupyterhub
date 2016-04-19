@@ -11,6 +11,7 @@ def get_or_error(argname, strip=True):
     """
     
     arg = RequestHandler.get_argument(argname, default=None, strip=strip)
+    return arg
 
     if arg is None:
         raise Exception('Could not find parameter "%s".  Please make sure that all required parameters have been provided' % argname)

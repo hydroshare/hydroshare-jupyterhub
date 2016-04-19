@@ -1,15 +1,25 @@
 import tornado.web
-import arguments
 
-class MainHandler(tornado.web.RequestHandler):
+class RequestHandler(tornado.web.RequestHandler):
+    def __init_(self):
+        super(RequestHandler, self)
+
+    def get_or_error(self, argname, strip=True):
+        """
+        This function gets a REST input argument or returns an error message if the argument is not found
+        Arguments:
+        argname -- the name of the argument to get
+        strip -- indicates if the whitespace will be stripped from the argument
+        """
+        arg = self.get_argument(argname, default=None, strip=strip)
+        if arg is None:
+            raise Exception('Could not find parameter "%s".  Please make sure that all required parameters have been provided' % argname)
+        return arg
+
+class MainHandler(RequestHandler):
     def get(self):
 
-        name = arguments.get_or_error('name', strip=True)
-#        name = self.get_argument('name', default=None, strip=True)
-#        if name is None:
-#            self.write('missing parameter: "name"')
-#            return
-
+        name = self.get_or_error('name', strip=True)
         self.write('Hello %s'%name)
 
 
