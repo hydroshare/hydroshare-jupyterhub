@@ -61,11 +61,11 @@ class JupyterHandler(RequestHandler):
         # move files into user space
         files = get_ipynb_files(ipynb_dir)
         for file in files:
-            self.write('<b>Found file: </b> %s'%file)
+            self.write('<b>Found file: </b> %s <br>'%file)
 
         relpaths = [os.path.relpath(p, '.') for p in files]
         for file in relpaths:
-            self.write(file)
+            self.write(file+'<br>')
 
         return
         
