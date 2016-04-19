@@ -79,13 +79,8 @@ class JupyterHandler(RequestHandler):
 
             self.write('<b>Copied: %s --> %s<br>' % (src, dst))
 
-
-
-        return
-        
-
-#        url = "http://129.123.51.34/user/%s/notebooks/%s.ipynb" % (username, resourcetype)
-#        self.redirect(url)
+        url = "http://129.123.51.34/user/%s/notebooks/%s.ipynb" % (username, resourcetype)
+        self.redirect(url)
 
 
 
