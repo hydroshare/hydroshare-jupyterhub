@@ -44,7 +44,9 @@ def build_userspace(username):
     user_dir = userinfo.pw_dir
 
     # get the default files 
-    files = collect_ipynb_files('./ipynbs')
+    files = collect_files('./ipynbs')
+    for file in files:
+        print('Found File: %s'% file)
     relpaths = [os.path.relpath(p, '.') for p in files]
 
     # copy files into user space and change ownership
@@ -67,11 +69,10 @@ def build_userspace(username):
         # make content directory
         make_content_dir(username)
 
-def collect_ipynb_files(dir):
+def collect_files(dir):
     files_paths = []
     for root, dirs, files in os.walk(dir):
         for file in files:
-            #if file[-5:] == 'ipynb':
             files_paths.append(os.path.join(os.path.abspath(root), file))
     return files_paths
 
