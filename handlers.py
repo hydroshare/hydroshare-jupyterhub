@@ -1,19 +1,6 @@
 import tornado.web
-import shutil
-import pwd
 import os
-import grp
 import utilities
-
-ipynb_dir = './ipynbs'
-
-def get_ipynb_files(dir):
-    files_paths = []
-    for root, dirs, files in os.walk(dir):
-        for file in files:
-            #if file[-5:] == 'ipynb':
-            files_paths.append(os.path.join(os.path.abspath(root), file))
-    return files_paths
 
 class RequestHandler(tornado.web.RequestHandler):
     def __init_(self):

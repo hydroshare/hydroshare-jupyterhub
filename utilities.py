@@ -2,6 +2,7 @@
 
 import os
 import pwd
+import shutil
 from hs_restclient import HydroShare
 
 
