@@ -14,7 +14,7 @@ class Application(tornado.web.Application):
             (r"/?", resthandlers.MainHandler),
             (r"/jupyter/?",resthandlers.JupyterHandler)
         ]
-        tornado.web.Application.__init__(self, handlers, debug=True, log_function=True)
+        tornado.web.Application.__init__(self, handlers, debug=True)
 
 def main():
     app = Application()
