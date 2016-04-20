@@ -84,7 +84,6 @@ class JupyterHandler(RequestHandler):
             # modify user permissions
             os.chown(dst, uid, gid)
 
-
             self.write('<b>Copied: %s --> %s<br>' % (src, dst))
 
         url = "http://129.123.51.34/user/%s/notebooks/ipynbs/%s.ipynb" % (username, resourcetype)
