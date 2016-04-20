@@ -51,7 +51,7 @@ class JupyterHandler(RequestHandler):
        
         # generate the redirect url
         baseurl = socket.gethostbyname(socket.gethostname())
-        url = "https://%s/user/%s/notebooks/ipynbs/%s.ipynb" % (baseurl, username, resourcetype)
+        url = "http://%s/user/%s/notebooks/ipynbs/%s.ipynb" % (baseurl, username, resourcetype)
         print(url)
 
         # redirect to ipynb
