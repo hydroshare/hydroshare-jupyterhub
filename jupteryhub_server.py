@@ -19,7 +19,9 @@ class Application(tornado.web.Application):
 def main():
     app = Application()
     app.listen(8080)
+    print('\n'+'-'*60)
     print('JupyterHub REST server listening on %s:8080' % socket.gethostbyname(socket.gethostname()))
+    print('-'*60+'\n')
     IOLoop.instance().start()
 
 if __name__ == '__main__':

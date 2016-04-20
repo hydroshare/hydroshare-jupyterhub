@@ -1,6 +1,7 @@
 import tornado.web
 import os
 import utilities
+import socket
 
 class RequestHandler(tornado.web.RequestHandler):
     def __init_(self):
@@ -47,8 +48,12 @@ class JupyterHandler(RequestHandler):
         except Exception as e:
             self.write(e)
             return
+       
+        # generate the redirect url
+        baseurl = socket.gethostbyname(socket.gethostname())
+        url = "%s/user/%s/notebooks/ipynbs/%s.ipynb" % (baseurl, username, resourcetype)
 
-        url = "http://129.123.51.34/user/%s/notebooks/ipynbs/%s.ipynb" % (username, resourcetype)
+        # redirect to ipynb
         self.redirect(url)
 
 
