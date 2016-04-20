@@ -3,6 +3,7 @@ import shutil
 import pwd
 import os
 import grp
+import utilities
 
 ipynb_dir = './ipynbs'
 
