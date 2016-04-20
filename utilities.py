@@ -34,6 +34,45 @@ def get_content_for_resource(username, resource_id):
     hs.getResource(resource_id, destination=dst, unzip=True)
     return os.path.join(dst, resource_id)
 
+def build_userspace(username):
+
+    userinfo = get_user_info(username)
+    if not username:
+        raise Exception("<b>Encountered Error: </b> User '%s' does not exist on system" % username)
+
+    user_dir = userinfo.pw_dir
+
+    # get the default files 
+    files = collect_ipynb_files('./ipynbs')
+    relpaths = [os.path.relpath(p, '.') for p in files]
+
+    # copy files into user space and change ownership
+    for i in range(0, len(files)):
+        src = files[i]
+        dst = os.path.join(user_dir, relpaths[i])
+
+        # make the destination directory if it doesn't already exist
+        dirpath = os.path.dirname(dst)
+        if not os.path.exists(dirpath):
+            os.makedirs(dirpath)
+            os.chown(dirpath, userinfo.pw_uid, userinfo.pw_gid)
+
+        # todo: check if file exists, so that it is not overwritten
+        shutil.copyfile(src, dst)
+
+        # modify user permissions
+        os.chown(dst, userinfo.pw_uid, userinfo.pw_gid)
+
+        # make content directory
+        make_content_dir(username)
+
+def collect_ipynb_files(dir):
+    files_paths = []
+    for root, dirs, files in os.walk(dir):
+        for file in files:
+            #if file[-5:] == 'ipynb':
+            files_paths.append(os.path.join(os.path.abspath(root), file))
+    return files_paths
 
 
 
