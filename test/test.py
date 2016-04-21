@@ -30,6 +30,9 @@ class LoginHandler(tornado.web.RequestHandler):
         if error: 
             self.render('index.html', message=msg, ip=base, username=username, restype=restype, resid=resid)
         else:
+            print('USERNAME: '+username)
+            print('RESTYPE: '+restype)
+            print('RESID: '+resid)
             base = socket.gethostbyname(socket.gethostname())
             jhub_addr = 'http://%s:8080/jupyter?username=%s&resourcetype=%s&resourceid=%s' % (base, username, restype, resid)
             self.redirect(jhub_addr, status=303)
