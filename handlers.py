@@ -30,7 +30,7 @@ class JupyterHandler(RequestHandler):
         resourceid = self.get_or_error('resourceid')
         husername = self.get_or_error('husername')
 
-        log.info('Jupyter Handler RECEIVED: %s, %s, %s ' % (username, husername, resourcetype, resourceid))
+        log.info('Jupyter Handler RECEIVED: %s, %s, %s, %s' % (username, husername, resourcetype, resourceid))
         
         if not (username and resourcetype and resourceid and husername): return
 
