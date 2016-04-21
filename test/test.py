@@ -7,8 +7,8 @@ enable_pretty_logging()
 
 class MainHandler(tornado.web.RequestHandler):
     def get(self):
-        #self.write("Hello, world")
-        self.render('index.html', message='',username='', restype='', resid='')
+        base = socket.gethostbyname(socket.gethostname())
+        self.render('index.html', message='',ip=base, username='', restype='', resid='')
 
 
 class LoginHandler(tornado.web.RequestHandler):
@@ -28,7 +28,7 @@ class LoginHandler(tornado.web.RequestHandler):
             msg = 'Please enter the HydroShare resource ID.'
             error = True
         if error: 
-            self.render('index.html', message=msg, username=username, restype=restype, resid=resid)
+            self.render('index.html', message=msg, ip=base, username=username, restype=restype, resid=resid)
         else:
             base = socket.gethostbyname(socket.gethostname())
             jhub_addr = 'http://%s:8080/jupyter?username=%s&resourcetype=%s&resourceid=%s' % (base, username, restype, resid)

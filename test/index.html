@@ -5,7 +5,7 @@
 
         This page is designed to mimic the functionality that will be implemented in HydroShare, most likely as "launch with JupyterHub" button.  OAuth is not implemented yet, so currently the user will need to be logged into the JupyterHub server for this to work.
 
-        <form id="login_form" action="http://localhost:8888/login" method="post">
+        <form id="login_form" action="http://{{ip}}:8888/login" method="post">
             <label class="grey" for="log">Jupyter Username:  </label>
             <input type="text" name="username" style="width:150px" id="username" value={{username}}><br>
             <br/> 
