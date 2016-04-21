@@ -35,7 +35,7 @@ def getResourceContent(hs_connection, resourceid, destination='.'):
     ip = socket.gethostbyname(socket.gethostname())
     base_dir = 'http://%s/user/%s/tree/ipynbs/content' % (ip, jupyter_username)
     dst = os.path.join(base_dir, destination)
-    hs_connection.getResource(resourceid, destination=dst, unzip=True)
+    getattr(hs_connection,'getResource')(resourceid, destination=dst, unzip=True)
     return dst
 
 
