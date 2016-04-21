@@ -49,11 +49,14 @@ def build_userspace(username):
     for file in files:
         print('Found File: %s'% file)
     relpaths = [os.path.relpath(p, '.') for p in files]
+    print(relpaths)
 
     # copy files into user space and change ownership
     for i in range(0, len(files)):
         src = files[i]
         dst = os.path.join(user_dir, relpaths[i])
+
+        print(src+' --> '+dst)
 
         # make the destination directory if it doesn't already exist
         dirpath = os.path.dirname(dst)
@@ -63,6 +66,8 @@ def build_userspace(username):
 
         # todo: check if file exists, so that it is not overwritten
         shutil.copyfile(src, dst)
+
+        print('file copied')
 
         # modify user permissions
         os.chown(dst, userinfo.pw_uid, userinfo.pw_gid)
