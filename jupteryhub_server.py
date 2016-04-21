@@ -11,7 +11,6 @@ enable_pretty_logging()
 class Application(tornado.web.Application):
     def __init__(self):
         handlers = [
-            (r"/?", resthandlers.MainHandler),
             (r"/jupyter/?",resthandlers.JupyterHandler)
         ]
         tornado.web.Application.__init__(self, handlers, debug=True)

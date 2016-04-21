@@ -21,22 +21,13 @@ class RequestHandler(tornado.web.RequestHandler):
             return 0
         return arg
 
-class MainHandler(RequestHandler):
-    def get(self):
-
-        name = self.get_or_error('name')
-        if not name: return 
-
-        self.write('Hello %s'%name)
-
-
 class JupyterHandler(RequestHandler):
     def get(self):
         username = self.get_or_error('username')
         resourcetype = self.get_or_error('resourcetype')
         resourceid = self.get_or_error('resourceid')
         
-        logging.info('Jupyter Handler RECEIVED: %s, %s, %s ' % (username, resourcetype, resourceid))
+        log.info('Jupyter Handler RECEIVED: %s, %s, %s ' % (username, resourcetype, resourceid))
         
         if not (username and resourcetype and resourceid): return
 
@@ -51,13 +42,13 @@ class JupyterHandler(RequestHandler):
         try:
             # construct the userspace 
             fpaths = utilities.build_userspace(username)
-            print('Userspace created')
+            log.info('Userspace created')
 
             # loop through resourcetype notebooks and insert customization
             resource_specific_files = [f for f in fpaths if (resourcetype in f and f[-5:] == 'ipynb')]
             for r in resource_specific_files:
                 utilities.insert_user_info_into_ipynb(r, username, resourceid)
-                print('Customized ipynb: %s' % r)
+                log.info('Finished customizing ipynb %s using the following params: ' % (r, username, resourceid))
         except Exception as e:
             self.write(e)
             return
