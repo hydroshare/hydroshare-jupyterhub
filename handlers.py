@@ -55,7 +55,7 @@ class JupyterHandler(RequestHandler):
         print(url)
 
         # redirect to ipynb
-        self.redirect(url)
+        self.redirect(url, status=303)
 
 
 
