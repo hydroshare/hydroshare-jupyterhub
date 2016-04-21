@@ -25,13 +25,14 @@ class RequestHandler(tornado.web.RequestHandler):
 
 class JupyterHandler(RequestHandler):
     def get(self):
-        username = self.get_or_error('username')
+        username = self.get_or_error('jusername')
         resourcetype = self.get_or_error('resourcetype')
         resourceid = self.get_or_error('resourceid')
+        husername = self.get_or_error('husername')
+
+        log.info('Jupyter Handler RECEIVED: %s, %s, %s ' % (username, husername, resourcetype, resourceid))
         
-        log.info('Jupyter Handler RECEIVED: %s, %s, %s ' % (username, resourcetype, resourceid))
-        
-        if not (username and resourcetype and resourceid): return
+        if not (username and resourcetype and resourceid and husername): return
 
         # check to see if user exists
         userinfo = utilities.get_user_info(username)
@@ -49,7 +50,7 @@ class JupyterHandler(RequestHandler):
             # loop through resourcetype notebooks and insert customization
             resource_specific_files = [f for f in fpaths if (resourcetype in f and f[-5:] == 'ipynb')]
             for r in resource_specific_files:
-                utilities.insert_user_info_into_ipynb(r, username, resourceid)
+                utilities.insert_user_info_into_ipynb(r, husername, resourceid)
         except Exception as e:
             self.write(e)
             return
