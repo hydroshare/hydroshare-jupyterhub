@@ -1,0 +1,23 @@
+    
+<html>
+    <body>
+        <h3> {{ message }} </h3>
+        <form id="login_form" action="http://localhost:8888/login" method="post">
+            <label class="grey" for="log">Jupyter Username:  </label>
+            <input type="text" name="username" style="width:150px" id="username" value={{username}}><br>
+            <br/> 
+            
+            <label class="grey" for="pwd">Resource Type:  </label>
+            <input type="text" name="restype" style="width:150px" id="restype" value={{restype}}><br />
+            <br/> 
+            
+            <label class="grey" for="pwd">Resource ID:  </label>
+            <input type="text" name="resid" style="width:150px" id="resid" value={{resid}}><br />
+            <br/> 
+            <br/> 
+            <input type="submit" id="loginbtn" name="login" value="LAUNCH!" class="button"><br />
+        
+        </form>
+    </body>
+
+</html>
