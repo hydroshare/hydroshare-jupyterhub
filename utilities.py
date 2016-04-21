@@ -70,6 +70,10 @@ def build_userspace(username):
         # make content directory
         make_content_dir(username)
 
+        # return the file paths that were moved
+        return relpaths
+
+
 def collect_files(dir):
     files_paths = []
     for root, dirs, files in os.walk(dir):
@@ -77,7 +81,7 @@ def collect_files(dir):
             files_paths.append(os.path.join(os.path.abspath(root), file))
     return files_paths
 
-def insert_user_info_into_ipynbs(ipynb_file, username, resource_id):
+def insert_user_info_into_ipynb(ipynb_file, username, resource_id):
 
     # load the ipynb as json
     with open(ipynb_file) as f:
