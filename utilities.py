@@ -98,8 +98,8 @@ def insert_user_info_into_ipynb(ipynb_file, username, resource_id):
     for i in range(len(data['cells'])):
         cell = data['cells'][i]
         for j in range(len(cell['source'])):
-            data['cells'][i]['source'][j] = data['cells'][i]['source'][j].replace('INSERT_USERNAME', username)
-            data['cells'][i]['source'][j] = data['cells'][i]['source'][j].replace('INSERT_RESID', resource_id)
+            data['cells'][i]['source'][j] = data['cells'][i]['source'][j].replace('INSERT_USERNAME', "'%s'"%username)
+            data['cells'][i]['source'][j] = data['cells'][i]['source'][j].replace('INSERT_RESID', "'%s'"%resource_id)
 
     # rewrite the file
     with open(ipynb_file, 'w') as f:
