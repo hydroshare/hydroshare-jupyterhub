@@ -3,11 +3,23 @@
     <body>
         <h3> {{ message }} </h3>
 
+
+        <br/> 
+        <div style="width: 400px">
         This page is designed to mimic the functionality that will be implemented in HydroShare, most likely as "launch with JupyterHub" button.  OAuth is not implemented yet, so currently the user will need to be logged into the JupyterHub server for this to work.
 
+        </div>
+
         <form id="login_form" action="http://{{ip}}:8888/login" method="post", target="_blank">
+            <br/> 
+            <br/> 
+            
             <label class="grey" for="log">Jupyter Username:  </label>
-            <input type="text" name="username" style="width:150px" id="username" value={{username}}><br>
+            <input type="text" name="jusername" style="width:150px" id="jusername" value={{jusername}}><br>
+            <br/> 
+            
+            <label class="grey" for="log">HydroShare Username:  </label>
+            <input type="text" name="husername" style="width:150px" id="husername" value={{husername}}><br>
             <br/> 
             
             <label class="grey" for="pwd">Resource Type:  </label>

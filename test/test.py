@@ -8,18 +8,23 @@ enable_pretty_logging()
 class MainHandler(tornado.web.RequestHandler):
     def get(self):
         base = socket.gethostbyname(socket.gethostname())
-        self.render('index.html', message='',ip=base, username='', restype='', resid='')
+        self.render('index.html', message='',ip=base, jusername='', husername='', restype='', resid='')
 
 
 class LoginHandler(tornado.web.RequestHandler):
     def post(self):
-        username = self.get_argument('username', '')
+        jusername = self.get_argument('jusername', '')
+        husername = self.get_argument('husername', '')
         restype = self.get_argument('restype', '')
         resid = self.get_argument('resid', '')
+        base = socket.gethostbyname(socket.gethostname())
         message = ''
         error = False
-        if not username:
-            msg = 'Please enter your JupyterHub Username.'
+        if not jusername:
+            msg = 'Please enter your JupyterHub username.'
+            error = True
+        elif not husername:
+            msg = 'Please enter your HydroShare username.'
             error = True
         elif not restype:
             msg = 'Please enter the HydroShare resource type.'
@@ -28,13 +33,9 @@ class LoginHandler(tornado.web.RequestHandler):
             msg = 'Please enter the HydroShare resource ID.'
             error = True
         if error: 
-            self.render('index.html', message=msg, ip=base, username=username, restype=restype, resid=resid)
+            self.render('index.html', message=msg, ip=base, jusername=jusername, husername=husername, restype=restype, resid=resid)
         else:
-            print('USERNAME: '+username)
-            print('RESTYPE: '+restype)
-            print('RESID: '+resid)
-            base = socket.gethostbyname(socket.gethostname())
-            jhub_addr = 'http://%s:8080/jupyter?username=%s&resourcetype=%s&resourceid=%s' % (base, username, restype, resid)
+            jhub_addr = 'http://%s:8080/jupyter?jusername=%s&husername=%s&resourcetype=%s&resourceid=%s' % (base, jusername, husername, restype, resid)
             self.redirect(jhub_addr, status=303)
 def make_app():
     return tornado.web.Application([
