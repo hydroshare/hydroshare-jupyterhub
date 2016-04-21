@@ -50,11 +50,13 @@ def build_userspace(username):
     files = collect_files('./ipynbs')
     log.info('Collect files operation found %d files to be copied' % len(files))
     relpaths = [os.path.relpath(p, '.') for p in files]
-
+    
+    newfiles = []
     # copy files into user space and change ownership
     for i in range(0, len(files)):
         src = files[i]
         dst = os.path.join(user_dir, relpaths[i])
+        newfiles.append(dst)
 
         log.info('Copying file %s --> %s' % (src,dst))
 
@@ -74,7 +76,7 @@ def build_userspace(username):
         make_content_dir(username)
 
     # return the file paths that were moved
-    return relpaths
+    return newfiles
 
 
 def collect_files(dir):
