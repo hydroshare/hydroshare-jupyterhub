@@ -55,6 +55,7 @@ class JupyterHandler(RequestHandler):
         print(url)
 
         # redirect to ipynb
+        # Need to use OAuth, see http://www.tornadoweb.org/en/branch2.3/auth.html
         self.redirect(url, status=303)
 
 
