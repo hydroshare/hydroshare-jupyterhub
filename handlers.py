@@ -2,6 +2,7 @@ import tornado.web
 import os
 import utilities
 import socket
+import logging
 
 class RequestHandler(tornado.web.RequestHandler):
     def __init_(self):
@@ -34,9 +35,9 @@ class JupyterHandler(RequestHandler):
         username = self.get_or_error('username')
         resourcetype = self.get_or_error('resourcetype')
         resourceid = self.get_or_error('resourceid')
-        print('RECEIVED: '+username)
-        print('RECEIVED: '+resourcetype)
-        print('RECEIVED: '+resourceid)
+        
+        logging.info('Jupyter Handler RECEIVED: %s, %s, %s ' % (username, resourcetype, resourceid))
+        
         if not (username and resourcetype and resourceid): return
 
         # check to see if user exists
