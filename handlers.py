@@ -38,7 +38,7 @@ class JupyterHandler(RequestHandler):
         if not userinfo:
             self.write("<b>Encountered Error: </b> User '%s' does not exist on system" % username)
             return
-        print('User exists: %s'%username)
+        log.info('User %s exists on system' % username)
 
         # build userspace
         try:
@@ -58,7 +58,7 @@ class JupyterHandler(RequestHandler):
         # generate the redirect url
         baseurl = socket.gethostbyname(socket.gethostname())
         url = "http://%s/user/%s/notebooks/ipynbs/%s.ipynb" % (baseurl, username, resourcetype)
-        print(url)
+        log.info('Redirecting to url: %s' % url)
 
         # redirect to ipynb
         # Need to use OAuth, see http://www.tornadoweb.org/en/branch2.3/auth.html
