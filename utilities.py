@@ -86,8 +86,7 @@ def collect_files(dir):
 
 def insert_user_info_into_ipynb(ipynb_file, username, resource_id):
 
-    print('INSERTING %s INTO IPYNB'% username)
-    print('INSERTING %s INTO IPYNB'% resource_id)
+    log.info('Inserting the following params into %s: %s, %s' % (ipynb_file, username, resource_id))
 
     # load the ipynb as json
     with open(ipynb_file) as f:
