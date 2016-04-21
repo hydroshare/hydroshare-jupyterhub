@@ -4,6 +4,8 @@ import utilities
 import socket
 import logging
 
+log = logging.getLogger()
+
 class RequestHandler(tornado.web.RequestHandler):
     def __init_(self):
         super(RequestHandler, self)
