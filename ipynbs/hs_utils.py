@@ -1,7 +1,7 @@
 import os
 import getpass
 import socket
-from hs_restclient import HydroShare
+from hs_restclient import HydroShare, HydroShareAuthBasic
 
 
 def getSecureConnection(username):
