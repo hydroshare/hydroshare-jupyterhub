@@ -75,8 +75,8 @@ def build_userspace(username):
         # make content directory
         make_content_dir(username)
 
-        # return the file paths that were moved
-        return relpaths
+    # return the file paths that were moved
+    return relpaths
 
 
 def collect_files(dir):
