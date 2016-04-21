@@ -2,6 +2,7 @@
 
 import os
 import pwd
+import json
 import shutil
 from hs_restclient import HydroShare
 
@@ -76,5 +77,24 @@ def collect_files(dir):
             files_paths.append(os.path.join(os.path.abspath(root), file))
     return files_paths
 
+def insert_user_info_into_ipynbs(ipynb_file, username, resource_id):
 
+    # load the ipynb as json
+    with open(ipynb_file) as f:
+        data = json.load(f)
+
+    # replace keywords
+    for i in range(len(data['cells'])):
+        cell = data['cells'][i]
+        for j in range(len(cell['source'])):
+            data['cells'][i]['source'][j] = data['cells'][i]['source'][j].replace('INSERT_USERNAME', username)
+            data['cells'][i]['source'][j] = data['cells'][i]['source'][j].replace('INSERT_RESID', resource_id)
+
+    # rewrite the file
+    with open(ipynb_file, 'w') as f:
+        json.dump(data, f)
+
+
+                
+                
 
