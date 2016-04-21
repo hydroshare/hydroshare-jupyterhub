@@ -47,10 +47,10 @@ class JupyterHandler(RequestHandler):
             log.info('Userspace created')
 
             # loop through resourcetype notebooks and insert customization
-            #resource_specific_files = [f for f in fpaths if (resourcetype in f and f[-5:] == 'ipynb')]
-            #for r in resource_specific_files:
-            #    utilities.insert_user_info_into_ipynb(r, username, resourceid)
-            #    log.info('Finished customizing ipynb %s using the following params: %s, %s' % (r, username, resourceid))
+            resource_specific_files = [f for f in fpaths if (resourcetype in f and f[-5:] == 'ipynb')]
+            for r in resource_specific_files:
+                utilities.insert_user_info_into_ipynb(r, username, resourceid)
+                log.info('Finished customizing ipynb %s using the following params: %s, %s' % (r, username, resourceid))
         except Exception as e:
             self.write(e)
             return
