@@ -13,7 +13,11 @@ class Application(tornado.web.Application):
         handlers = [
             (r"/jupyter/?",resthandlers.JupyterHandler)
         ]
-        tornado.web.Application.__init__(self, handlers, debug=True)
+        settings = {
+            "debug":True,
+            "login_url":'http://129.123.51.34:80/',
+        }
+        tornado.web.Application.__init__(self, handlers, **settings)
 
 def main():
     app = Application()

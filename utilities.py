@@ -9,6 +9,13 @@ import logging
 
 log = logging.getLogger()
 
+
+def build_user_space(username):
+    """
+    Builds the userspace on the Jupyterhub server.  This userspace is volume mounted into the Docker JupyterHub container.
+    """
+    pass
+
 def get_user_info(username):
     try:
         userinfo = pwd.getpwnam(username)
