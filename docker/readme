@@ -1,0 +1,9 @@
+
+
+build the docker file, assuming that the Dockerfile resides in the current directory
+
+docker build -t [tag name] .
+
+
+
+
