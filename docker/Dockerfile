@@ -20,7 +20,6 @@ EXPOSE 8888
 
 USER root
 
-
 # install rhesyss library requirements
 #RUN apt-get install -y build-essential git
 
