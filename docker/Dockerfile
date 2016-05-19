@@ -20,8 +20,9 @@ EXPOSE 8888
 
 USER root
 
-# install rhesyss library requirements
-#RUN apt-get install -y build-essential git
+# update package lists
+RUN apt-get update && apt-get install -y \
+    libgeos-dev  # RHESYSS dependency
 
 # fetch juptyerhub-singleuser entrypoint
 RUN wget -q https://raw.githubusercontent.com/jupyterhub/jupyterhub/master/scripts/jupyterhub-singleuser -O /usr/local/bin/jupyterhub-singleuser && \
@@ -29,23 +30,42 @@ RUN wget -q https://raw.githubusercontent.com/jupyterhub/jupyterhub/master/scrip
 
 ADD singleuser.sh /srv/singleuser/singleuser.sh
 
+RUN ln -s /opt/conda/envs/python2/bin/python2 /usr/bin/python22
+
 USER jovyan 
 
 # setup base python 
 #RUN conda install -y conda-build
 
-# build rhesyss environment
-#RUN conda create -yn rhesyss python=2.7 pip requests && conda clean -yilts
+# prepare python environments
+RUN pip install --upgrade pip
+
+# INSTALL RHESYSS LIBS
+RUN cd .. && \
+mkdir tmp && \
+cd tmp && \
+git clone https://github.com/selimnairb/EcohydroLib.git && \
+cd EcohydroLib && \
+python22 setup.py install
+
+RUN conda install -y -n python2 gdal 
+
+env PATH /opt/conda/envs/python2/bin:$PATH
+#RUN export PATH=$PATH:/opt/conda/envs/python2/bin
+
+
+#  /bin/bash -c "source /opt/conda/bin/activate python2" && \
+#    /bin/bash -c "python setup.py install"
+
+
 
 # get rhesyss
-RUN git clone https://github.com/RHESSys/RHESSys_docker.git $HOME/rhesyss
-RUN cd $HOME/rhesyss && git submodule init && git submodule update
+#RUN git clone https://github.com/RHESSys/RHESSys_docker.git $HOME/rhesyss
+#RUN cd $HOME/rhesyss && git submodule init && git submodule update
 
-
-#RUN conda create -yn test python=3 pip requests && conda clean -yilts
 
 # smoke test that it's importable at least
-RUN sh /srv/singleuser/singleuser.sh -h
+#RUN sh /srv/singleuser/singleuser.sh -h
 CMD ["sh", "/srv/singleuser/singleuser.sh"]
 
 
