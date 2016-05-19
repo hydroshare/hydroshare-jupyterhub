@@ -59,6 +59,7 @@ mkdir libs
 #make 
 
 # add taudem binaries to system path
+env PATH $(cd ../libs/TauDEM; pwd):$PATH
 #env PATH ../libs/TauDEM:$PATH
 
 # link conda python2 (used by jupyterhub) to python22
