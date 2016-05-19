@@ -20,9 +20,23 @@ EXPOSE 8888
 
 USER root
 
-# update package lists
+############################
+# INSTALL SYSTEM LIBRARIES #
+############################
+
+# libgeos-dev  RHESYSS dependency
+# mpic++       TAUDEM dependency
+# libgdal-dev  TAUDEM dependency
+# libproj-dev  TAUDEM dependency
 RUN apt-get update && apt-get install -y \
-    libgeos-dev  # RHESYSS dependency
+libgeos-dev \  
+mpic++ \       
+libgdal-dev \
+libproj-dev    
+
+###############################
+# SETUP JUPYTERHUB ENTRYPOINT #
+###############################
 
 # fetch juptyerhub-singleuser entrypoint
 RUN wget -q https://raw.githubusercontent.com/jupyterhub/jupyterhub/master/scripts/jupyterhub-singleuser -O /usr/local/bin/jupyterhub-singleuser && \
@@ -30,9 +44,28 @@ RUN wget -q https://raw.githubusercontent.com/jupyterhub/jupyterhub/master/scrip
 
 ADD singleuser.sh /srv/singleuser/singleuser.sh
 
+##################
+# PREPARE TAUDEM #
+##################
+
+# create build/lib space for taudem and rhesyss
+RUN cd .. && \
+mkdir libs
+
+# install taudem (must happend before rhesyss b/c of gdal conflicts)
+#RUN cd ../libs && \
+#git clone https://github.com/dtarb/TauDEM.git && \
+#cd ./TauDEM/src && \
+#make 
+
+# add taudem binaries to system path
+#env PATH ../libs/TauDEM:$PATH
+
+# link conda python2 (used by jupyterhub) to python22
 RUN ln -s /opt/conda/envs/python2/bin/python2 /usr/bin/python22
 
 USER jovyan 
+
 
 # setup base python 
 #RUN conda install -y conda-build
@@ -40,18 +73,21 @@ USER jovyan
 # prepare python environments
 RUN pip install --upgrade pip
 
-# INSTALL RHESYSS LIBS
-RUN cd .. && \
-mkdir tmp && \
-cd tmp && \
-git clone https://github.com/selimnairb/EcohydroLib.git && \
-cd EcohydroLib && \
-python22 setup.py install
+###################
+# PREPARE RHESYSS #
+###################
 
-RUN conda install -y -n python2 gdal 
+# install rhesyss libs
+#RUN cd ../libs && \
+#git clone https://github.com/selimnairb/EcohydroLib.git && \
+#cd EcohydroLib && \
+#python22 setup.py install
 
-env PATH /opt/conda/envs/python2/bin:$PATH
-#RUN export PATH=$PATH:/opt/conda/envs/python2/bin
+# install gdal into python2 conda env
+#RUN conda install -y -n python2 gdal 
+
+# add rhesyss binaries to system path
+#env PATH /opt/conda/envs/python2/bin:$PATH
 
 
 #  /bin/bash -c "source /opt/conda/bin/activate python2" && \

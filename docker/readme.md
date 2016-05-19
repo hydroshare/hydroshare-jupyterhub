@@ -1,5 +1,10 @@
 
 
+start the docker service 
+
+`sudo service docker start`
+
+
 build the docker file, assuming that the Dockerfile resides in the current directory
 
 `cd docker`
