@@ -28,7 +28,9 @@ USER root
 # mpic++       TAUDEM dependency
 # libgdal-dev  TAUDEM dependency
 # libproj-dev  TAUDEM dependency
-RUN apt-get update && apt-get install -y \
+RUN apt-get clean && \
+apt-get update && \
+apt-get install -y \
 libgeos-dev \  
 mpic++ \       
 libgdal-dev \
@@ -49,18 +51,19 @@ ADD singleuser.sh /srv/singleuser/singleuser.sh
 ##################
 
 # create build/lib space for taudem and rhesyss
-RUN cd .. && \
-mkdir libs
+RUN mkdir ../libs && \
+chown -R jovyan:users ../libs
 
 # install taudem (must happend before rhesyss b/c of gdal conflicts)
-#RUN cd ../libs && \
-#git clone https://github.com/dtarb/TauDEM.git && \
-#cd ./TauDEM/src && \
-#make 
+RUN git clone https://github.com/dtarb/TauDEM.git ../libs/TauDEM && \
+cd ../libs/TauDEM/src && \
+make 
 
 # add taudem binaries to system path
-env PATH $(cd ../libs/TauDEM; pwd):$PATH
-#env PATH ../libs/TauDEM:$PATH
+ENV PATH /home/jovyan/libs/TauDEM:$PATH
+
+#ADD taudem_env /taudem_env
+#RUN /bin/bash -c "source /taudem_env" && \
 
 # link conda python2 (used by jupyterhub) to python22
 RUN ln -s /opt/conda/envs/python2/bin/python2 /usr/bin/python22
@@ -80,15 +83,41 @@ RUN pip install --upgrade pip
 
 # install rhesyss libs
 #RUN cd ../libs && \
-#git clone https://github.com/selimnairb/EcohydroLib.git && \
-#cd EcohydroLib && \
-#python22 setup.py install
+RUN git clone https://github.com/selimnairb/EcohydroLib.git ../libs/EcohydroLib && \
+cd ../libs/EcohydroLib && \
+python22 setup.py install
 
+
+
+###############################
+# PREPARE PYTHON ENVIRONMENTS #
+###############################
+
+# Python 3
+RUN conda install -y -n root \
+gdal 
+
+RUN pip3 install \ 
+hs_restclient
+#RUN /bin/bash -c "/opt/conda/bin/activate root" hs_restclient
+
+# Python 2
 # install gdal into python2 conda env
-#RUN conda install -y -n python2 gdal 
+RUN conda install -y -n python2 \
+gdal 
+
+RUN /bin/bash -c "source /opt/conda/bin/activate python2" &&  \
+pip install hs_restclient 
+
+######################
+# SET PATH VARIABLES #
+######################
 
 # add rhesyss binaries to system path
-#env PATH /opt/conda/envs/python2/bin:$PATH
+env PATH /opt/conda/envs/python2/bin:$PATH
+env PYTHONPATH /home/jovyan/work/notebooks/utilities:$PYTHONPATH
+env DOCUMENTS /home/jovyan/work/notebooks/documents
+env DATA /home/jovyan/work/notebooks/data
 
 
 #  /bin/bash -c "source /opt/conda/bin/activate python2" && \
