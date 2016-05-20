@@ -95,7 +95,8 @@ python22 setup.py install
 
 # Python 3
 RUN conda install -y -n root \
-gdal 
+gdal \
+basemap 
 
 RUN pip3 install \ 
 hs_restclient
@@ -104,7 +105,8 @@ hs_restclient
 # Python 2
 # install gdal into python2 conda env
 RUN conda install -y -n python2 \
-gdal 
+gdal \
+basemap
 
 RUN /bin/bash -c "source /opt/conda/bin/activate python2" &&  \
 pip install hs_restclient 
