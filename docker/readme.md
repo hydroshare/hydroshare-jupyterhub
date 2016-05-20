@@ -27,3 +27,8 @@ docker rm $(docker ps -a -q)
 docker rmi $(docker images -q)
 ```
 
+To update the volume mounts for a container, it just needs to be stopped, hen let jupyterhub restart it at next login.
+
+`docker stop [container id]`
+
+

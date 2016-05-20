@@ -39,11 +39,15 @@ class hydroshare():
 
         """
 
-        jupyter_username = getpass.getuser()
-        ip = socket.gethostbyname(socket.gethostname())
-        base_dir = 'http://%s/user/%s/tree/notebooks/data/' % (ip, jupyter_username)
-        dst = os.path.join(base_dir, destination)
-        self.hs.getResource(resourceid, destination=dst, unzip=True)
+        try:
+            default_dl_path = os.environ['DATA']
+            dst = os.path.abspath(os.path.join(default_dl_path, destination))
+            self.hs.getResource(resourceid, destination=dst, unzip=True)
+        except Exception as e:
+            print('Encountered an error when retrieving resource content from HydroShare: %s' % e)
+            return None
+        
+        print('Download successful.\nContent is located at: %s' % dst)
         return dst
 
 
