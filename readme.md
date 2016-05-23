@@ -8,9 +8,6 @@ This repository contains files for setting up and testing the HydroShare-Jupyter
 4. rest - a rest interface for accessing Jupyter notebooks from HydroShare
 4. test - test scripts, test website that envokes the rest endpoint
 
-
-## Server Setup
-
 Note: *These steps have only been tested on CentOS7*
 
 ### System Setup
@@ -49,19 +46,65 @@ Note: *These steps have only been tested on CentOS7*
 `firewall-cmd --zone=public --add-port=80/tcp --permanent`  
 `firewall-cmd --reload`  
 
-**check that the port was opened successfully**
+**check that the port was opened successfully**  
 `firewall-cmd --zone=public --list-ports`  
 
-**Create a group for notebook users**
+**Create a group for notebook users**  
 `groupadd jupyterhub`  
  
-**Create shadow group**  
+**Create shadow group**   
 `groupadd shadow`  
 `chown root.shadow /etc/shadow` 
 
-**Modify shadow folder permissions**
+**Modify shadow folder permissions**  
 `chmod 640 /etc/shadow`  
 
-**Give node permission to port 80**
+**Give node permission to port 80**  
 `sudo setcap 'cap_net_bind_service=+ep' /usr/bin/node`
 
+### DockerSpawner + OAuth 
+
+**install dockerspawner**    
+`cd [project_root]`
+`git clone https://github.com/jupyterhub/dockerspawner.git`  
+`cd dockerspawner`  
+`pip3 install -r requirements.txt`  
+`python3 setup.py install`  
+
+**install oauth library**  
+`cd [project_root]/oauthenticator`  
+`python3 setup.py install`  
+`cd ..`
+
+**set environment vars**  
+`cd [project_root]/jupyterhub`  
+`touch env`  
+```
+export HYDROSHARE_CLIENT_ID=[INSERT CLIENT ID]
+export HYDROSHARE_CLIENT_SECRET=[INSERT CLIENT SECRET]
+export OAUTH_CALLBACK_URL=http://[YOU IP ADDRESS]/hub/oauth_callback
+export HYDROSHARE_USE_WHITELIST=0
+export JUPYTER_NOTEBOOK_DIR=[PATH TO NOTEBOOKS]
+export JUPYTER_USERSPACE_DIR=[PATH TO USERSPACE]
+```
+
+### Build Docker Image  
+
+**install docker**   
+`sudo yum install docker` 
+
+**start the docker service**  
+`sudo service docker start`  
+
+**add user to docker group**  
+`sudo groupadd docker`  
+`sudo usermod -aG docker [username]`  
+`sudo service docker start`  
+
+**build the docker file**  
+`cd [project_root]/docker`  
+`docker build -t jupyterhub/singleuser  . `
+
+**Open the port to communicate with the docker container**  
+`sudo firewall-cmd --zone=public --add-port 8081/tcp --permanent`  
+`sudo firewall-cmd --reload`  
