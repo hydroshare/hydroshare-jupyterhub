@@ -16,11 +16,12 @@ Note: *These steps have only been tested on CentOS7*
 `yum check-update`  
 `yum update`  
 
-**Install SSH, GIT, VIM, and WGET**  
+**Install base libraries**  
 `yum install openssh-server`  
 `yum install git`  
 `yum install vim`  
 `yum install wget`
+`yum install screen`
 
 **Install Python 3**  
 `yum install epel-release`  
@@ -109,3 +110,12 @@ $vim env
 **Open the port to communicate with the docker container**  
 `sudo firewall-cmd --zone=public --add-port 8081/tcp --permanent`  
 `sudo firewall-cmd --reload`  
+
+### Run the server
+
+*Create a screen session*  
+`screen -S jupyter`  
+`cd [project_root]/jupyter`  
+`sudo ./run.py`
+`CTRL A+D`
+
