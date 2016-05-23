@@ -1,0 +1,3 @@
+[submodule "oauthenticator"]
+	path = oauthenticator
+	url = https://github.com/hydroshare/oauthenticator.git
