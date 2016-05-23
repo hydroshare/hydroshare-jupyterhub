@@ -80,12 +80,13 @@ Note: *These steps have only been tested on CentOS7*
 `cd [project_root]/jupyterhub`  
 `touch env`  
 ```
-export HYDROSHARE_CLIENT_ID=[INSERT CLIENT ID]
-export HYDROSHARE_CLIENT_SECRET=[INSERT CLIENT SECRET]
-export OAUTH_CALLBACK_URL=http://[YOU IP ADDRESS]/hub/oauth_callback
-export HYDROSHARE_USE_WHITELIST=0
-export JUPYTER_NOTEBOOK_DIR=[PATH TO NOTEBOOKS]
-export JUPYTER_USERSPACE_DIR=[PATH TO USERSPACE]
+$vim env
+  export HYDROSHARE_CLIENT_ID=[INSERT CLIENT ID]
+  export HYDROSHARE_CLIENT_SECRET=[INSERT CLIENT SECRET]
+  export OAUTH_CALLBACK_URL=http://[YOU IP ADDRESS]/hub/oauth_callback
+  export HYDROSHARE_USE_WHITELIST=0
+  export JUPYTER_NOTEBOOK_DIR=[PATH TO NOTEBOOKS]
+  export JUPYTER_USERSPACE_DIR=[PATH TO USERSPACE]
 ```
 
 ### Build Docker Image  
