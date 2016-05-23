@@ -1,6 +1,7 @@
 import os
 import getpass
 import socket
+import glob
 from hs_restclient import HydroShare, HydroShareAuthBasic, HydroShareHTTPException
 
 class hydroshare():
@@ -43,12 +44,21 @@ class hydroshare():
             default_dl_path = os.environ['DATA']
             dst = os.path.abspath(os.path.join(default_dl_path, destination))
             self.hs.getResource(resourceid, destination=dst, unzip=True)
+            outdir = os.path.join(dst, '%s/%s' % (resourceid, resourceid))
+            content_files = glob.glob(os.path.join(outdir,'data/contents/*'))
         except Exception as e:
             print('Encountered an error when retrieving resource content from HydroShare: %s' % e)
             return None
         
-        print('Download successful.\nContent is located at: %s' % dst)
-        return dst
+        print('Download successful.\nContent is located at: %s' % outdir)
+        print('\nFound the following content files: ')
+        content = {}
+        for f in content_files:
+            fname = os.path.basename(f)
+            content[fname] = f
+            print('\n[%s]: %s' % (fname,f))
+            
+        return content
 
 
 
