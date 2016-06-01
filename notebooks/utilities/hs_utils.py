@@ -7,8 +7,22 @@ from hs_restclient import HydroShare, HydroShareAuthBasic, HydroShareHTTPExcepti
 class hydroshare():
     def __init__(self):
         self.hs = None
+        self.load_env()
+        
+    def load_env(self):
+        env_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'env')
+        with open(env_path, 'r') as f:
+            lines = f.readlines()
+            print('Adding the following system variables:')
+            for line in lines:
+                k,v = line.strip().split('=')
+                os.environ[k] = v
+                print('   %s = %s' % (k, v))
+            print('\nThese can be accessed using the following command: ')
+            print('   os.environ[key]')
+            print('\n   (e.g.)\n   os.environ["HS_USR_NAME"]  => %s' % os.environ['HS_USR_NAME'])
 
-    def getSecureConnection(self, email):
+    def getSecureConnection(self, username):
         """
         Establishes a secure connection with HydroShare.
 
@@ -19,7 +33,7 @@ class hydroshare():
         """
 
         p = getpass.getpass('Enter you HydroShare Password: ')
-        auth = HydroShareAuthBasic(username=email, password=p)
+        auth = HydroShareAuthBasic(username=username, password=p)
         self.hs = HydroShare(auth=auth)
         
         try:
@@ -62,4 +76,6 @@ class hydroshare():
 
 
 
+# initialize
+hs = hydroshare()
 

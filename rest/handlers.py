@@ -43,14 +43,16 @@ class JupyterHandler(RequestHandler, tornado.auth.OAuth2Mixin):
         if not (resourcetype and resourceid and husername): return
 
         # make all usernames lowercase
-        husername = husername.lower()
+        username = husername.lower()
         resourcetype = resourcetype.lower()
- 
-        os.environ['TEST'] = '1'        
+	
+        # build userspace
+        utilities.build_userspace(username)
+        utilities.set_hydroshare_args(husername, resourceid, resourcetype)
  
         # generate the redirect url
         baseurl = socket.gethostbyname(socket.gethostname())
-        url = "http://%s/user/%s/tree/notebooks/examples/%s.ipynb" % (baseurl,husername, resourcetype)
+        url = "http://%s/user/%s/tree/notebooks/examples/%s.ipynb" % (baseurl,username, resourcetype)
         print('Redirecting to url: %s' % url)
 
         self.redirect(url, status=303)
