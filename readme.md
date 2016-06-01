@@ -119,3 +119,19 @@ $vim env
 `sudo ./run.py`
 `CTRL A+D`
 
+### Cleanup docker images (cron job)  
+Delete docker images after they have been active for 1 day.  This will ensure that the users environment is rebuilt with the latest notebooks periodically.  
+
+**make the cleanup script executable**  
+`cd [prject_root]/docker`  
+`chmod +x cleanup.sh`  
+
+**load the cleanup script into crontab**  
+`crontab cleanup.cron`  
+
+
+
+
+
+
+

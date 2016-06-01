@@ -1,0 +1,2 @@
+# 0-60 <minutes>, 0-23 <hours>, 1-31 <days>, 1-12 <months>, 0-7 <days of week>, script
+* * 1 * * sh /home/castro/jupyterhub/hydroshare-jupyterhub/docker/cleanup.sh
