@@ -45,55 +45,13 @@ class JupyterHandler(RequestHandler, tornado.auth.OAuth2Mixin):
         # make all usernames lowercase
         husername = husername.lower()
         resourcetype = resourcetype.lower()
-
  
-#        # check to see if user exists
-#        path = os.path.abspath(os.path.join('/home/castro/userspace', '%s/notebooks'%husername))
-#        if not os.path.exists(path):
-#            os.makedirs(path)
-#            #os.chown
-#            #os.chmod(path, 777)
-#        file_paths = []
-#        ipynb_dir = './notebooks'
-#        for root, dirs, files in os.walk(ipynb_dir):
-#            for file in files:
-#                file_paths.append(os.path.join(os.path.abspath(root), file))
-#        relpaths = [os.path.relpath(p, ipynb_dir) for p in file_paths]
-#        for i in range(0, len(file_paths)):
-#            src = file_paths[i]
-#            dst = os.path.join(path, relpaths[i])
-#            dirpath = os.path.dirname(dst)
-#            if not os.path.exists(dirpath):
-#                os.makedirs(dirpath)
-#            print('copying: %s -> %s' %(src,dst))
-#            shutil.copyfile(src, dst)
-            #    os.chmod(dst, 0o777)
-
-#        # build userspace
-#        try:
-#            # construct the userspace 
-#            fpaths = utilities.build_userspace(username)
-#            log.info('Userspace created')
-#
-#            # loop through resourcetype notebooks and insert customization
-#            resource_specific_files = [f for f in fpaths if (resourcetype in f and f[-5:] == 'ipynb')]
-#            for r in resource_specific_files:
-#                utilities.insert_user_info_into_ipynb(r, husername, resourceid)
-#        except Exception as e:
-#            self.write(e)
-#            return
-
+        os.environ['TEST'] = '1'        
+ 
         # generate the redirect url
         baseurl = socket.gethostbyname(socket.gethostname())
         url = "http://%s/user/%s/tree/notebooks/examples/%s.ipynb" % (baseurl,husername, resourcetype)
         print('Redirecting to url: %s' % url)
-
-        # redirect to ipynb
-        # Need to use OAuth, see http://www.tornadoweb.org/en/branch2.3/auth.html
-        #self.log.info('oauth2_request url')
-        #res = yield self.oauth2_request(
-        #    url,
-        #)
 
         self.redirect(url, status=303)
 
