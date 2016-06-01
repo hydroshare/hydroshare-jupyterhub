@@ -1,3 +1,5 @@
+import os
+
 # Configuration file for Jupyter Hub
 c = get_config()
 
