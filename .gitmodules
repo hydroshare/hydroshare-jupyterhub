@@ -3,4 +3,4 @@
 	url = https://github.com/hydroshare/oauthenticator.git
 [submodule "dockerspawner"]
 	path = dockerspawner
-	url = https://github.com/jupyterhub/dockerspawner.git
+	url = https://github.com/hydroshare/dockerspawner.git
