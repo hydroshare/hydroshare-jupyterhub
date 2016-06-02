@@ -9,9 +9,6 @@ import shutil
 from tornado.log import enable_pretty_logging
 enable_pretty_logging()
 
-#log = logging.getLogger()
-#log.setLevel(logging.DEBUG)
-
 class RequestHandler(tornado.web.RequestHandler):
     def __init_(self):
         super(RequestHandler, self)
@@ -30,10 +27,7 @@ class RequestHandler(tornado.web.RequestHandler):
         return arg
 
 class JupyterHandler(RequestHandler, tornado.auth.OAuth2Mixin):
-    #@tornado.web.authenticated
-    #@tornado.gen.coroutine
     def get(self):
-#        username = self.get_or_error('jusername')
         resourcetype = self.get_or_error('resourcetype')
         resourceid = self.get_or_error('resourceid')
         husername = self.get_or_error('husername')
