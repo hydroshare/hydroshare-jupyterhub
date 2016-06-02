@@ -2,7 +2,28 @@ import os
 import getpass
 import socket
 import glob
+import requests
+import threading
+import time
+import utils
 from hs_restclient import HydroShare, HydroShareAuthBasic, HydroShareHTTPException
+
+def sizeof_fmt(num, suffix='B'):
+    for unit in ['','Ki','Mi','Gi','Ti','Pi','Ei','Zi']:
+        if abs(num) < 1024.0:
+            return "%3.1f%s%s" % (num, unit, suffix)
+        num /= 1024.0
+    return "%.1f%s%s" % (num, 'Yi', suffix)
+
+def get_tree_size(path):
+    """Return total size of files in given path and subdirs."""
+    total = 0
+    for entry in os.scandir(path):
+        if entry.is_dir(follow_symlinks=False):
+            total += get_tree_size(entry.path)
+        else:
+            total += entry.stat(follow_symlinks=False).st_size
+    return total
 
 class hydroshare():
     def __init__(self):
@@ -43,7 +64,7 @@ class hydroshare():
             print(e)
             self.hs = None
 
-
+   
     def getResourceContent(self,resourceid, destination='.'):
         """
         Downloads the content of HydroShare resource to the JupyterHub userspace
@@ -57,23 +78,42 @@ class hydroshare():
         try:
             default_dl_path = os.environ['DATA']
             dst = os.path.abspath(os.path.join(default_dl_path, destination))
-            self.hs.getResource(resourceid, destination=dst, unzip=True)
+            
+            # get some metadata about the resource that will be downloaded
+            res_meta = hs.hs.getSystemMetadata(resourceid)
+            header = requests.head(res_meta['bag_url'])
+
+            # download the resource (threaded)
+            t = threading.Thread(target=self.hs.getResource, args=(resourceid,), kwargs={'destination':dst, 'unzip':False})
+            t.start()
+            
+            message = '    downloaded [%s]'
+            bar = utils.heartbeat(message, finish_message='Download Finished Successfully')
+            dl_file_path = os.path.join(dst, os.path.basename(header.headers['Location']))
+            print(dl_file_path)
+            while(t.isAlive()):
+                time.sleep(.1)
+                downloaded_size = sizeof_fmt(float(os.stat(dl_file_path).st_size))
+                bar.update(downloaded_size)
+            t.join()
+            bar.success()
+            
+            #self.hs.getResource(resourceid, destination=dst, unzip=True)
             outdir = os.path.join(dst, '%s/%s' % (resourceid, resourceid))
             content_files = glob.glob(os.path.join(outdir,'data/contents/*'))
         except Exception as e:
             print('Encountered an error when retrieving resource content from HydroShare: %s' % e)
             return None
         
-        print('Download successful.\nContent is located at: %s' % outdir)
+        print(20*'-')
+        print('Downloaded content is located at: %s' % outdir)
         print('\nFound the following content files: ')
         content = {}
         for f in content_files:
             fname = os.path.basename(f)
             content[fname] = f
             print('\n[%s]: %s' % (fname,f))
-            
         return content
-
 
 
 # initialize
