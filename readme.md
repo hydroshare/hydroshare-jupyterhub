@@ -107,8 +107,8 @@ $vim env
 
 *Create a screen session*  
 `screen -S jupyter`  
-`cd [project_root]/jupyter`  
-`sudo ./run.py`
+`cd [project_root]/jupyterhub`  
+`sudo ./run.sh`
 `CTRL A+D`
 
 ### Cleanup docker images (cron job)  
