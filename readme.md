@@ -17,29 +17,21 @@ Note: *These steps have only been tested on CentOS7*
 `yum update`  
 
 **Install base libraries**  
-`yum install openssh-server`  
-`yum install git`  
-`yum install vim`  
-`yum install wget`
-`yum install screen`
+`yum install -y openssh-server git vim wget screen`  
 
 **Install Python 3**  
-`yum install epel-release`  
-`yum install python34`  (`yum search python3`)  
-`yum install python34-devel`  
+`yum install -y epel-release python34 python34-devel`  
 
 **Install pip3**  
 `wget https://bootstrap.pypa.io/get-pip.py`  
 `python3 get-pip.py`  
 
 **install node**  
-`yum install nodejs`  
-`yum install npm`  
+`yum install -y nodejs npm`  
 `npm install -g configurable-http-proxy`  
 
 **install jupyterhub**  
-`pip3 install "ipython[notebook]"`  
-`pip3 install jupyterhub`   
+`pip3 install "ipython[notebook]" jupyterhub`  
 
 ### Web Server Setup
 
