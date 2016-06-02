@@ -1,4 +1,4 @@
-import os
+import os, sys
 import getpass
 import socket
 import glob
@@ -84,19 +84,24 @@ class hydroshare():
             header = requests.head(res_meta['bag_url'])
 
             # download the resource (threaded)
-            t = threading.Thread(target=self.hs.getResource, args=(resourceid,), kwargs={'destination':dst, 'unzip':False})
+            t = threading.Thread(target=self.hs.getResource, args=(resourceid,), kwargs={'destination':dst, 'unzip':True})
             t.start()
             
-            message = '    downloaded [%s]'
-            bar = utils.heartbeat(message, finish_message='Download Finished Successfully')
+            message = 'Downloading '
             dl_file_path = os.path.join(dst, os.path.basename(header.headers['Location']))
-            print(dl_file_path)
+            max_msg_len = 25
+            msg_len = max_msg_len
             while(t.isAlive()):
-                time.sleep(.1)
-                downloaded_size = sizeof_fmt(float(os.stat(dl_file_path).st_size))
-                bar.update(downloaded_size)
+                time.sleep(.25)    
+                if msg_len == max_msg_len:
+                    msg_len = 0
+                    sys.stdout.write('\r' + ' '*(len(message) + 11))
+                    sys.stdout.write('\r')
+                    print(message, end='') 
+                print('.',end='')
+                msg_len += 1
+            print('\rDownload Completed Successfully                         ')
             t.join()
-            bar.success()
             
             #self.hs.getResource(resourceid, destination=dst, unzip=True)
             outdir = os.path.join(dst, '%s/%s' % (resourceid, resourceid))
