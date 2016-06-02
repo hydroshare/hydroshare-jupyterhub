@@ -49,5 +49,12 @@ class JupyterHandler(RequestHandler, tornado.auth.OAuth2Mixin):
         url = "http://%s/user/%s/tree/notebooks/examples/%s.ipynb" % (baseurl,username, resourcetype)
         print('Redirecting to url: %s' % url)
 
+        # save the next url to ensure that the redirect will work
+        
+        p = '/usr/local/etc/.redirect_%s' % username
+        print('Writing redirect to:',p)
+        with open(p, 'w') as f:
+            f.write(url)
+
         self.redirect(url, status=303)
 
