@@ -98,9 +98,9 @@ RUN conda install -y -n root \
 gdal \
 basemap 
 
-RUN pip3 install \ 
-hs_restclient
-#RUN /bin/bash -c "/opt/conda/bin/activate root" hs_restclient
+#RUN pip3 install \ 
+#hs_restclient
+RUN pip3 install git+https://github.com/hydroshare/hs_restclient.git@2_and_3
 
 # Python 2
 # install gdal into python2 conda env

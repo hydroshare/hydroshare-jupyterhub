@@ -80,7 +80,7 @@ class hydroshare():
             dst = os.path.abspath(os.path.join(default_dl_path, destination))
             
             # get some metadata about the resource that will be downloaded
-            res_meta = hs.hs.getSystemMetadata(resourceid)
+            res_meta = self.hs.getSystemMetadata(resourceid)
             header = requests.head(res_meta['bag_url'])
 
             # download the resource (threaded)
