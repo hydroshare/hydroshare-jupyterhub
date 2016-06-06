@@ -55,12 +55,12 @@ Note: *These steps have only been tested on CentOS7*
 `chmod 640 /etc/shadow`  
 
 **Give node permission to port 80**  
-`sudo setcap 'cap_net_bind_service=+ep' /usr/bin/node`
+`sudo setcap 'cap_net_bind_service=+ep' /usr/bin/node`  
 
 ### DockerSpawner + OAuth 
 
 **install dockerspawner**    
-`cd [project_root]`
+`cd [project_root]`  
 `git clone https://github.com/jupyterhub/dockerspawner.git`  
 `cd dockerspawner`  
 `pip3 install -r requirements.txt`  
