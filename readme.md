@@ -84,6 +84,7 @@ These environment variables are loaded when the jupyterhub server is started.  T
   
   # HydroShare specific settings
   export HYDROSHARE_USE_WHITELIST=0
+  export HYDROSHARE_REDIRECT_COOKIE_PATH=[PATH TO STORE COOKIES]
   
   # Jupyter Notebook Settings.  These env vars are used to prepare the JupyterHub server during initialization (all required)
   export JUPYTER_NOTEBOOK_DIR=[PATH TO NOTEBOOKS]   
