@@ -72,9 +72,10 @@ Note: *These steps have only been tested on CentOS7*
 `cd ..`
 
 **set environment vars**  
-These environment variables are loaded when the jupyterhub server is started.  To keep the code generic, several additional variables have been added which are used in `jupyter_config.py` to prepare the jupyterhub environment. 
-`cd [project_root]/jupyterhub`  
-`vim env`  
+These environment variables are loaded when the jupyterhub server is started.  To keep the code generic, several additional variables have been added which are used in `jupyter_config.py` to prepare the jupyterhub environment.   
+
+`cd [project_root]/jupyterhub`   
+`vim env`   
 ```  
   # HydroShare OAuth Settings
   export HYDROSHARE_CLIENT_ID=[INSERT CLIENT ID]
