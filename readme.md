@@ -2,13 +2,15 @@
 This repository contains files for setting up and testing the HydroShare-Jupyterhub integration.  The project is subdivided into the following folders:
 
 1. docker - Dockerfile and associated scripts for setting up the HydroShare container
+2. dockerspawner - fork of the jupyterhub DockerSpawner project. 
 2. jupyterhub - the jupyterhub run and configuration directory
 3. notebooks - sample ipynbs that are copied into Jupyter userspace
-4. oauthenticator - an oauth2 plugin for hydroshare authentication
+4. oauthenticator - fork of the OAuthentivator project extended for hydroshare oauth2 authentication
 4. rest - a rest interface for accessing Jupyter notebooks from HydroShare
 4. test - test scripts, test website that envokes the rest endpoint
 
-Note: *These steps have only been tested on CentOS7*
+## Installation Instructions  
+Note: *These steps have only been tested on CentOS7*  
 
 ### System Setup
 
@@ -70,17 +72,28 @@ Note: *These steps have only been tested on CentOS7*
 `cd ..`
 
 **set environment vars**  
+These environment variables are loaded when the jupyterhub server is started.  To keep the code generic, several additional variables have been added which are used in `jupyter_config.py` to prepare the jupyterhub environment. 
 `cd [project_root]/jupyterhub`  
-`touch env`  
-```
-$vim env
+`vim env`  
+```  
+  # HydroShare OAuth Settings
   export HYDROSHARE_CLIENT_ID=[INSERT CLIENT ID]
   export HYDROSHARE_CLIENT_SECRET=[INSERT CLIENT SECRET]
   export OAUTH_CALLBACK_URL=http://[YOU IP ADDRESS]/hub/oauth_callback
+  
+  # HydroShare specific settings
   export HYDROSHARE_USE_WHITELIST=0
-  export JUPYTER_NOTEBOOK_DIR=[PATH TO NOTEBOOKS]
-  export JUPYTER_USERSPACE_DIR=[PATH TO USERSPACE]
+  
+  # Jupyter Notebook Settings.  These env vars are used to prepare the JupyterHub server during initialization (all required)
+  export JUPYTER_NOTEBOOK_DIR=[PATH TO NOTEBOOKS]   # this can contain {username} which will be replaced with the current users name
+  export JUPYTER_USERSPACE_DIR=[PATH TO USERSPACE]  # this can contain {username} which will be replaced with the current users name
+  export JUPYTER_IP=[SERVER IP ADDRESS]
+  export JUPYTER_PORT=[PORT FOR JUPYTER TO LISTEN]
+  export JUPYTER_LOG=[LOG FILE LOCATION]
 ```
+
+
+
 
 ### Build Docker Image  
 
