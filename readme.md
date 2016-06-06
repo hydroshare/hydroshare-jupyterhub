@@ -86,11 +86,17 @@ These environment variables are loaded when the jupyterhub server is started.  T
   export HYDROSHARE_USE_WHITELIST=0
   
   # Jupyter Notebook Settings.  These env vars are used to prepare the JupyterHub server during initialization (all required)
-  export JUPYTER_NOTEBOOK_DIR=[PATH TO NOTEBOOKS]   # this can contain {username} which will be replaced with the current users name
-  export JUPYTER_USERSPACE_DIR=[PATH TO USERSPACE]  # this can contain {username} which will be replaced with the current users name
+  export JUPYTER_NOTEBOOK_DIR=[PATH TO NOTEBOOKS]   
+  export JUPYTER_USERSPACE_DIR=[PATH TO USERSPACE]  
   export JUPYTER_IP=[SERVER IP ADDRESS]
   export JUPYTER_PORT=[PORT FOR JUPYTER TO LISTEN]
   export JUPYTER_LOG=[LOG FILE LOCATION]
+  export JUPYTER_USER=[LINUX SYSTEM USER]
+ 
+  # Jupyterhub REST Settings
+  export JUPYTER_REST_PORT=[POST FOR REST SERVER TO LISTEN]
+  export JUPYTER_REST_IP=[REST SERVER IP ADDRESS]
+ 
 ```
 
 
