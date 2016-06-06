@@ -39,6 +39,7 @@ Note: *These steps have only been tested on CentOS7*
 
 **open firewall ports**  
 `firewall-cmd --zone=public --add-port=80/tcp --permanent`  
+`firewall-cmd --zone=public --add-port=8080/tcp --permanent`  
 `firewall-cmd --reload`  
 
 **check that the port was opened successfully**  
