@@ -46,15 +46,18 @@ class JupyterHandler(RequestHandler, tornado.auth.OAuth2Mixin):
  
         # generate the redirect url
         baseurl = socket.gethostbyname(socket.gethostname())
+        # todo: check that this path exists before setting it as redirect, otherwise set welcome path
         url = "http://%s/user/%s/tree/notebooks/examples/%s.ipynb" % (baseurl,username, resourcetype)
         print('Redirecting to url: %s' % url)
 
         # save the next url to ensure that the redirect will work
-        
-        p = '/usr/local/etc/.redirect_%s' % username
-        print('Writing redirect to:',p)
+	
+        p = os.path.join(os.environ['HYDROSHARE_REDIRECT_COOKIE_PATH'], '.redirect_%s' % username)        
+#        p = '/usr/local/etc/.redirect_%s' % username
+#        print('Writing redirect to:',p)
         with open(p, 'w') as f:
             f.write(url)
 
+        # redirect to the desired page
         self.redirect(url, status=303)
 
