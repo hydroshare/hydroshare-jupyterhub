@@ -15,12 +15,6 @@ try:
 except Exception as e:
     print('Error setting JupyterHub settings from environment variables.  Please make sure that the following environment variables are set properly in ./env:\n  JUPYER_PORT\n  JUPYTER_IP\n  JUPYTER_LOG\n  JUPYTER_USERSPACE_DIR\n\n%s' % e)
 
-#c.JupyterHub.port = 80
-#c.DockerSpawner.hub_ip_connect = '129.123.51.34'
-#c.JupyterHub.hub_ip = '129.123.51.34'
-#c.JupyterHub.extra_log_file = './jupyterhub.log'
-
-
 # OAuth with HydroShare
 c.JupyterHub.authenticator_class = 'oauthenticator.HydroShareOAuthenticator'
 c.HydroShareOAuthenticator.oauth_callback_url = os.environ['OAUTH_CALLBACK_URL']
@@ -29,7 +23,6 @@ c.HydroShareOAuthenticator.oauth_callback_url = os.environ['OAUTH_CALLBACK_URL']
 print('USERSPACE: ',userspace)
 c.DockerSpawner.volumes = {
     userspace: '/home/jovyan/work',
-#    '/home/castro/userspace/{username}': '/home/jovyan/work',
 }
 
 
