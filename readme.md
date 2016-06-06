@@ -27,6 +27,7 @@ Note: *These steps have only been tested on CentOS7*
 **Install pip3**  
 `wget https://bootstrap.pypa.io/get-pip.py`  
 `python3 get-pip.py`  
+`pip3 install ipgetter`  
 
 **install node**  
 `yum install -y nodejs npm`  
