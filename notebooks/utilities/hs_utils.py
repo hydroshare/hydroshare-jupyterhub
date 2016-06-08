@@ -7,6 +7,7 @@ import threading
 import time
 import utils
 import yaml
+from IPython.core.display import display, HTML
 from hs_restclient import HydroShare, HydroShareAuthBasic, HydroShareHTTPException
 
 def sizeof_fmt(num, suffix='B'):
@@ -37,6 +38,22 @@ def find_resource_directory(resid):
                 return os.path.join(dirpath, dirname)
     return None
 
+def check_for_ipynb(content_files):
+
+    links = {}
+    for f in content_files:
+        if f[-5:] == 'ipynb':
+            fname = os.path.basename(f)
+            rel_path = os.path.relpath(f, os.environ['HOME'])
+            url = '%s%s/notebooks/notebooks/%s' % (':'.join(os.environ['JPY_HUB_API_URL'].split(':')[:-1]),os.environ['JPY_BASE_URL'], rel_path)
+            links[fname] = url
+
+    if len(links) > 0:
+        print ('\nI found the following notebook(s) associated with this HydroShare resource.')
+        print('Click the link(s) below if you wish to navigate away from this page')
+        for name, url in links.items():
+            display(HTML('<a href=%s>%s<a>' % (url, name)))
+    
 class hydroshare():
     def __init__(self):
         self.hs = None
@@ -129,6 +146,9 @@ class hydroshare():
             fname = os.path.basename(f)
             content[fname] = f
             print('\n[%s]: %s' % (fname,f))
+            
+        check_for_ipynb(content_files)
+        
         return content
 
     def getDownloadedResource(self, resourceid):
@@ -148,6 +168,9 @@ class hydroshare():
             content[fname] = f
         # use yaml for pretty printing
         print(yaml.dump(content, default_flow_style=False))
+        
+        check_for_ipynb(content_files)
+        
         return content
 
             
