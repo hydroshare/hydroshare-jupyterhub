@@ -98,6 +98,8 @@ RUN conda install -y -n root \
 gdal \
 basemap 
 
+RUN conda install landlab -c landlab
+
 #RUN pip3 install \ 
 #hs_restclient
 RUN pip3 install git+https://github.com/hydroshare/hs_restclient.git@2_and_3
@@ -120,6 +122,7 @@ env PATH /opt/conda/envs/python2/bin:$PATH
 env PYTHONPATH /home/jovyan/work/notebooks/utilities:$PYTHONPATH
 env DOCUMENTS /home/jovyan/work/notebooks/documents
 env DATA /home/jovyan/work/notebooks/data
+env HOME /home/jovyan/work/notebooks
 
 
 #  /bin/bash -c "source /opt/conda/bin/activate python2" && \

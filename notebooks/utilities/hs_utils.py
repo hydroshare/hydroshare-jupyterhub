@@ -6,6 +6,7 @@ import requests
 import threading
 import time
 import utils
+import yaml
 from hs_restclient import HydroShare, HydroShareAuthBasic, HydroShareHTTPException
 
 def sizeof_fmt(num, suffix='B'):
@@ -25,12 +26,22 @@ def get_tree_size(path):
             total += entry.stat(follow_symlinks=False).st_size
     return total
 
+def find_resource_directory(resid):
+   
+    basedir = os.environ['HOME']
+   
+    # loop over all the files in userspace
+    for dirpath, dirnames, filenames in os.walk(basedir):
+        for dirname in [d for d in dirnames]:
+            if dirname == resid:
+                return os.path.join(dirpath, dirname)
+    return None
+
 class hydroshare():
     def __init__(self):
         self.hs = None
-        self.load_env()
         
-    def load_env(self):
+    def load_environment(self):
         env_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'env')
         with open(env_path, 'r') as f:
             lines = f.readlines()
@@ -120,7 +131,26 @@ class hydroshare():
             print('\n[%s]: %s' % (fname,f))
         return content
 
+    def getDownloadedResource(self, resourceid):
+        
+        resdir = find_resource_directory(resourceid)
+        if resdir is None:
+            print('Could not find any resource matching the id: %s. If this HydroShare resource has not been downloaded yet, use the getResourceContent function')
+            return
+        
+        content_files = glob.glob(os.path.join(resdir,'%s/data/contents/*' % resourceid))
+        print('\nDownloaded content is located at: %s' % resdir)
+        print('These data are placed in a dictionary for easy access.')
+        print('Found %d content file(s). \n' % len(content_files))
+        content = {}
+        for f in content_files:
+            fname = os.path.basename(f)
+            content[fname] = f
+        # use yaml for pretty printing
+        print(yaml.dump(content, default_flow_style=False))
+        return content
 
+            
 # initialize
 hs = hydroshare()
 
