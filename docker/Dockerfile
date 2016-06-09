@@ -96,9 +96,8 @@ python22 setup.py install
 # Python 3
 RUN conda install -y -n root \
 gdal \
-basemap 
-
-RUN conda install landlab -c landlab
+basemap \
+landlab -c landlab
 
 #RUN pip3 install \ 
 #hs_restclient
@@ -108,10 +107,11 @@ RUN pip3 install git+https://github.com/hydroshare/hs_restclient.git@2_and_3
 # install gdal into python2 conda env
 RUN conda install -y -n python2 \
 gdal \
-basemap
+basemap \
+landlab -c landlab
 
 RUN /bin/bash -c "source /opt/conda/bin/activate python2" &&  \
-pip install hs_restclient 
+pip install hs_restclient
 
 ######################
 # SET PATH VARIABLES #

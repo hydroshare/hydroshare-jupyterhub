@@ -49,14 +49,29 @@ def check_for_ipynb(content_files):
             links[fname] = url
 
     if len(links) > 0:
-        print ('\nI found the following notebook(s) associated with this HydroShare resource.')
-        print('Click the link(s) below if you wish to navigate away from this page')
+        display(HTML('<h3>I found the following notebook(s) associated with this HydroShare resource.</h3>'))
+        display(HTML('Click the link(s) below if you wish to load a different Python notebook'))
         for name, url in links.items():
             display(HTML('<a href=%s>%s<a>' % (url, name)))
+
+def display_resource_content_files(content_file_dictionary):
     
+    display(HTML('<h3>Found the following content when parsing the HydroShare resource:</h3>'))
+    table_str = '<table>'
+    table_str += '<th>Key</th><th>Value</th>'
+    for k,v in content_file_dictionary.items():
+        table_str += '<tr style="word-break: break-word;">'
+        table_str += '<td width="20%%">%s</td><td>%s</td>' % (k,v)
+        table_str += '</tr>'
+    table_str += '</table>'
+    display(HTML(table_str))
+    display(HTML('<p>To access these variables issue the following command: <br> <code>   my_value = hs.content["key"] </code><p>'))
+    
+        
 class hydroshare():
     def __init__(self):
         self.hs = None
+        self.content = {}
         
     def load_environment(self):
         env_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'env')
@@ -87,13 +102,13 @@ class hydroshare():
         
         try:
             self.hs.getUserInfo()
-            print('Successfully established a connection with HydroShare')
+            display(HTML('<b style="color:green;">Successfully established a connection with HydroShare</b>'))
         except HydroShareHTTPException as e:
-            print(e)
+            display(HTML('<p style="color:red;"><b>Failed to establish a connection with HydroShare.  Please check that you provided the correct credentials</b><br>%s </p>' % e))
             self.hs = None
 
    
-    def getResourceContent(self,resourceid, destination='.'):
+    def getResourceFromHydroShare(self,resourceid, destination='.'):
         """
         Downloads the content of HydroShare resource to the JupyterHub userspace
 
@@ -128,30 +143,30 @@ class hydroshare():
                     print(message, end='') 
                 print('.',end='')
                 msg_len += 1
-            print('\rDownload Completed Successfully                         ')
+            print('\r                                                              ')
+            display(HTML('<b style="color:green;">Download Completed Successfully</h3>'))
             t.join()
             
             #self.hs.getResource(resourceid, destination=dst, unzip=True)
             outdir = os.path.join(dst, '%s/%s' % (resourceid, resourceid))
             content_files = glob.glob(os.path.join(outdir,'data/contents/*'))
         except Exception as e:
-            print('Encountered an error when retrieving resource content from HydroShare: %s' % e)
+            print('<b style="color:red">Failed to retrieve resource content from HydroShare: %s</b>' % e)
             return None
+
+        display(HTML('Downloaded content is located at: %s' % outdir))
         
-        print(20*'-')
-        print('Downloaded content is located at: %s' % outdir)
-        print('\nFound the following content files: ')
         content = {}
         for f in content_files:
             fname = os.path.basename(f)
             content[fname] = f
-            print('\n[%s]: %s' % (fname,f))
-            
+
+        display_resource_content_files(content)
         check_for_ipynb(content_files)
         
-        return content
+        self.content = content
 
-    def getDownloadedResource(self, resourceid):
+    def loadResource(self, resourceid):
         
         resdir = find_resource_directory(resourceid)
         if resdir is None:
@@ -159,19 +174,17 @@ class hydroshare():
             return
         
         content_files = glob.glob(os.path.join(resdir,'%s/data/contents/*' % resourceid))
-        print('\nDownloaded content is located at: %s' % resdir)
-        print('These data are placed in a dictionary for easy access.')
-        print('Found %d content file(s). \n' % len(content_files))
+        display(HTML('<p>Downloaded content is located at: %s</p>' % resdir))
+        display(HTML('<p>Found %d content file(s). \n</p>' % len(content_files)))
         content = {}
         for f in content_files:
             fname = os.path.basename(f)
             content[fname] = f
-        # use yaml for pretty printing
-        print(yaml.dump(content, default_flow_style=False))
         
+        display_resource_content_files(content)
         check_for_ipynb(content_files)
         
-        return content
+        self.content = content
 
             
 # initialize
