@@ -9,6 +9,9 @@ import utils
 import yaml
 from IPython.core.display import display, HTML
 from hs_restclient import HydroShare, HydroShareAuthBasic, HydroShareHTTPException
+import queue
+
+threadResults = queue.Queue()
 
 def sizeof_fmt(num, suffix='B'):
     for unit in ['','Ki','Mi','Gi','Ti','Pi','Ei','Zi']:
@@ -52,7 +55,7 @@ def check_for_ipynb(content_files):
         display(HTML('<h3>I found the following notebook(s) associated with this HydroShare resource.</h3>'))
         display(HTML('Click the link(s) below if you wish to load a different Python notebook'))
         for name, url in links.items():
-            display(HTML('<a href=%s>%s<a>' % (url, name)))
+            display(HTML('<a href=%s target="_blank">%s<a>' % (url, name)))
 
 def display_resource_content_files(content_file_dictionary):
     
@@ -67,11 +70,61 @@ def display_resource_content_files(content_file_dictionary):
     display(HTML(table_str))
     display(HTML('<p>To access these variables issue the following command: <br> <code>   my_value = hs.content["key"] </code><p>'))
     
-        
+def runThreadedFunction(t, msg, success):
+
+    # start the thread
+    t.start()
+
+    # add some padding to the message
+    message = msg+' ' if msg[-1] != ' ' else msg
+ 
+    # print message while 
+    max_msg_len = 25
+    msg_len = max_msg_len
+    while(t.isAlive()):
+        time.sleep(.25)    
+        if msg_len == max_msg_len:
+            msg_len = 0
+            sys.stdout.write('\r' + ' '*(len(message) + 11))
+            sys.stdout.write('\r')
+            print(message, end='')     
+        print('.',end='')
+        msg_len += 1
+    
+    # join the thread
+    print('\r' + (len(message) + 10)*' ')
+    display(HTML('<b style="color:green;">%s</b>' % success))
+    
+    res = None
+    if not threadResults.empty():
+        res = threadResults.get()
+      
+    t.join()
+    return res
+            
+    
 class hydroshare():
     def __init__(self):
         self.hs = None
         self.content = {}
+        
+    def _getResourceFromHydroShare(self, resourceid, destination='.', unzip=True):
+        # download the resource
+        pid = self.hs.getResource(resourceid, destination=destination, unzip=unzip)
+        threadResults.put(pid)
+    
+    def _createHydroShareResource(self, res_type, title, abstract, content_file,              
+                                  keywords=[]):
+        
+        resid = self.hs.createResource(res_type, title, resource_file=content_file, 
+                                       keywords=keywords, abstract=abstract)
+        threadResults.put(resid)
+    
+    def _addContentToExistingResource(self, resid, content_files):
+   
+        for f in content_files:
+            self.hs.addResourceFile(resid, f)
+            
         
     def load_environment(self):
         env_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'env')
@@ -107,8 +160,30 @@ class hydroshare():
             display(HTML('<p style="color:red;"><b>Failed to establish a connection with HydroShare.  Please check that you provided the correct credentials</b><br>%s </p>' % e))
             self.hs = None
 
-   
-    def getResourceFromHydroShare(self,resourceid, destination='.'):
+
+    def createHydroShareResource(self, abstract, title, keywords=[], resource_type='GenericResource', content_files=[], public=False):
+        
+        # query the hydroshare resource types and make sure that resource_type is valid
+        restypes = {r.lower():r for r in hs.hs.getResourceTypes()}
+        try:
+            res_type = restypes[resource_type]
+        except KeyError:
+            display(HTML('<b style="color:red;">[%s] is not a valid HydroShare resource type.</p>' % resource_type))
+        
+        f = None if len(content_files) == 0 else content_files[0]
+
+        # create the hs resource (1 content file allowed)
+        t = threading.Thread(target=self._createHydroShareResource, args=(res_type, title, abstract, f), kwargs={'keywords':keywords})
+        resid = runThreadedFunction(t, msg='Creating HydroShare Resource', success='Resource Creation Successful')
+
+        # add the remaining content files to the hs resource
+        self.addContentToExistingResource(resid, content_files[1:])
+                                                                           
+        
+        display(HTML('Resource id: %s' % resid))
+        display(HTML('<a href=%s target="_blank">%s<a>' % ('https://www.hydroshare.org/resource/%s' % resid, 'Open Resource in HydroShare')))
+        
+    def getResourceFromHydroShare(self, resourceid, destination='.'):
         """
         Downloads the content of HydroShare resource to the JupyterHub userspace
 
@@ -127,26 +202,10 @@ class hydroshare():
             header = requests.head(res_meta['bag_url'])
 
             # download the resource (threaded)
-            t = threading.Thread(target=self.hs.getResource, args=(resourceid,), kwargs={'destination':dst, 'unzip':True})
-            t.start()
-            
-            message = 'Downloading '
-            dl_file_path = os.path.join(dst, os.path.basename(header.headers['Location']))
-            max_msg_len = 25
-            msg_len = max_msg_len
-            while(t.isAlive()):
-                time.sleep(.25)    
-                if msg_len == max_msg_len:
-                    msg_len = 0
-                    sys.stdout.write('\r' + ' '*(len(message) + 11))
-                    sys.stdout.write('\r')
-                    print(message, end='') 
-                print('.',end='')
-                msg_len += 1
-            print('\r                                                              ')
-            display(HTML('<b style="color:green;">Download Completed Successfully</h3>'))
-            t.join()
-            
+            t = threading.Thread(target=self._getResourceFromHydroShare, 
+                                 args=(resourceid,), kwargs={'destination':dst, 'unzip':True})
+            runThreadedFunction(t, msg='Downloading', success='Download Completed Successfully')
+                        
             #self.hs.getResource(resourceid, destination=dst, unzip=True)
             outdir = os.path.join(dst, '%s/%s' % (resourceid, resourceid))
             content_files = glob.glob(os.path.join(outdir,'data/contents/*'))
@@ -165,7 +224,11 @@ class hydroshare():
         check_for_ipynb(content_files)
         
         self.content = content
-
+        
+    def addContentToExistingResource(self, resid, content):
+        t = threading.Thread(target=self._addContentToExistingResource, args=(resid, content))
+        runThreadedFunction(t, msg='Adding Content to Resource', success='Successfully Added Content Files') 
+    
     def loadResource(self, resourceid):
         
         resdir = find_resource_directory(resourceid)
