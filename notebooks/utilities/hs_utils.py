@@ -57,6 +57,9 @@ def check_for_ipynb(content_files):
         for name, url in links.items():
             display(HTML('<a href=%s target="_blank">%s<a>' % (url, name)))
 
+def check_for_ipynbs_by_keyword():    
+    pass
+            
 def display_resource_content_files(content_file_dictionary):
     
     display(HTML('<h3>Found the following content when parsing the HydroShare resource:</h3>'))
@@ -233,7 +236,7 @@ class hydroshare():
         
         resdir = find_resource_directory(resourceid)
         if resdir is None:
-            print('Could not find any resource matching the id: %s. If this HydroShare resource has not been downloaded yet, use the getResourceContent function')
+            display(HTML('<b style="color:red">Could not find any resource matching the id [%s].</b> <br> It is likely that this resource has not yet been downloaded from HydroShare.org, or it was removed from the JupyterHub server.   Please use the following command to aquire the resource content: <br><br> <code>    hs.getResourceFromHydroShare(%s)</code>.' % (resourceid, resourceid)))
             return
         
         content_files = glob.glob(os.path.join(resdir,'%s/data/contents/*' % resourceid))
