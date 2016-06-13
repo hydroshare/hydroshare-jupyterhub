@@ -57,7 +57,14 @@ def check_for_ipynb(content_files):
         for name, url in links.items():
             display(HTML('<a href=%s target="_blank">%s<a>' % (url, name)))
 
-def check_for_ipynbs_by_keyword():    
+def check_for_ipynbs_by_keyword(resid): 
+    
+    try:
+        res_meta = hs.hs.getSystemMetadata(resid)
+    except Exception as e:
+        display(HTML('<b style="color:red">Failed to retrieve metadata for resource id [%s].</b> <br> Please make sure that this resource id exists on HydroShare.org.' % (resourceid)))
+    
+    return res_meta
     pass
             
 def display_resource_content_files(content_file_dictionary):
@@ -213,7 +220,7 @@ class hydroshare():
             outdir = os.path.join(dst, '%s/%s' % (resourceid, resourceid))
             content_files = glob.glob(os.path.join(outdir,'data/contents/*'))
         except Exception as e:
-            print('<b style="color:red">Failed to retrieve resource content from HydroShare: %s</b>' % e)
+            display(HTML('<b style="color:red">Failed to retrieve resource content from HydroShare: %s</b>' % e))
             return None
 
         display(HTML('Downloaded content is located at: %s' % outdir))
