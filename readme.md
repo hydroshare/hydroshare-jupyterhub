@@ -14,6 +14,11 @@ Note: *These steps have only been tested on CentOS7*
 
 ### System Setup
 
+**Add user to sudoers**  
+`su`  
+`usermod -aG wheel [jupyter-user]`  
+logout and log back in again  
+
 **Update the system**  
 `yum check-update`  
 `yum update`  
