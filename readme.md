@@ -72,15 +72,18 @@ logout and log back in again
 
 **install dockerspawner**    
 `cd [project_root]`  
-`git clone https://github.com/jupyterhub/dockerspawner.git`  
-`cd dockerspawner`  
+`git clone https://github.com/hydroshare/hydroshare-jupyterhub.git` 
+`git submodule init`  
+`git submodule update`  
+
+`cd [project_root]/hydroshare-jupyterhub/dockerspawner`  
 `pip3 install -r requirements.txt`  
 `python3 setup.py install`  
 
 **install oauth library**  
-`cd [project_root]/oauthenticator`  
+`cd [project_root]/hydroshare-jupyterhub/oauthenticator` 
+`pip3 install -r requirements.txt`    
 `python3 setup.py install`  
-`cd ..`
 
 **set environment vars**  
 These environment variables are loaded when the jupyterhub server is started.  To keep the code generic, several additional variables have been added which are used in `jupyter_config.py` to prepare the jupyterhub environment.   
