@@ -50,6 +50,7 @@ logout and log back in again
 **open firewall ports**  
 `firewall-cmd --zone=public --add-port=80/tcp --permanent`  
 `firewall-cmd --zone=public --add-port=8080/tcp --permanent`  
+`firewall-cmd --zone=public --add-port 8081/tcp --permanent`  
 `firewall-cmd --reload`  
 
 **check that the port was opened successfully**  
@@ -132,10 +133,6 @@ These environment variables are loaded when the jupyterhub server is started.  T
 **build the docker file**  
 `cd [project_root]/docker`  
 `docker build -t jupyterhub/singleuser  . `
-
-**Open the port to communicate with the docker container**  
-`sudo firewall-cmd --zone=public --add-port 8081/tcp --permanent`  
-`sudo firewall-cmd --reload`  
 
 ### Run the server
 
