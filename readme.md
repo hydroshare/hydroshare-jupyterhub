@@ -12,7 +12,7 @@ This repository contains files for setting up and testing the HydroShare-Jupyter
 ## Installation Instructions  
 Note: *These steps have only been tested on CentOS7*  
 
-### System Setup
+### Core System Setup
 
 **Add user to sudoers**  
 `su`  
@@ -27,6 +27,8 @@ logout and log back in again
 
 **Install base libraries**  
 `yum install -y openssh-server git vim wget screen`  
+
+### Prereq Libraries
 
 **Install Python 3**  
 `yum install -y epel-release python34 python34-devel`  
