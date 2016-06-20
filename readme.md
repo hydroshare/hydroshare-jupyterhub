@@ -72,7 +72,7 @@ logout and log back in again
 
 **install dockerspawner**    
 `cd [project_root]`  
-`git clone https://github.com/hydroshare/hydroshare-jupyterhub.git` 
+`git clone https://github.com/hydroshare/hydroshare-jupyterhub.git`  
 `git submodule init`  
 `git submodule update`  
 
@@ -81,7 +81,7 @@ logout and log back in again
 `python3 setup.py install`  
 
 **install oauth library**  
-`cd [project_root]/hydroshare-jupyterhub/oauthenticator` 
+`cd [project_root]/hydroshare-jupyterhub/oauthenticator`  
 `pip3 install -r requirements.txt`    
 `python3 setup.py install`  
 
