@@ -128,7 +128,6 @@ These environment variables are loaded when the jupyterhub server is started.  T
 **add user to docker group**  
 `sudo groupadd docker`  
 `sudo usermod -aG docker [username]`  
-`sudo service docker start`  
 
 **build the docker file**  
 `cd [project_root]/docker`  
