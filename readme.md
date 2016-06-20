@@ -109,10 +109,11 @@ These environment variables are loaded when the jupyterhub server is started.  T
   # Jupyter Notebook Settings.  These env vars are used to prepare the JupyterHub server during initialization (all required)
   export JUPYTER_NOTEBOOK_DIR=[PATH TO NOTEBOOKS]   
   export JUPYTER_USERSPACE_DIR=[PATH TO USERSPACE]  
-  export JUPYTER_IP=[SERVER IP ADDRESS]
+  export JUPYTER_HUB_IP=[SERVER IP ADDRESS]
   export JUPYTER_PORT=[PORT FOR JUPYTER TO LISTEN]
   export JUPYTER_LOG=[LOG FILE LOCATION]
   export JUPYTER_USER=[LINUX SYSTEM USER]
+  export DOCKER_SPAWNER_IP=[IP ADDRESS WHERE DOCKER WILL SPAWN CONTAINERS (usually, 8081)]
  
   # Jupyterhub REST Settings
   export JUPYTER_REST_PORT=[PORT FOR REST SERVER TO LISTEN]
