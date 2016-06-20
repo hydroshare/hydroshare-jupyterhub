@@ -94,7 +94,7 @@ These environment variables are loaded when the jupyterhub server is started.  T
   # HydroShare OAuth Settings
   export HYDROSHARE_CLIENT_ID=[INSERT CLIENT ID]
   export HYDROSHARE_CLIENT_SECRET=[INSERT CLIENT SECRET]
-  export OAUTH_CALLBACK_URL=http://[YOU IP ADDRESS]/hub/oauth_callback
+  export OAUTH_CALLBACK_URL=http://[YOUR IP ADDRESS]/hub/oauth_callback
   
   # HydroShare specific settings
   export HYDROSHARE_USE_WHITELIST=0
@@ -109,7 +109,7 @@ These environment variables are loaded when the jupyterhub server is started.  T
   export JUPYTER_USER=[LINUX SYSTEM USER]
  
   # Jupyterhub REST Settings
-  export JUPYTER_REST_PORT=[POST FOR REST SERVER TO LISTEN]
+  export JUPYTER_REST_PORT=[PORT FOR REST SERVER TO LISTEN]
   export JUPYTER_REST_IP=[REST SERVER IP ADDRESS]
  
 ```
