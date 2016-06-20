@@ -19,6 +19,8 @@ Note: *These steps have only been tested on CentOS7*
 `usermod -aG wheel [jupyter-user]`  
 logout and log back in again  
 
+*Get VM on network so that repo's can be accessed*
+
 **Update the system**  
 `yum check-update`  
 `yum update`  
