@@ -16,7 +16,12 @@ Note: *These steps have only been tested on CentOS7*
 
 **Add user to sudoers**  
 `su`  
-`usermod -aG wheel [jupyter-user]`  
+`usermod -aG wheel [username]`  
+
+**add user to docker group**  
+`sudo groupadd docker`  
+`sudo usermod -aG docker [username]`  
+
 logout and log back in again  
 
 *Get VM on network so that repo's can be accessed*
@@ -26,7 +31,7 @@ logout and log back in again
 `yum update`  
 
 **Install base libraries**  
-`yum install -y openssh-server git vim wget screen`  
+`yum install -y openssh-server git vim wget screen docker`  
 
 ### Prereq Libraries
 
@@ -120,15 +125,8 @@ These environment variables are loaded when the jupyterhub server is started.  T
 
 ### Build Docker Image  
 
-**install docker**   
-`sudo yum install docker` 
-
 **start the docker service**  
 `sudo service docker start`  
-
-**add user to docker group**  
-`sudo groupadd docker`  
-`sudo usermod -aG docker [username]`  
 
 **build the docker file**  
 `cd [project_root]/docker`  
