@@ -141,6 +141,19 @@ These environment variables are loaded when the jupyterhub server is started.  T
 `sudo ./run.sh`
 `CTRL A+D`
 
+
+### Run the REST server  
+*Create a screen session*    
+`screen -S rest`    
+`cd [project_root]/rest`    
+`sudo python3 jupyterhub_server.py`
+`CTRL A+D`
+
+
+
+
+---
+
 ### Cleanup docker images (cron job)  
 Delete docker images after they have been active for 1 day.  This will ensure that the users environment is rebuilt with the latest notebooks periodically.  
 
