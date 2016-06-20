@@ -41,7 +41,10 @@ logout and log back in again
 **Install pip3**  
 `wget https://bootstrap.pypa.io/get-pip.py`  
 `python3 get-pip.py`  
-`pip3 install ipgetter`  
+`pip3 install ipgetter`
+
+**install hs_restclient**  
+`pip3 install git+https://github.com/hydroshare/hs_restclient.git@2_and_3`  
 
 **install node**  
 `yum install -y nodejs npm`  
