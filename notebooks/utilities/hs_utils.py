@@ -10,6 +10,8 @@ import yaml
 from IPython.core.display import display, HTML
 from hs_restclient import HydroShare, HydroShareAuthBasic, HydroShareHTTPException
 import queue
+import xml.etree.ElementTree as et
+from datetime import datetime as dt
 
 threadResults = queue.Queue()
 
@@ -113,6 +115,49 @@ def runThreadedFunction(t, msg, success):
     return res
             
     
+class ResourceMetadata (object):
+    def __init__(self, system_meta, science_meta):
+        
+        self.root = et.fromstring(science_meta)
+        self.ns = {'dc': 'http://purl.org/dc/elements/1.1/', 
+                      'ns2': "http://purl.org/dc/terms/",
+                      'ns3':"http://hydroshare.org/terms/",
+                      'ns4': 'http://www.w3.org/2001/01/rdf-schema#',
+                      'rdf': "http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+                     }
+        self.parse_science_metadata()
+        
+        self.__dict__.update(system_meta)
+        
+    @property
+    def url(self): return self._url
+    @property
+    def abstract(self): return self._abstract
+    @property
+    def keywords(self): return self._keywords
+    
+    @url.setter
+    def url(self, value): self._url = value
+    @abstract.setter
+    def abstract(self, value): self._abstract = value
+    @keywords.setter
+    def keywords(self, value): self._keywords = value
+        
+    
+    def parse_science_metadata(self):
+        
+        # get the resource url
+        search = '{{{0}}}Description'.format(self.ns['rdf'])
+        self.url = self.root.find(search).get('{{{0}}}about'.format(self.ns['rdf']))
+
+        search = '{{{0}}}Description/{{{1}}}description/{{{0}}}Description/{{{2}}}abstract'.format(self.ns['rdf'], self.ns['dc'], self.ns['ns2'])
+        self.abstract = self.root.find(search).text
+
+        search = '{{{0}}}Description/{{{1}}}subject'.format(self.ns['rdf'], self.ns['dc'])
+        kw_elems = self.root.findall(search)
+        self.keywords = [kw.text for kw in kw_elems]
+        
+        
 class hydroshare():
     def __init__(self):
         self.hs = None
@@ -170,8 +215,12 @@ class hydroshare():
             display(HTML('<p style="color:red;"><b>Failed to establish a connection with HydroShare.  Please check that you provided the correct credentials</b><br>%s </p>' % e))
             self.hs = None
 
-
-    def createHydroShareResource(self, abstract, title, keywords=[], resource_type='GenericResource', content_files=[], public=False):
+    def getResourceMetadata(self, resid):
+        science_meta = self.hs.getScienceMetadata(resid)
+        system_meta = self.hs.getSystemMetadata(resid)
+        return ResourceMetadata(system_meta, science_meta)
+        
+    def createHydroShareResource(self, abstract, title, derivedFromId, keywords=[], resource_type='GenericResource', content_files=[], public=False):
         
         # query the hydroshare resource types and make sure that resource_type is valid
         restypes = {r.lower():r for r in hs.hs.getResourceTypes()}
@@ -179,6 +228,23 @@ class hydroshare():
             res_type = restypes[resource_type]
         except KeyError:
             display(HTML('<b style="color:red;">[%s] is not a valid HydroShare resource type.</p>' % resource_type))
+        
+        # get the 'derived resource' metadata
+        if derivedFromId is not None:
+            try:
+                # update the abstract and keyword metadata
+                meta = self.getResourceMetadata(derivedFromId)
+                abstract = meta.abstract + '\n\n[Modified in JupyterHub on %s]\n%s' % (dt.now(), abstract)
+                keywords = set(keywords + meta.keywords)
+                
+            except:
+                display(HTML('<b style="color:red;">[%s] is not a valid HydroShare resource id for setting the "derivedFrom" attribute.</p>' % derivedFromId))
+        
+        else:
+            response = input('You have indicated that this resource is NOT derived from any existing HydroShare resource.  Are you sure that this is what you intended? [Y/n]')
+            if response == 'n':
+                display(HTML('<b style="color:red;">Resource creation aborted.</p>'))
+                return  
         
         f = None if len(content_files) == 0 else content_files[0]
 

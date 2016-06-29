@@ -21,6 +21,7 @@ c.HydroShareOAuthenticator.oauth_callback_url = os.environ['OAUTH_CALLBACK_URL']
 
 # mount the userspace directory
 print('USERSPACE: ',userspace)
+print('MOUNTING USERSPACE: %s -> /home/jovyan/work' % userspace)
 c.DockerSpawner.volumes = {
     userspace: '/home/jovyan/work',
 }

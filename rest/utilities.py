@@ -13,7 +13,7 @@ log = logging.getLogger()
 
 
 def load_envs():
-    with open('env','r') as f:
+    with open('../jupyterhub/env','r') as f:
         lines = f.readlines()
         for line in lines:
             vals = line.strip().split(' ')[-1].split('=')
