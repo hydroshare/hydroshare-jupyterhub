@@ -33,8 +33,16 @@ apt-get update && \
 apt-get install -y \
 libgeos-dev \  
 mpic++ \       
-libgdal-dev \
 libproj-dev    
+
+# install rhessys workflows
+RUN apt-get install -y build-essential git subversion p7zip-full \
+python python-dev python-pip python-scipy \
+libxml2-dev libxslt-dev \
+libgdal-dev libgdal-doc gdal-bin python-gdal \
+grass grass-dev \
+libbsd-dev vlc 
+#ffmpeg
 
 ###############################
 # SETUP JUPYTERHUB ENTRYPOINT #
@@ -68,7 +76,15 @@ ENV PATH /home/jovyan/libs/TauDEM:$PATH
 # link conda python2 (used by jupyterhub) to python22
 RUN ln -s /opt/conda/envs/python2/bin/python2 /usr/bin/python22
 
+
+# load the rhessys configuration file
+ADD https://raw.github.com/selimnairb/RHESSysWorkflows/master/docs/config/ecohydro-Linux.cfg /home/jovyan/.ecohydro.cfg  
+RUN chown jovyan:users /home/jovyan/.ecohydro.cfg  
+RUN sed -i -e 's/<myusername>/jovyab/g' /home/jovyan/.ecohydro.cfg  
+
+
 USER jovyan 
+
 
 
 # setup base python 
@@ -81,9 +97,10 @@ RUN pip install --upgrade pip
 # PREPARE RHESYSS #
 ###################
 
+
 # install rhesyss libs
-#RUN cd ../libs && \
-RUN git clone https://github.com/selimnairb/EcohydroLib.git ../libs/EcohydroLib && \
+RUN cd ../libs && \
+git clone https://github.com/selimnairb/EcohydroLib.git ../libs/EcohydroLib && \
 cd ../libs/EcohydroLib && \
 python22 setup.py install
 
@@ -124,6 +141,9 @@ env DOCUMENTS /home/jovyan/work/notebooks/documents
 env DATA /home/jovyan/work/notebooks/data
 env HOME /home/jovyan/work/notebooks
 
+# set ecohydrolib environment variables
+ENV ECOHYDROLIB_CFG /home/jovyan/.ecohydro.cfg
+ENV LD_LIBRARY_PATH /usr/lib/grass64:$LD_LIBRARY_PATH
 
 #  /bin/bash -c "source /opt/conda/bin/activate python2" && \
 #    /bin/bash -c "python setup.py install"
