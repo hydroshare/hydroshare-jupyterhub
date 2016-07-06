@@ -162,6 +162,7 @@ class hydroshare():
     def __init__(self):
         self.hs = None
         self.content = {}
+        self.load_environment()
         
     def _getResourceFromHydroShare(self, resourceid, destination='.', unzip=True):
         # download the resource
