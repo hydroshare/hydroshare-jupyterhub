@@ -54,8 +54,8 @@ def check_for_ipynb(content_files):
             links[fname] = url
 
     if len(links) > 0:
-        display(HTML('<h3>I found the following notebook(s) associated with this HydroShare resource.</h3>'))
-        display(HTML('Click the link(s) below if you wish to load a different Python notebook'))
+        display(HTML('<h3>Found the following notebook(s) associated with this HydroShare resource.</h3>'))
+        display(HTML('Click the link(s) below to launch in a new browser tab.'))
         for name, url in links.items():
             display(HTML('<a href=%s target="_blank">%s<a>' % (url, name)))
 
@@ -73,7 +73,7 @@ def display_resource_content_files(content_file_dictionary, text='Found the foll
     
     display(HTML('<h3>%s</h3>' % text))
     table_str = '<table>'
-    table_str += '<th>Key</th><th>Value</th>'
+    table_str += '<th>File Key</th><th>Path Value</th>'
     for k,v in content_file_dictionary.items():
         table_str += '<tr style="word-break: break-word;">'
         table_str += '<td width="20%%">%s</td><td>%s</td>' % (k,v)
