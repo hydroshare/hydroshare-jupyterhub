@@ -69,9 +69,9 @@ def check_for_ipynbs_by_keyword(resid):
     return res_meta
     pass
             
-def display_resource_content_files(content_file_dictionary):
+def display_resource_content_files(content_file_dictionary, text='Found the following content when parsing the HydroShare resource:'):
     
-    display(HTML('<h3>Found the following content when parsing the HydroShare resource:</h3>'))
+    display(HTML('<h3>%s</h3>' % text))
     table_str = '<table>'
     table_str += '<th>Key</th><th>Value</th>'
     for k,v in content_file_dictionary.items():
@@ -164,6 +164,9 @@ class hydroshare():
         self.content = {}
         self.load_environment()
         
+        if self.hs is None:
+            self.getSecureConnection(os.environ['HS_USR_NAME'])
+        
     def _getResourceFromHydroShare(self, resourceid, destination='.', unzip=True):
         # download the resource
         pid = self.hs.getResource(resourceid, destination=destination, unzip=unzip)
@@ -204,7 +207,8 @@ class hydroshare():
         Returns:
             HydroShare connection 
         """
-
+        
+        print('\nThe hs_utils library requires a secure connection to your HydroShare account.')
         p = getpass.getpass('Enter you HydroShare Password: ')
         auth = HydroShareAuthBasic(username=username, password=p)
         self.hs = HydroShare(auth=auth)
@@ -300,7 +304,7 @@ class hydroshare():
         display_resource_content_files(content)
         check_for_ipynb(content_files)
         
-        self.content = content
+        self.content.update(content)
         
     def addContentToExistingResource(self, resid, content):
         t = threading.Thread(target=self._addContentToExistingResource, args=(resid, content))
