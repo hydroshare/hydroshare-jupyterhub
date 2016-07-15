@@ -251,7 +251,7 @@ class hydroshare():
     def createHydroShareResource(self, abstract, title, derivedFromId, keywords=[], resource_type='GenericResource', content_files=[], public=False):
         
         # query the hydroshare resource types and make sure that resource_type is valid
-        restypes = {r.lower():r for r in hs.hs.getResourceTypes()}
+        restypes = {r.lower():r for r in self.hs.getResourceTypes()}
         try:
             res_type = restypes[resource_type]
         except KeyError:
