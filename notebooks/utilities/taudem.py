@@ -3,7 +3,27 @@ import matplotlib.pyplot as plt
 import numpy as np
 from osgeo import gdal
 import subprocess
+import shutil
 
+def create_workspace(folder_name):
+
+    # get the data directory (this is an environment variable that is provided to you)
+    data_directory = os.path.join(os.environ['DATA'], folder_name)
+    create_dir = True
+    if os.path.exists(data_directory):
+        res = input('This directory already exists. Would you like to remove it [Y/n]? ')
+        if res != 'n':
+            shutil.rmtree(data_directory)
+        else:
+            create_dir = False
+            print('Directory creation aborted')
+            return None
+    if create_dir:
+        os.mkdir(data_directory)
+        print('A clean directory has been created')  
+    
+    return data_directory
+    
     
 def plot_tiff(tiff, size=(5,10), aspect=1, title=''):
     """

@@ -19,3 +19,16 @@
 /*body {background-color: #090300;}
 a {color: #01a0e4;}
 */
+
+
+input.raw_input {
+    font-family: monospace;
+    font-size: inherit;
+    color: inherit;
+    width: auto;
+    vertical-align: baseline;
+    padding: 0em 0.25em;
+    margin: 0em 0.25em;
+    width: 30px;
+}
+
