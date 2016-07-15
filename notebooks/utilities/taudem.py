@@ -17,7 +17,7 @@ def create_workspace(folder_name):
         else:
             create_dir = False
             print('Directory creation aborted')
-            return None
+            
     if create_dir:
         os.mkdir(data_directory)
         print('A clean directory has been created')  
