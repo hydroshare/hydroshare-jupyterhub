@@ -13,6 +13,7 @@ import queue
 import xml.etree.ElementTree as et
 from datetime import datetime as dt
 import pickle
+import shutil
 
 threadResults = queue.Queue()
 
@@ -295,28 +296,42 @@ class hydroshare():
             destination: path relative to /user/[username]/notebooks/data
 
         """
+        
+        default_dl_path = os.environ['DATA']
+        dst = os.path.abspath(os.path.join(default_dl_path, destination))
+        download = True
+        
+        # check if the data should be overwritten
+        dst_res_folder = os.path.join(dst, resourceid)
+        if os.path.exists(dst_res_folder):    
+            res = input('This resource already exists in your userspace.  Would you like to overwrite this data [Y/n]? ')
+            if res != 'n':
+                shutil.rmtree(dst_res_folder)
+            else:
+                download = False
+         
+        # re-download the content if desired
+        if download:
+            try:
 
-        try:
-            default_dl_path = os.environ['DATA']
-            dst = os.path.abspath(os.path.join(default_dl_path, destination))
-            
-            # get some metadata about the resource that will be downloaded
-            res_meta = self.hs.getSystemMetadata(resourceid)
-            header = requests.head(res_meta['bag_url'])
+                # get some metadata about the resource that will be downloaded
+                res_meta = self.hs.getSystemMetadata(resourceid)
+                header = requests.head(res_meta['bag_url'])
 
-            # download the resource (threaded)
-            t = threading.Thread(target=self._getResourceFromHydroShare, 
-                                 args=(resourceid,), kwargs={'destination':dst, 'unzip':True})
-            runThreadedFunction(t, msg='Downloading', success='Download Completed Successfully')
-                        
-            #self.hs.getResource(resourceid, destination=dst, unzip=True)
-            outdir = os.path.join(dst, '%s/%s' % (resourceid, resourceid))
-            content_files = glob.glob(os.path.join(outdir,'data/contents/*'))
-        except Exception as e:
-            display(HTML('<b style="color:red">Failed to retrieve resource content from HydroShare: %s</b>' % e))
-            return None
+                # download the resource (threaded)
+                t = threading.Thread(target=self._getResourceFromHydroShare, 
+                                     args=(resourceid,), kwargs={'destination':dst, 'unzip':True})
+                runThreadedFunction(t, msg='Downloading', success='Download Completed Successfully')
 
-        display(HTML('Downloaded content is located at: %s' % outdir))
+
+            except Exception as e:
+                display(HTML('<b style="color:red">Failed to retrieve resource content from HydroShare: %s</b>' % e))
+                return None
+
+        # load the resource content
+        outdir = os.path.join(dst, '%s/%s' % (resourceid, resourceid))
+        content_files = glob.glob(os.path.join(outdir,'data/contents/*'))
+            #display(HTML('Your Content is located at: %s' % outdir))
         
         content = {}
         for f in content_files:
@@ -326,6 +341,7 @@ class hydroshare():
         display_resource_content_files(content)
         check_for_ipynb(content_files)
         
+        # update the content dictionary
         self.content.update(content)
         
     def addContentToExistingResource(self, resid, content):
