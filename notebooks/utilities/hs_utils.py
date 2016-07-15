@@ -12,6 +12,7 @@ from hs_restclient import HydroShare, HydroShareAuthBasic, HydroShareHTTPExcepti
 import queue
 import xml.etree.ElementTree as et
 from datetime import datetime as dt
+import pickle
 
 threadResults = queue.Queue()
 
@@ -162,10 +163,26 @@ class hydroshare():
     def __init__(self):
         self.hs = None
         self.content = {}
+        
+        # load the HS environment variables
         self.load_environment()
         
-        if self.hs is None:
-            self.getSecureConnection(os.environ['HS_USR_NAME'])
+        # get a secure connection to hydroshare
+        auth = self.getSecureConnection(os.environ['HS_USR_NAME'])
+        
+        try:
+            self.hs = HydroShare(auth=auth)
+            self.hs.getUserInfo()
+            display(HTML('<b style="color:green;">Successfully established a connection with HydroShare</b>'))
+     
+        except HydroShareHTTPException as e:
+            display(HTML('<p style="color:red;"><b>Failed to establish a connection with HydroShare.  Please check that you provided the correct credentials</b><br>%s </p>' % e))
+
+            # remove the cached authentication
+            auth_path = os.path.join(os.path.dirname(__file__), '../../../.auth')
+            os.remove(auth_path)
+            
+            return None
         
     def _getResourceFromHydroShare(self, resourceid, destination='.', unzip=True):
         # download the resource
@@ -180,7 +197,7 @@ class hydroshare():
         threadResults.put(resid)
     
     def _addContentToExistingResource(self, resid, content_files):
-   
+
         for f in content_files:
             self.hs.addResourceFile(resid, f)
             
@@ -208,17 +225,22 @@ class hydroshare():
             HydroShare connection 
         """
         
-        print('\nThe hs_utils library requires a secure connection to your HydroShare account.')
-        p = getpass.getpass('Enter you HydroShare Password: ')
-        auth = HydroShareAuthBasic(username=username, password=p)
-        self.hs = HydroShare(auth=auth)
+        auth_path = os.path.join(os.path.dirname(__file__), '../../../.auth')
+        if not os.path.exists(auth_path):
+            print('\nThe hs_utils library requires a secure connection to your HydroShare account.')
+            p = getpass.getpass('Enter you HydroShare Password: ')
+            auth = HydroShareAuthBasic(username=username, password=p)
+            
+            with open(auth_path, 'wb') as f:
+                pickle.dump(auth, f, pickle.HIGHEST_PROTOCOL)
+                
+        else:
+            
+            with open(auth_path, 'rb') as f:
+                auth = pickle.load(f)
+            
+        return auth
         
-        try:
-            self.hs.getUserInfo()
-            display(HTML('<b style="color:green;">Successfully established a connection with HydroShare</b>'))
-        except HydroShareHTTPException as e:
-            display(HTML('<p style="color:red;"><b>Failed to establish a connection with HydroShare.  Please check that you provided the correct credentials</b><br>%s </p>' % e))
-            self.hs = None
 
     def getResourceMetadata(self, resid):
         science_meta = self.hs.getScienceMetadata(resid)
@@ -332,5 +354,5 @@ class hydroshare():
 
             
 # initialize
-hs = hydroshare()
-
+#hs = hydroshare()
+#hs.load_environment()
