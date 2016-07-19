@@ -52,7 +52,7 @@ def check_for_ipynb(content_files):
         if f[-5:] == 'ipynb':
             fname = os.path.basename(f)
             rel_path = os.path.relpath(f, os.environ['HOME'])
-            url = '%s%s/notebooks/notebooks/%s' % (':'.join(os.environ['JPY_HUB_API_URL'].split(':')[:-1]),os.environ['JPY_BASE_URL'], rel_path)
+            url = '%s%s/notebooks/notebooks/%s' % (':'.join(os.environ['JUPYTER_HUB_IP'].split(':')[:-1]),os.environ['JPY_BASE_URL'], rel_path)
             links[fname] = url
 
     if len(links) > 0:

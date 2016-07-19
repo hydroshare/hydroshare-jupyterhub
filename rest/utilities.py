@@ -30,6 +30,7 @@ def set_hydroshare_args(username, resourceid, resourcetype):
         f.write('HS_USR_NAME=%s\n' % username)
         f.write('HS_RES_ID=%s\n' % resourceid)
         f.write('HS_RES_TYPE=%s\n' % resourcetype)
+        f.write('JUPYTER_HUB_IP=%s\n' % os.environ['JUPYTER_HUB_IP'] )
     
     # get the jupyter username
     user = getpwnam(os.environ['JUPYTER_USER'])

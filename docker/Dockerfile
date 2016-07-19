@@ -29,8 +29,9 @@ USER root
 # libgdal-dev  TAUDEM dependency
 # libproj-dev  TAUDEM dependency
 RUN apt-get clean && \
-apt-get update && \
-apt-get install -y \
+apt-get update --fix-missing
+
+RUN apt-get install -y \
 libgeos-dev \  
 mpic++ \       
 libproj-dev    
