@@ -1,2 +1,2 @@
-export JUPYTER_NOTEBOOK_DIR=/home/castro/jupyterhub/hydroshare-jupyterhub/notebooks
-export JUPYTER_USERSPACE_DIR=/home/castro/userspace 
+export JUPYTER_NOTEBOOK_DIR=/home/centos/hydroshare-jupyterhub/notebooks
+export JUPYTER_USERSPACE_DIR=/volume/userspace 

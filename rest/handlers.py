@@ -5,6 +5,7 @@ import socket
 import logging
 import tornado.auth
 import shutil
+import ipgetter
 
 from tornado.log import enable_pretty_logging
 enable_pretty_logging()
@@ -45,7 +46,7 @@ class JupyterHandler(RequestHandler, tornado.auth.OAuth2Mixin):
         utilities.set_hydroshare_args(husername, resourceid, resourcetype)
  
         # generate the redirect url
-        baseurl = socket.gethostbyname(socket.gethostname())
+        baseurl = ipgetter.myip()#'141.142.170.16'#socket.gethostbyname(socket.gethostname())
         # todo: check that this path exists before setting it as redirect, otherwise set welcome path
         url = "http://%s/user/%s/tree/notebooks/examples/%s.ipynb" % (baseurl,username, resourcetype)
         print('Redirecting to url: %s' % url)

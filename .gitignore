@@ -1,0 +1,6 @@
+jupyterhub/env
+jupyterhub/jupyterhub.log
+jupyterhub/jupyterhub.sqlite
+jupyterhub/jupyterhub_cookie_secret
+jupyterhub/test
+*.pyc

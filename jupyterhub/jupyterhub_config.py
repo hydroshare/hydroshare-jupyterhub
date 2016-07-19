@@ -8,8 +8,8 @@ try:
     c.JupyterHub.spawner_class = 'dockerspawner.DockerSpawner'
     c.JupyterHub.confirm_no_ssl = True
     c.JupyterHub.port = int(os.environ['JUPYTER_PORT'])
-    c.DockerSpawner.hub_ip_connect = os.environ['JUPYTER_IP']
-    c.JupyterHub.hub_ip = os.environ['JUPYTER_IP']
+    c.DockerSpawner.hub_ip_connect = os.environ['HOST_DOCKER_IP']
+    c.JupyterHub.hub_ip = os.environ['HOST_DOCKER_IP']
     c.JupyterHub.extra_log_file = os.environ['JUPYTER_LOG']
     userspace = os.path.join(os.environ['JUPYTER_USERSPACE_DIR'], '{username}')
 except Exception as e:
