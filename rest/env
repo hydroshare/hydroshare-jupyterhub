@@ -1,2 +1,0 @@
-export JUPYTER_NOTEBOOK_DIR=/home/centos/hydroshare-jupyterhub/notebooks
-export JUPYTER_USERSPACE_DIR=/volume/userspace 
