@@ -33,10 +33,6 @@ class JupyterHandler(RequestHandler, tornado.auth.OAuth2Mixin):
         resourceid = self.get_or_error('resourceid')
         husername = self.get_or_error('husername')
 
-        print('Jupyter Handler RECEIVED: %s, %s, %s' % (husername, resourcetype, resourceid))
-        
-        if not (resourcetype and resourceid and husername): return
-
         # make all usernames lowercase
         username = husername.lower()
         resourcetype = resourcetype.lower()
@@ -47,15 +43,12 @@ class JupyterHandler(RequestHandler, tornado.auth.OAuth2Mixin):
  
         # generate the redirect url
         baseurl = os.environ['JUPYTER_HUB_IP']
-        # todo: check that this path exists before setting it as redirect, otherwise set welcome path
-        url = "http://%s/user/%s/tree/notebooks/examples/%s.ipynb" % (baseurl,username, resourcetype)
-        print('Redirecting to url: %s' % url)
+        
+        # build the redirect url 
+        url = "http://%s/user/%s/tree/notebooks/Welcome.ipynb" % (baseurl,username)
 
         # save the next url to ensure that the redirect will work
-	
         p = os.path.join(os.environ['HYDROSHARE_REDIRECT_COOKIE_PATH'], '.redirect_%s' % username)        
-#        p = '/usr/local/etc/.redirect_%s' % username
-#        print('Writing redirect to:',p)
         with open(p, 'w') as f:
             f.write(url)
 
