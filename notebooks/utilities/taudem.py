@@ -11,7 +11,7 @@ def create_workspace(folder_name):
     data_directory = os.path.join(os.environ['DATA'], folder_name)
     create_dir = True
     if os.path.exists(data_directory):
-        res = input('This directory already exists. Would you like to remove it [Y/n]? ')
+        res = input('This directory already exists.\nWould you like to remove it [Y/n]? ')
         if res != 'n':
             shutil.rmtree(data_directory)
         else:
