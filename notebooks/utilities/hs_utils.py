@@ -61,35 +61,32 @@ def check_for_ipynb(content_files):
             rel_path = os.path.relpath(f, os.environ['HOME'])
             url = '%s%s/notebooks/notebooks/%s' % (':'.join(os.environ['JUPYTER_HUB_IP'].split(':')[:-1]),os.environ['JPY_BASE_URL'], rel_path)
             links[fname] = url
-
-    if len(links) > 0:
-        display(HTML('<h3>Found the following notebook(s) associated with this HydroShare resource.</h3>'))
-        display(HTML('Click the link(s) below to launch in a new browser tab.'))
-        for name, url in links.items():
-            display(HTML('<a href=%s target="_blank">%s<a>' % (url, name)))
-
-def check_for_ipynbs_by_keyword(resid): 
-    
-    try:
-        res_meta = hs.hs.getSystemMetadata(resid)
-    except Exception as e:
-        display(HTML('<b style="color:red">Failed to retrieve metadata for resource id [%s].</b> <br> Please make sure that this resource id exists on HydroShare.org.' % (resourceid)))
-    
-    return res_meta
-    pass
+    return links
             
 def display_resource_content_files(content_file_dictionary, text='Found the following content when parsing the HydroShare resource:'):
     
-    display(HTML('<h3>%s</h3>' % text))
-    table_str = '<table>'
-    table_str += '<th>File Key</th><th>Path Value</th>'
-    for k,v in content_file_dictionary.items():
-        table_str += '<tr style="word-break: break-word;">'
-        table_str += '<td width="20%%">%s</td><td>%s</td>' % (k,v)
-        table_str += '</tr>'
-    table_str += '</table>'
-    display(HTML(table_str))
-    display(HTML('<p>To access these variables issue the following command: <br> <code>   my_value = hs.content["key"] </code><p>'))
+    # get ipynb files
+    nbs = check_for_ipynb(content_file_dictionary)
+    
+    if len(nbs.keys()) > 0:
+        display(HTML('<b>Found the following notebook(s) associated with this HydroShare resource.</b><br>Click the link(s) below to launch the notebook.'))
+        
+        for name, url in nbs.items():
+
+            # remove notebook from content_file_dictionary
+            content_file_dictionary.pop(name)
+
+            display(HTML('<a href=%s target="_blank">%s<a>' % (url, name)))
+
+    # print the remaining files    
+    if len(content_file_dictionary.keys()) > 0:
+        display(HTML('<b>Found the following file(s) associated with this HydroShare resource.</b>'))
+        
+        text = '<br>'.join(content_file_dictionary.keys())
+        display(HTML(text))
+    
+    if (len(content_file_dictionary.keys()) + len(nbs.keys())) > 0:
+        display(HTML('These files are stored in a dictionary called <b>hs.content</b> for your convenience.  To access a file, simply issue the following command where MY_FILE is one of the files listed above: <pre>hs.content["MY_FILE"] </pre> '))
     
 def runThreadedFunction(t, msg, success):
 
@@ -311,7 +308,7 @@ class hydroshare():
         # check if the data should be overwritten
         dst_res_folder = os.path.join(dst, resourceid)
         if os.path.exists(dst_res_folder):    
-            res = input('This resource already exists in your userspace.\n Would you like to overwrite this data [Y/n]? ')
+            res = input('This resource already exists in your userspace.\nWould you like to overwrite this data [Y/n]? ')
             if res != 'n':
                 shutil.rmtree(dst_res_folder)
             else:
@@ -346,7 +343,7 @@ class hydroshare():
             content[fname] = f
 
         display_resource_content_files(content)
-        check_for_ipynb(content_files)
+        #check_for_ipynb(content_files)
         
         # update the content dictionary
         self.content.update(content)
@@ -371,11 +368,5 @@ class hydroshare():
             content[fname] = f
         
         display_resource_content_files(content)
-        check_for_ipynb(content_files)
         
         self.content = content
-
-            
-# initialize
-#hs = hydroshare()
-#hs.load_environment()
