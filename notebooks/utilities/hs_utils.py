@@ -1,3 +1,4 @@
+from __future__ import print_function
 import os, sys
 import getpass
 import socket
@@ -9,11 +10,17 @@ import utils
 import yaml
 from IPython.core.display import display, HTML
 from hs_restclient import HydroShare, HydroShareAuthBasic, HydroShareHTTPException
-import queue
 import xml.etree.ElementTree as et
 from datetime import datetime as dt
 import pickle
 import shutil
+
+is_py2 = sys.version[0] == '2'
+if is_py2:
+    import Queue as queue
+    input = raw_input
+else:
+    import queue as queue
 
 threadResults = queue.Queue()
 
@@ -233,7 +240,7 @@ class hydroshare():
             auth = HydroShareAuthBasic(username=username, password=p)
             
             with open(auth_path, 'wb') as f:
-                pickle.dump(auth, f, pickle.HIGHEST_PROTOCOL)
+                pickle.dump(auth, f, protocol=2)
                 
         else:
             
@@ -304,7 +311,7 @@ class hydroshare():
         # check if the data should be overwritten
         dst_res_folder = os.path.join(dst, resourceid)
         if os.path.exists(dst_res_folder):    
-            res = input('This resource already exists in your userspace.  Would you like to overwrite this data [Y/n]? ')
+            res = input('This resource already exists in your userspace.\n Would you like to overwrite this data [Y/n]? ')
             if res != 'n':
                 shutil.rmtree(dst_res_folder)
             else:
