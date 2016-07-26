@@ -55,10 +55,10 @@ def find_resource_directory(resid):
 def check_for_ipynb(content_files):
 
     links = {}
-    for f in content_files:
+    for f, p in content_files.items():
         if f[-5:] == 'ipynb':
-            fname = os.path.basename(f)
-            rel_path = os.path.relpath(f, os.environ['HOME'])
+            fname = os.path.basename(p)
+            rel_path = os.path.relpath(p, os.environ['HOME'])
             url = '%s%s/notebooks/notebooks/%s' % (':'.join(os.environ['JUPYTER_HUB_IP'].split(':')[:-1]),os.environ['JPY_BASE_URL'], rel_path)
             links[fname] = url
     return links
@@ -67,7 +67,6 @@ def display_resource_content_files(content_file_dictionary, text='Found the foll
     
     # get ipynb files
     nbs = check_for_ipynb(content_file_dictionary)
-    
     if len(nbs.keys()) > 0:
         display(HTML('<b>Found the following notebook(s) associated with this HydroShare resource.</b><br>Click the link(s) below to launch the notebook.'))
         
