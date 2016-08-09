@@ -13,7 +13,7 @@
 
 FROM jupyter/scipy-notebook
 
-MAINTAINER Project Jupyter <jupyter@googlegroups.com>
+MAINTAINER Tony Castronova <tony.castronova@usu.edu>
 
 EXPOSE 8888
 
@@ -28,21 +28,19 @@ USER root
 # mpic++       TAUDEM dependency
 # libgdal-dev  TAUDEM dependency
 # libproj-dev  TAUDEM dependency
-RUN apt-get clean && \
-apt-get update --fix-missing
+RUN apt-get clean && apt-get update --fix-missing
 
-RUN apt-get install -y \
-libgeos-dev \  
-mpic++ \       
-libproj-dev    
+RUN apt-get install -y libgeos-dev mpic++ libproj-dev    
+
+# install irods fuse
+RUN apt-get install -y fuse libfuse2 libfuse-dev
+RUN wget -q ftp://ftp.renci.org/pub/irods/releases/4.1.8/ubuntu12/irods-icommands-4.1.8-ubuntu12-x86_64.deb -O /tmp/irods-icommands-4.1.8-ubuntu12-x86_64.deb
+RUN dpkg -i /tmp/irods-icommands-4.1.8-ubuntu12-x86_64.deb
+RUN groupadd fuse && usermod -aG fuse jovyan
+RUN chmod g+rw /dev/fuse && chgrp fuse /dev/fuse
 
 # install rhessys workflows
-RUN apt-get install -y build-essential git subversion p7zip-full \
-python python-dev python-pip python-scipy \
-libxml2-dev libxslt-dev \
-libgdal-dev libgdal-doc gdal-bin python-gdal \
-grass grass-dev \
-libbsd-dev vlc 
+RUN apt-get install -y build-essential git subversion p7zip-full python python-dev python-pip python-scipy libxml2-dev libxslt-dev libgdal-dev libgdal-doc gdal-bin python-gdal grass grass-dev libbsd-dev vlc 
 #ffmpeg
 
 ###############################
@@ -60,16 +58,12 @@ ADD singleuser.sh /srv/singleuser/singleuser.sh
 ##################
 
 # create build/lib space for taudem and rhesyss
-RUN mkdir ../libs && \
-chown -R jovyan:users ../libs
+RUN mkdir ../libs && chown -R jovyan:users ../libs
 
 # install taudem (must happend before rhesyss b/c of gdal conflicts)
 RUN git clone https://github.com/dtarb/TauDEM.git ../libs/TauDEM && \
-cd ../libs/TauDEM/src && \
-make 
+cd ../libs/TauDEM/src && make 
 
-# add taudem binaries to system path
-ENV PATH /home/jovyan/libs/TauDEM:$PATH
 
 #ADD taudem_env /taudem_env
 #RUN /bin/bash -c "source /taudem_env" && \
@@ -135,21 +129,11 @@ pip install hs_restclient
 # SET PATH VARIABLES #
 ######################
 
-# add rhesyss binaries to system path
-env PATH /opt/conda/envs/python2/bin:$PATH
-env PYTHONPATH /home/jovyan/work/notebooks/utilities:$PYTHONPATH
-env DOCUMENTS /home/jovyan/work/notebooks/documents
-env DATA /home/jovyan/work/notebooks/data
-env HOME /home/jovyan/work/notebooks
+# add taudem binaries to system path
+ENV PATH /home/jovyan/libs/TauDEM:$PATH
 
-# set ecohydrolib environment variables
-ENV ECOHYDROLIB_CFG /home/jovyan/.ecohydro.cfg
-ENV LD_LIBRARY_PATH /usr/lib/grass64:$LD_LIBRARY_PATH
-
-#  /bin/bash -c "source /opt/conda/bin/activate python2" && \
-#    /bin/bash -c "python setup.py install"
-
-
+# set rhesyss and ecohydrolib environment variables
+ENV PATH=/opt/conda/envs/python2/bin:$PATH PYTHONPATH=/home/jovyan/work/notebooks/utilities:$PYTHONPATH DOCUMENTS=/home/jovyan/work/notebooks/documents DATA=/home/jovyan/work/notebooks/data HOME=/home/jovyan/work/notebooks ECOHYDROLIB_CFG=/home/jovyan/.ecohydro.cfg LD_LIBRARY_PATH=/usr/lib/grass64:$LD_LIBRARY_PATH
 
 # get rhesyss
 #RUN git clone https://github.com/RHESSys/RHESSys_docker.git $HOME/rhesyss

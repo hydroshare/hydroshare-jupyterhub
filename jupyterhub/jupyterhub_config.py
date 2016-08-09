@@ -4,6 +4,9 @@ from os.path import *
 # Configuration file for Jupyter Hub
 c = get_config()
 
+c.Authenticator.admin_users = {'root','jupyter'}
+c.JupyterHub.api_tokens = {"6b2ee57055123b95be0df3a3c3609e09886e419b7f032db219dc8235de93ed44":"jupyter"}
+
 try:
     # spawn with Docker
     c.JupyterHub.spawner_class = 'dockerspawner.DockerSpawner'
@@ -20,21 +23,21 @@ except Exception as e:
 c.JupyterHub.authenticator_class = 'oauthenticator.HydroShareOAuthenticator'
 c.HydroShareOAuthenticator.oauth_callback_url = os.environ['OAUTH_CALLBACK_URL']
 
-#c.extra_static_paths = ['../static/javascript/custom.js']
-#js = abspath(join(basename(__file__), '../../static/js'))
-#css = abspath(join(basename(__file__), '../../static/css'))
 static = abspath(join(basename(__file__), '../../static/custom'))
 
-#print(js, ' Path Exists: ', exists(js))
-#print(css, ' Path Exists: ', exists(css))
-print(static, ' Path Exists: ', exists(static))
 
 # mount the userspace directory
-print('USERSPACE: ',userspace)
-print('MOUNTING USERSPACE: %s -> /home/jovyan/work' % userspace)
 c.DockerSpawner.volumes = {
     userspace: '/home/jovyan/work',
     static: '/home/jovyan/work/notebooks/.jupyter/custom',
+}
+
+# http://stackoverflow.com/questions/37144357/link-containers-with-the-docker-python-api
+c.DockerSpawner.extra_host_config = {
+    'privileged':True,
+    'cap_add':['SYS_ADMIN','MKNOD'],
+    'devices':['/dev/fuse'],
+    'security_opt':['apparmor:unconfined']
 }
 
 #c.NotebookApp.extra_static_paths = ['/home/jovyan/work/notebooks/.ipython/profile_default/static']

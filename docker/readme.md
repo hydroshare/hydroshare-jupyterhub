@@ -28,6 +28,9 @@ docker rm $(docker ps -a -q)
 
 # Delete all images
 docker rmi $(docker images -q)
+
+# Clean orphaned images
+docker rmi $(docker images -q --filter "dangling=true")
 ```
 
 To update the volume mounts for a container, it just needs to be stopped, hen let jupyterhub restart it at next login.
