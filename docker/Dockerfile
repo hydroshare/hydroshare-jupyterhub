@@ -71,34 +71,55 @@ cd ../libs/TauDEM/src && make
 # link conda python2 (used by jupyterhub) to python22
 RUN ln -s /opt/conda/envs/python2/bin/python2 /usr/bin/python22
 
+# prepare grass
+COPY create_grass_loc.sh /home/jovyan/libs/create_grass_loc.sh
+RUN chown jovyan:users /home/jovyan/libs/create_grass_loc.sh && \
+chmod +x /home/jovyan/libs/create_grass_loc.sh
+
+RUN /bin/sh /home/jovyan/libs/create_grass_loc.sh jupyter
+
+#sh /home/jovyan/libs/create_grass_loc.sh jupyter
 
 # load the rhessys configuration file
 ADD https://raw.github.com/selimnairb/RHESSysWorkflows/master/docs/config/ecohydro-Linux.cfg /home/jovyan/.ecohydro.cfg  
-RUN chown jovyan:users /home/jovyan/.ecohydro.cfg  
-RUN sed -i -e 's/<myusername>/jovyab/g' /home/jovyan/.ecohydro.cfg  
+RUN chown jovyan:users /home/jovyan/.ecohydro.cfg  && \
+sed -i -e 's|.*ETC.*|ETC = /home/jovyan/libs/RHESSysWorkflows/etc|g' /home/jovyan/.ecohydro.cfg &&\
+sed -i -e 's|.*MODULE_PATHC.*|MODULE_PATH = /home/jovyan/libs/notebooks/.grass6/addons|g' /home/jovyan/.ecohydro.cfg &&\
+sed -i -e 's|.*MODULE_PATHC.*|MODULE_ETC = /home/jovyan/libs/RHESSysWorkflows/etc/r.soils.texture|g' /home/jovyan/.ecohydro.cfg
 
+#RUN sed -i -e 's/<myusername>/jovyan/g' /home/jovyan/.ecohydro.cfg  
 
+#########################
+# SWITCH TO JOVYAN USER #
+#########################
 USER jovyan 
-
-
-
-# setup base python 
-#RUN conda install -y conda-build
 
 # prepare python environments
 RUN pip install --upgrade pip
 
-###################
-# PREPARE RHESYSS #
-###################
-
-
-# install rhesyss libs
-RUN cd ../libs && \
-git clone https://github.com/selimnairb/EcohydroLib.git ../libs/EcohydroLib && \
+# install ecohydrolib
+RUN git clone https://github.com/leonard-psu/EcohydroLib.git ../libs/EcohydroLib && \
 cd ../libs/EcohydroLib && \
 python22 setup.py install
 
+# install RHESSysWorkflows
+RUN git clone https://github.com/selimnairb/RHESSysWorkflows.git ../libs/RHESSysWorkflows && \
+cd ../libs/RHESSysWorkflows && \
+python22 setup.py install
+
+# install RHESSys
+RUN git clone https://github.com/RHESSys/RHESSys.git ../libs/RHESSys && \
+cd ../libs/RHESSys && \
+GISBASE=/usr/lib/grass64 make 2>&1 | grep warning | wc -l
+
+# install EcoHydroLib
+#RUN cd ../libs && \
+#git clone https://github.com/leonard-psu/EcohydroLib.git ../libs/EcohydroLib && \
+#cd ../libs/EcohydroLib && \
+#python22 setup.py install
+
+# install RHESSys Workflows 
+#RUN pip2 install rhessysworkflows
 
 
 ###############################
@@ -133,7 +154,7 @@ pip install hs_restclient
 ENV PATH /home/jovyan/libs/TauDEM:$PATH
 
 # set rhesyss and ecohydrolib environment variables
-ENV PATH=/opt/conda/envs/python2/bin:$PATH PYTHONPATH=/home/jovyan/work/notebooks/utilities:$PYTHONPATH DOCUMENTS=/home/jovyan/work/notebooks/documents DATA=/home/jovyan/work/notebooks/data HOME=/home/jovyan/work/notebooks ECOHYDROLIB_CFG=/home/jovyan/.ecohydro.cfg LD_LIBRARY_PATH=/usr/lib/grass64:$LD_LIBRARY_PATH
+ENV PATH=/opt/conda/envs/python2/bin:$PATH PYTHONPATH=/home/jovyan/work/notebooks/utilities:$PYTHONPATH DOCUMENTS=/home/jovyan/work/notebooks/documents DATA=/home/jovyan/work/notebooks/data HOME=/home/jovyan/work/notebooks ECOHYDROLIB_CFG=/home/jovyan/.ecohydro.cfg LD_LIBRARY_PATH=/usr/lib/grass64/lib
 
 # get rhesyss
 #RUN git clone https://github.com/RHESSys/RHESSys_docker.git $HOME/rhesyss
@@ -145,3 +166,4 @@ ENV PATH=/opt/conda/envs/python2/bin:$PATH PYTHONPATH=/home/jovyan/work/notebook
 CMD ["sh", "/srv/singleuser/singleuser.sh"]
 
 
+ADD ./create_grass_loc.sh /home/jovyan/libs/create_grass_loc.sh
