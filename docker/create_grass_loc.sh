@@ -4,8 +4,8 @@
 
 #variables to customize:
 GISBASE=/usr/lib/grass64
-GISDBASE=/home/jovyan/work/notebooks
-GRASS_ADDON_PATH=/home/jovyan/work/notebooks/.grass6/addons
+GISDBASE=/home/jovyan/grassdata
+GRASS_ADDON_PATH=/home/jovyan/grassdata/.grass6/addons
 
 wget https://www.hydroshare.org/django_irods/download/3d74dccef69649b3a271d1c76f36d310/data/contents/static_lai-01589312.tif -O map.tif
 
@@ -49,6 +49,13 @@ if test -f /tmp/$TEMPDIR.grassrc6 ; then
    mv /tmp/$TEMPDIR.grassrc6 $HOME/.grassrc6
 fi
 echo $GRASS_ADDON_PATH
+
+echo "LOCATION_NAME: $LOCATION"  >  $HOME/.grassrc6
+echo "MAPSET: PERMANENT"                 >> $HOME/.grassrc6
+echo "DIGITIZER: none"              >> $HOME/.grassrc6
+echo "GISDBASE: $GISDBASE"          >> $HOME/.grassrc6
+export GISRC=$HOME/.grassrc6
+
 #grass64 -text /home/jovyan/work/notebooks/$LOCATION/PERMANENT
 g.extension extension=r.soils.texture prefix=$GRASS_ADDON_PATH
 g.extension extension=r.findtheriver prefix=$GRASS_ADDON_PATH
