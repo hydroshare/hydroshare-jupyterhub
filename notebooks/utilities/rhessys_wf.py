@@ -185,7 +185,7 @@ class RHESSysWorkflow(object):
     ###############################################################################################
     ### Functions to execute RHESSysWorkflow
 
-    def get_NHDStreamflowGageIdentifiersAndLocation(self, sub_project_folder, gageid, options):
+    def get_NHDStreamflowGageIdentifiersAndLocation(self, sub_project_folder, gageid):
         try:
             my_command = "GetNHDStreamflowGageIdentifiersAndLocation.py -p " + sub_project_folder + " -g " + gageid
             self.logger.info(my_command)
