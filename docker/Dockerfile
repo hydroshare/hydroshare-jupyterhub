@@ -43,7 +43,7 @@ RUN apt-get install -y build-essential git subversion p7zip-full python python-d
 
 # create directories
 RUN mkdir /home/jovyan/libs && chown -R jovyan:users /home/jovyan/libs
-RUN mkdir /home/jovyan/grassdata && chown -R jovyan:users /home/jovyan/grassdata
+#RUN mkdir /home/jovyan/grassdata && chown -R jovyan:users /home/jovyan/grassdata
 
 ###############################
 # SETUP JUPYTERHUB ENTRYPOINT #
@@ -55,8 +55,12 @@ RUN wget -q https://raw.githubusercontent.com/jupyterhub/jupyterhub/master/scrip
 ADD singleuser.sh /srv/singleuser/singleuser.sh
 
 # add grass create location script
-ADD create_grass_loc.sh /home/jovyan/libs/create_grass_loc.sh
-RUN chmod 755 /home/jovyan/libs/create_grass_loc.sh
+#ADD create_grass_loc.sh /home/jovyan/libs/create_grass_loc.sh
+#RUN chmod 755 /home/jovyan/libs/create_grass_loc.sh
+
+# fetch the ecohydro config file
+ADD https://raw.github.com/selimnairb/RHESSysWorkflows/master/docs/config/ecohydro-Linux.cfg /home/jovyan/.ecohydro.cfg  
+RUN chown jovyan:users /home/jovyan/.ecohydro.cfg
 
 ##################
 # PREPARE TAUDEM #
@@ -70,9 +74,9 @@ cd ../libs/TauDEM/src && make
 RUN ln -s /opt/conda/envs/python2/bin/python2 /usr/bin/python22
 
 # prepare grass
-COPY create_grass_loc.sh /home/jovyan/libs/create_grass_loc.sh
-RUN chown jovyan:users /home/jovyan/libs/create_grass_loc.sh && \
-chmod +x /home/jovyan/libs/create_grass_loc.sh
+#COPY create_grass_loc.sh /home/jovyan/libs/create_grass_loc.sh
+#RUN chown jovyan:users /home/jovyan/libs/create_grass_loc.sh && \
+#chmod +x /home/jovyan/libs/create_grass_loc.sh
 
 #########################
 # SWITCH TO JOVYAN USER #
@@ -80,29 +84,28 @@ chmod +x /home/jovyan/libs/create_grass_loc.sh
 USER jovyan 
 
 # load the rhessys configuration file
-ADD https://raw.github.com/selimnairb/RHESSysWorkflows/master/docs/config/ecohydro-Linux.cfg /home/jovyan/.ecohydro.cfg  
-RUN chown jovyan:users /home/jovyan/.ecohydro.cfg  && \
-sed -i -e 's|^ETC.*|ETC = /home/jovyan/libs/RHESSysWorkflows/etc|g' /home/jovyan/.ecohydro.cfg &&\
-sed -i -e 's|^MODULE_PATHC.*|MODULE_PATH = /home/jovyan/grassdata/.grass6/addons|g' /home/jovyan/.ecohydro.cfg &&\
-sed -i -e 's|^MODULE_PATHC.*|MODULE_ETC = /home/jovyan/libs/RHESSysWorkflows/etc/r.soils.texture|g' /home/jovyan/.ecohydro.cfg
+RUN sed -i -e 's|^ETC.*|ETC = /home/jovyan/libs/RHESSysWorkflows/etc|g' /home/jovyan/.ecohydro.cfg &&\
+sed -i -e 's|^MODULE_PATH.*|MODULE_PATH = /home/jovyan/work/notebooks/.grass6/addons|g' /home/jovyan/.ecohydro.cfg &&\
+sed -i -e 's|^MODULE_ETC.*|MODULE_ETC = /home/jovyan/libs/RHESSysWorkflows/etc/r.soils.texture|g' /home/jovyan/.ecohydro.cfg
 
 # prepare python environments
 RUN pip install --upgrade pip
 
 # install ecohydrolib
-RUN git clone https://github.com/leonard-psu/EcohydroLib.git ../libs/EcohydroLib && \
-cd ../libs/EcohydroLib && \
-python22 setup.py install
+RUN git clone https://github.com/leonard-psu/EcohydroLib.git ../libs/EcohydroLib
+RUN /bin/bash -c "source /opt/conda/bin/activate python2  \
+&& cd ../libs/EcohydroLib \
+&& python setup.py install "
 
 # install RHESSysWorkflows
-RUN git clone https://github.com/selimnairb/RHESSysWorkflows.git ../libs/RHESSysWorkflows && \
-cd ../libs/RHESSysWorkflows && \
-python22 setup.py install
+RUN git clone https://github.com/leonard-psu/RHESSysWorkflows.git ../libs/RHESSysWorkflows
+RUN /bin/bash -c "source /opt/conda/bin/activate python2 \
+&& cd ../libs/RHESSysWorkflows \
+&& python setup.py install"
 
-# install RHESSys
-RUN git clone https://github.com/RHESSys/RHESSys.git ../libs/RHESSys && \
-cd ../libs/RHESSys && \
-GISBASE=/usr/lib/grass64 make 2>&1 | grep warning | wc -l
+RUN /bin/bash -c "source /opt/conda/bin/activate python2 \
+&& pip install --upgrade pip \
+&& pip install wget "
 
 ###############################
 # PREPARE PYTHON ENVIRONMENTS #
@@ -114,9 +117,10 @@ gdal \
 basemap \
 landlab -c landlab
 
-#RUN pip3 install \ 
-#hs_restclient
-RUN pip3 install git+https://github.com/hydroshare/hs_restclient.git@2_and_3
+RUN git clone -b 2_and_3 https://github.com/hydroshare/hs_restclient.git ../libs/hs_restclient
+RUN /bin/bash -c "source /opt/conda/bin/activate root \
+&& cd ../libs/hs_restclient \
+&& python setup.py install "
 
 # Python 2
 # install gdal into python2 conda env
@@ -131,15 +135,19 @@ landlab -c landlab
 
 ENV PATH=/opt/conda/envs/python2/bin:/home/jovyan/libs/TauDEM:$PATH PYTHONPATH=/home/jovyan/work/notebooks/utilities:$PYTHONPATH DOCUMENTS=/home/jovyan/work/notebooks/documents DATA=/home/jovyan/work/notebooks/data HOME=/home/jovyan/work/notebooks ECOHYDROLIB_CFG=/home/jovyan/.ecohydro.cfg LD_LIBRARY_PATH=/usr/lib/grass64/lib
 
-RUN /bin/bash -c "source /opt/conda/bin/activate python2" &&  \
-pip install --upgrade hs_restclient
+#RUN /bin/bash -c "source /opt/conda/bin/activate python2" &&  \
+#pip install --upgrade hs_restclient
 
 # install odm2api, then upgrade it to renamevalueobjects branch
 RUN conda install -y -n python2 -c odm2 odm2api
-RUN /bin/bash -c "source /opt/conda/bin/activate python2" &&  \
-pip install --upgrade --process-dependency-links git+https://github.com/ODM2/ODM2PythonAPI.git@renamevalueobjects
+RUN /bin/bash -c "source /opt/conda/bin/activate python2 \
+&& pip install --upgrade --process-dependency-links git+https://github.com/ODM2/ODM2PythonAPI.git@renamevalueobjects"
 
 # prepare grass environment
+#RUN mkdir notebooks
+ADD rhessys_wf.py /home/jovyan/libs/rhessys_wf.py
+ADD run.py /home/jovyan/libs/run.py
+ADD create_grass_loc.sh /home/jovyan/libs/create_grass_loc.sh
 RUN /bin/sh /home/jovyan/libs/create_grass_loc.sh jupyter
 
 CMD ["sh", "/srv/singleuser/singleuser.sh"]
