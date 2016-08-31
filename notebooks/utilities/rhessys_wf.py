@@ -354,8 +354,8 @@ class RHESSysWorkflow(object):
 
     def GenerateSoilTextureMap(self, sub_project_folder, options=''):
         try:
-            my_command = "GenerateSoilTextureMap.py %s -p " + sub_project_folder
-            self.logger.info(my_command) % options
+            my_command = "GenerateSoilTextureMap.py %s -p %s" %(options, sub_project_folder)
+            self.logger.info(my_command)
             output = subprocess.check_output(my_command, shell=True, stderr=subprocess.STDOUT)
             return output
         except Exception,e:
