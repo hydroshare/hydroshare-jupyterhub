@@ -8,6 +8,7 @@ import logging
 sys.path.append('/usr/local/lib/python2.7/dist-packages/')
 import wget
 import datetime
+import shutil
 
 class Extent(object):
 
@@ -74,7 +75,15 @@ class RHESSysWorkflow(object):
     hdlr = ''
 
     ###############################################################################################
-    def __init__(self, project_location, project_name, gageid, start_date, end_date, rhessys_source_location, publisher):
+    def __init__(self, project_location=os.environ['DATA'], 
+                 project_name='test_project', 
+                 gageid='01589312', 
+                 start_date='2008-01-01', 
+                 end_date='2010-01-01', 
+                 rhessys_source_location='', 
+                 publisher='RHESSysWorkflow'):
+        
+        #project_location = os.environ['DATA'] if project_location is None else project_location
         self.project_location = project_location
         self.project_name = project_name
         self.gageid = gageid
@@ -88,10 +97,13 @@ class RHESSysWorkflow(object):
 
         ######################################
         ## Create project location
+        if os.path.exists(self.output_folder_location):
+            print ('project folder exists...removing')
+            shutil.rmtree(self.output_folder_location)
         self.create_path(self.output_folder_location)
         self.create_path(self.sub_project_folder)
         self.setup_log()
-
+        
         ######################################
         ## Create workflow
         #print("Start Executing workflow")
@@ -100,6 +112,7 @@ class RHESSysWorkflow(object):
 
         # prepare grass environment extensions
         if not os.path.exists(os.path.join(os.environ['HOME'], '.grassrc6')):
+            print('preparing grass6 installation')
             try:
                 prepare_script = os.path.join(os.path.dirname(__file__), 'prepare_grass.sh')
                 my_command = 'sh %s jupyter' % prepare_script
