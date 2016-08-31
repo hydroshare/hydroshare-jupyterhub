@@ -74,9 +74,9 @@ cd ../libs/TauDEM/src && make
 RUN ln -s /opt/conda/envs/python2/bin/python2 /usr/bin/python22
 
 # prepare grass
-#COPY create_grass_loc.sh /home/jovyan/libs/create_grass_loc.sh
-#RUN chown jovyan:users /home/jovyan/libs/create_grass_loc.sh && \
-#chmod +x /home/jovyan/libs/create_grass_loc.sh
+ADD create_grass_loc.sh /home/jovyan/libs/create_grass_loc.sh
+RUN chown jovyan:users /home/jovyan/libs/create_grass_loc.sh && \
+chmod +x /home/jovyan/libs/create_grass_loc.sh
 
 #########################
 # SWITCH TO JOVYAN USER #
@@ -148,8 +148,6 @@ RUN /bin/bash -c "source /opt/conda/bin/activate python2 \
 #ADD create_grass_loc.sh /home/jovyan/libs/create_grass_loc.sh
 ADD rhessys_wf.py /home/jovyan/libs/rhessys_wf.py
 ADD run.py /home/jovyan/libs/run.py
-ADD create_grass_loc.sh /home/jovyan/libs/create_grass_loc.sh
-RUN /bin/sh /home/jovyan/libs/create_grass_loc.sh jupyter
 
 CMD ["sh", "/srv/singleuser/singleuser.sh"]
 
