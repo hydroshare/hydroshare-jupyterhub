@@ -43,6 +43,7 @@ RUN apt-get install -y build-essential git subversion p7zip-full python python-d
 
 # create directories
 RUN mkdir /home/jovyan/libs && chown -R jovyan:users /home/jovyan/libs
+RUN mkdir /home/jovyan/work/notebooks && chown -R jovyan:users /home/jovyan/work/notebooks
 #RUN mkdir /home/jovyan/grassdata && chown -R jovyan:users /home/jovyan/grassdata
 
 ###############################
@@ -55,8 +56,7 @@ RUN wget -q https://raw.githubusercontent.com/jupyterhub/jupyterhub/master/scrip
 ADD singleuser.sh /srv/singleuser/singleuser.sh
 
 # add grass create location script
-#ADD create_grass_loc.sh /home/jovyan/libs/create_grass_loc.sh
-#RUN chmod 755 /home/jovyan/libs/create_grass_loc.sh
+#RUN chmod 755 /home/jovyan/libs/create_grass_loc.sh && chown jovyan:users /home/jovyan/libs/create_grass_loc.sh
 
 # fetch the ecohydro config file
 ADD https://raw.github.com/selimnairb/RHESSysWorkflows/master/docs/config/ecohydro-Linux.cfg /home/jovyan/.ecohydro.cfg  
@@ -145,6 +145,7 @@ RUN /bin/bash -c "source /opt/conda/bin/activate python2 \
 
 # prepare grass environment
 #RUN mkdir notebooks
+#ADD create_grass_loc.sh /home/jovyan/libs/create_grass_loc.sh
 ADD rhessys_wf.py /home/jovyan/libs/rhessys_wf.py
 ADD run.py /home/jovyan/libs/run.py
 ADD create_grass_loc.sh /home/jovyan/libs/create_grass_loc.sh

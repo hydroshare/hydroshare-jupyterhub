@@ -1,0 +1,4 @@
+GISDBASE: /home/jovyan/grassdata
+LOCATION_NAME: jupyter
+MAPSET: PERMANENT
+GRASS_GUI: text

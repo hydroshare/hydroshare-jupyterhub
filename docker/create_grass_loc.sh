@@ -5,7 +5,7 @@
 #variables to customize:
 GISBASE=/usr/lib/grass64
 GISDBASE=/home/jovyan/grassdata
-GRASS_ADDON_PATH=/home/jovyan/grassdata/.grass6/addons
+GRASS_ADDON_PATH=/home/jovyan/work/notebooks/.grass6/addons
 
 wget https://www.hydroshare.org/django_irods/download/3d74dccef69649b3a271d1c76f36d310/data/contents/static_lai-01589312.tif -O map.tif
 
