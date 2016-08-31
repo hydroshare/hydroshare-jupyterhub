@@ -98,7 +98,18 @@ class RHESSysWorkflow(object):
         #self.execute_workflow()
         #print("End Executing workflow")
 
-
+        # prepare grass environment extensions
+        if not os.path.exists(os.path.join(os.environ['HOME'], '.grassrc6')):
+            try:
+                prepare_script = os.path.join(os.path.dirname(__file__), 'prepare_grass.sh')
+                my_command = 'sh %s jupyter' % prepare_script
+                self.logger.info(my_command)
+                output = subprocess.check_output(my_command, shell=True, stderr=subprocess.STDOUT)
+            except Exception,e:
+                self.logger.error(str(e))
+                
+            
+            
 
     ###############################################################################################
     ### Common functions to manage workflow

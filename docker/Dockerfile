@@ -74,9 +74,9 @@ cd ../libs/TauDEM/src && make
 RUN ln -s /opt/conda/envs/python2/bin/python2 /usr/bin/python22
 
 # prepare grass
-ADD create_grass_loc.sh /home/jovyan/libs/create_grass_loc.sh
-RUN chown jovyan:users /home/jovyan/libs/create_grass_loc.sh && \
-chmod +x /home/jovyan/libs/create_grass_loc.sh
+#ADD create_grass_loc.sh /home/jovyan/libs/create_grass_loc.sh
+#RUN chown jovyan:users /home/jovyan/libs/create_grass_loc.sh && \
+#chmod +x /home/jovyan/libs/create_grass_loc.sh
 
 #########################
 # SWITCH TO JOVYAN USER #
