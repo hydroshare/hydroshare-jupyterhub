@@ -460,9 +460,9 @@ class RHESSysWorkflow(object):
         ######################################
         ## Create project location
         if os.path.exists(self.output_folder_location):
-            res = raw_input('Project %s already exists, would you like to remove it [Y/n]?' % self.project_name)
+            res = raw_input('Project [%s] already exists, would you like to remove it [Y/n]? ' % self.project_name)
             if res != 'n':
-                print('Creating a clean directory for project: {0}'.format(self.project_name))
+                print('Creating a clean directory for project [{0}]'.format(self.project_name))
                 shutil.rmtree(self.output_folder_location)
         self.create_path(self.output_folder_location)
         self.create_path(self.sub_project_folder)
