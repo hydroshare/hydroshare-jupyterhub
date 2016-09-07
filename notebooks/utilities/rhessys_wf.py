@@ -9,7 +9,38 @@ sys.path.append('/usr/local/lib/python2.7/dist-packages/')
 import wget
 import datetime
 import shutil
+from IPython.core.display import display, HTML
+import jupyter_utils
 
+# Plotting libraries
+import math
+import numpy as np
+import pandas as pd
+import statsmodels.api as sm
+import matplotlib.pyplot as plt
+import matplotlib
+from rhessysworkflows.rhessys import RHESSysOutput
+PLOT_TYPE_STD = 'standard'
+PLOT_TYPE_LOGY = 'logy'
+PLOT_TYPE_CDF = 'cdf'
+PLOT_TYPE_SCATTER = 'scatter'
+PLOT_TYPE_SCATTER_LOG = 'scatter-log'
+PLOT_TYPES = [PLOT_TYPE_STD, PLOT_TYPE_LOGY, PLOT_TYPE_CDF, PLOT_TYPE_SCATTER, PLOT_TYPE_SCATTER_LOG]
+PLOT_DEFAULT = PLOT_TYPE_STD
+
+LINE_TYPE_LINE = 'line'
+LINE_TYPE_DASH = 'dash'
+LINE_TYPE_DASH_DOT = 'dashdot'
+LINE_TYPE_COLON = 'colon'
+LINE_TYPE_DOT = 'dot'
+LINE_TYPE_DICT = { LINE_TYPE_LINE: '-',
+                  LINE_TYPE_DASH: '--',
+                  LINE_TYPE_DASH_DOT: '-.',
+                  LINE_TYPE_COLON: ':',
+                  LINE_TYPE_DOT: '.' }
+LINE_TYPES = [LINE_TYPE_LINE, LINE_TYPE_DASH, LINE_TYPE_DASH_DOT, LINE_TYPE_COLON, LINE_TYPE_DOT]
+NUM_LINE_TYPES = len(LINE_TYPES)
+    
 class Extent(object):
 
     min_x = 0
@@ -27,6 +58,337 @@ class Extent(object):
     def __repr__(self):
         return "\nmin x = " + str(self.min_x) + "\nmin y = " + str(self.min_y) + "\nmax x = " + str(self.max_x)  + "\nmax y = " + str(self.max_y) + "\n"
 
+def plotGraph(obs, data, sizeX=1, sizeY=1, dpi=80, **kwargs):
+    
+    plottype = kwargs.get('plottype')
+    supressObs = kwargs.get('supressObs')
+    linewidth = kwargs.get('linewidth')
+    linestyle = kwargs.get('linestyle')
+    color = kwargs.get('color')
+    column = kwargs.get('column')
+    title = kwargs.get('title')
+    ylabel = kwargs.get('ylabel')
+    xlabel = kwargs.get('xlabel')
+    legend = kwargs.get('legend')
+    secondaryData = kwargs.get('secondaryData')
+    secondaryColumn = kwargs.get('secondaryColumn')
+    secondaryPlotType = kwargs.get('secondaryPlotType')
+    
+    fig = plt.figure(figsize=(sizeX, sizeY), dpi=dpi, tight_layout=True)
+    ax = fig.add_subplot(111)
+
+    if plottype == PLOT_TYPE_STD or \
+       plottype == PLOT_TYPE_LOGY:
+        x = obs.index
+    elif plottype == PLOT_TYPE_CDF:
+        x = np.linspace(min_x, max_x, num=len(obs) )
+    
+    # Plot observed values
+    # Standard or log plot
+    obs_y = obs
+    if plottype == PLOT_TYPE_CDF:
+        obs_ecdf = sm.distributions.ECDF(obs)
+        obs_y = obs_ecdf(x)
+    obs_plt = None
+    if not supressObs:
+        (obs_plt,) = ax.plot(x, obs_y, linewidth=2.0, color='black')
+        
+    # Plot modeled values 
+    data_plt = []
+    for (i, d) in enumerate(data):
+        # Standard or log plot
+        mod_y = d
+        if plottype == PLOT_TYPE_CDF:
+            mod_ecdf = sm.distributions.ECDF(d)
+            mod_y = mod_ecdf(x)
+        
+        # Plot (we could move this outside of the for loop)
+        if linewidth is not None:
+            linewidth = linewidth[i]
+        else:
+            linewidth = 1.0
+            
+        if linestyle is not None:
+            linestyle = LINE_TYPE_DICT[ linestyle[i] ]
+        else:
+            # Rotate styles
+            styleIdx = ( (i + 1) % NUM_LINE_TYPES ) - 1
+            linestyle = LINE_TYPE_DICT[ LINE_TYPES[styleIdx] ]
+            
+        if color:
+            (mod_plt,) = ax.plot(x, mod_y, linewidth=linewidth, linestyle=linestyle,
+                                 color=color[i])
+        else:
+            (mod_plt,) = ax.plot(x, mod_y, linewidth=linewidth, linestyle=linestyle)
+        
+        data_plt.append(mod_plt)
+    
+    # Plot annotations
+    columnName = column.capitalize()
+    if title:
+        title = title
+    else:
+        if plottype == PLOT_TYPE_STD:
+            title = columnName
+        elif plottype == PLOT_TYPE_LOGY:
+            title = "log(%s)" % (columnName,)
+        elif plottype == PLOT_TYPE_CDF:
+            title = "Cummulative distribution - %s" % (columnName,) 
+    fig.suptitle(title, y=0.99)
+
+    # X-axis
+    if plottype == PLOT_TYPE_STD or \
+       plottype == PLOT_TYPE_LOGY:
+        num_years = len(x) / 365
+        if num_years > 4:
+            if num_years > 10:
+                ax.xaxis.set_major_locator(matplotlib.dates.YearLocator())
+            else:
+                ax.xaxis.set_major_locator(matplotlib.dates.MonthLocator(interval=3))
+        else:
+            ax.xaxis.set_major_locator(matplotlib.dates.MonthLocator())
+        ax.xaxis.set_major_formatter(matplotlib.dates.DateFormatter('%b-%Y'))
+        # Rotate
+        plt.setp( ax.xaxis.get_majorticklabels(), rotation=45)
+        plt.setp( ax.xaxis.get_majorticklabels(), fontsize='x-small')
+    
+    if plottype == PLOT_TYPE_CDF:
+        ax.set_xlim(min_x, max_x)
+        ax.set_xscale('log')
+        if xlabel:
+            ax.set_xlabel(xlabel)
+        else:
+            ax.set_xlabel( columnName )
+    elif xlabel:
+        ax.set_xlabel(xlabel)
+    
+    # Y-axis
+    if plottype == PLOT_TYPE_LOGY:
+        ax.set_yscale('log')
+    
+    if ylabel:
+        ax.set_ylabel(ylabel)
+    elif plottype != PLOT_TYPE_CDF:
+        y_label = columnName
+        if plottype == PLOT_TYPE_LOGY:
+            y_label = "log( %s )" % (columnName,)
+        ax.set_ylabel( y_label )
+    
+    if supressObs:
+        legend_items = legend
+    else:
+        data_plt.insert(0, obs_plt)
+        legend_items = ['Observed'] + legend
+    
+    # Plot secondary data (if specified)
+    if secondaryData and \
+       (plottype == PLOT_TYPE_STD or plottype == PLOT_TYPE_LOGY):
+        sec_file = open(secondaryData, 'r')
+        (sec_datetime, sec_data) = RHESSysOutput.readColumnFromFile(sec_file,
+                                                                    secondaryColumn,
+                                                                    startHour=0)
+        sec_file.close()
+        sec = pd.Series(sec_data, index=sec_datetime)
+        # Align timeseries
+        (sec_align, obs_align) = sec.align(obs, join='inner')
+        # Plot
+        ax2 = ax.twinx()
+        if secondaryPlotType == 'line':
+            (sec_plot,) = ax2.plot(x, sec_align)
+        elif secondaryPlotType == 'bar':
+            sec_plot = ax2.bar(x, sec_align, facecolor='blue', edgecolor='none', width=2.0)
+        secondaryLabel = secondaryColumn.capitalize()
+        if secondaryLabel:
+            secondaryLabel = secondaryLabel
+        ax2.invert_yaxis()
+        ax2.set_ylabel(secondaryLabel)
+    #ax.set_zorder(ax2.get_zorder()+1) # put ax in front of ax2
+    #ax.patch.set_visible(False) # hide the 'canvas' 
+    
+    # Plot legend last
+    num_cols = len(data)
+    if not supressObs:
+        num_cols += 1
+    
+    if plottype == PLOT_TYPE_CDF:
+        fig.legend( data_plt, legend_items, 'lower center', fontsize='x-small', 
+                    bbox_to_anchor=(0.5, -0.015), ncol=num_cols, frameon=False )
+    else:
+        fig.legend( data_plt, legend_items, 'lower center', fontsize='x-small', 
+                    bbox_to_anchor=(0.5, -0.01), ncol=num_cols, frameon=False )
+
+def plot_rhessys_results(outfileSuffix,
+        obs,
+        column,
+        legend,
+        plottype=PLOT_DEFAULT,
+        data=None, 
+        behavioralData=None,
+        color=[None],
+        linewidth=None,
+        linestyle=None,
+        title=None,
+        x=None,
+        y=None,
+        titlefontsize=12,
+        scatterwidth=1,
+        fontweight='regular',
+        legendfontsize=6,
+        axesfontsize=12,
+        ticklabelfontsize=12,
+        figureX=4,
+        figureY=3,
+        supressObs=False,
+        secondaryData=None,
+        secondaryPlotType='bar',
+        secondaryColumn=None,
+        secondaryLabel=None
+       ):
+    """
+    plottype: Type of plot
+    outfileSuffix: Suffix to append on to name part of file name
+    obs: File containing observed data, required=True
+    data: One or more RHESSys output data files
+    behavioralData: One or more ensemble output files from RHESSys behavioral runs
+    color: Color of symbol to be applied to plots of data. Color must be expressed in form recognized by matplotlib
+    linewidth: Width of lines to be applied to plots of data. Value must be float in units of points
+    linestyle: Style of symbol to be applied to plots of data. Styles correspond to those of matplotlib
+    column: Name of column to use from data files
+    title: Title of figure
+    legend: Legend item labels
+    x: X-axis label
+    y: Y-axis label
+    titlefontsize
+    scatterwidth: Width to use for lines and markers in scatter plots.  
+                  Markers size will be determine by multiplying scatterwidth by 6
+    fontweight: 
+    legendfontsize: 
+    axesfontsize:
+    ticklabelfontsize: 
+    figureX: The width of the plot, in inches
+    figureY: The height of the plot, in inches
+    supressObs: Do not plot observed data.  Observed data will still be used for aligning timeseries. 
+                Not applicable to scatter plot output
+    secondaryData: A data file containing the varaible to plot on a secondary Y-axis
+    secondaryPlotTyp: Type of plot to use for secondary data.
+    secondaryColumn: Name of column to use from secondary data file
+    secondaryLabel: Label to use for seconary Y-axis
+    """
+    
+    
+    if color:
+        if len(color) != len(data):
+            return 'Number of colors must match number of data files'
+    
+    if linewidth:
+        if min(linewidth) <= 0.0:
+            return 'All line widths must be > 0.0'
+        if len(linewidth) != len(data):
+            return 'Number of line widths must match number of data files'
+            
+    if linestyle:
+        if len(linestyle) != len(data):
+            return 'Number of line styles must match number of data files'
+    
+    if secondaryData and not secondaryColumn:
+        return 'A secondary data file was specified, but the secondary column to use was not'
+    
+    if data and ( len(data) != len(legend) ):
+        return 'Number of legend items must equal the number of data files'
+    elif behavioralData and ( len(behavioralData) != len(legend) ):
+        return 'Number of legend items must equal the number of data files'
+
+    # Open data and align to observed
+    obs_align = None
+    data_list = []
+    max_x = min_x = 0
+    
+    if data:
+        # Open observed data
+        obs_file = open(obs, 'r')
+        (obs_datetime, obs_data) = RHESSysOutput.readObservedDataFromFile(obs_file,
+                                                                          readHour=False)
+        obs_file.close()
+        obs = pd.Series(obs_data, index=obs_datetime)
+        
+        for d in data:
+            mod_file = open(d, 'r')
+            (tmp_datetime, tmp_data) = RHESSysOutput.readColumnFromFile(mod_file, column, startHour=0)
+            tmp_mod = pd.Series(tmp_data, index=tmp_datetime)
+            # Align timeseries
+            (mod_align, obs_align) = tmp_mod.align(obs, join='inner')
+            tmp_max_x = max(mod_align.max(), obs_align.max())
+            if tmp_max_x > max_x:
+                max_x = tmp_max_x
+            min_x = max(min_x, mod_align.min())
+        
+            mod_file.close()
+            data_list.append( mod_align )
+    elif behavioralData:
+        
+        # Open observed data (behavioral data has hour in it, so we need to read obs. data differently)
+        obs_file = open(obs, 'r')
+        (obs_datetime, obs_data) = RHESSysOutput.readObservedDataFromFile(obs_file,
+                                                                          readHour=True)
+        obs_file.close()
+        obs = pd.Series(obs_data, index=obs_datetime)
+        
+        for b in behavioralData:
+            tmp_mod = pd.read_csv(b, index_col=0, parse_dates=True)
+            # Convert df to series
+            tmp_mod = pd.Series(tmp_mod[column], index=tmp_mod.index)
+            # Align timeseries
+            (mod_align, obs_align) = tmp_mod.align(obs, join='inner')
+            tmp_max_x = max(mod_align.max(), obs_align.max())
+            if tmp_max_x > max_x:
+                max_x = tmp_max_x
+            min_x = max(min_x, mod_align.min())
+        
+            data_list.append( mod_align )
+
+    kwargs = dict(legend=legend,
+                 column=column,
+                 plottype=plottype,
+                 behavioralData=behavioralData,
+                 color=color,
+                 linewidth=linewidth,
+                 linestyle=linestyle,
+                 title=title,
+                 xlabel=x,
+                 ylabel=y,
+                 titlefontsize=titlefontsize,
+                 scatterwidth=scatterwidth,
+                 fontweight=fontweight,
+                 legendfontsize=legendfontsize,
+                 axesfontsize=axesfontsize,
+                 ticklabelfontsize=ticklabelfontsize,
+                 figureX=figureX,
+                 figureY=figureY,
+                 supressObs=supressObs,
+                 secondaryData=secondaryData,
+                 secondaryPlotType=secondaryPlotType,
+                 secondaryColumn=secondaryColumn,
+                 secondaryLabel=secondaryLabel)
+    
+    if plottype == PLOT_TYPE_SCATTER:
+        print('%s: not supported at this time' % PLOT_TYPE_SCATTER)
+        return
+        
+    elif plottype == PLOT_TYPE_SCATTER_LOG:
+        print('%s: not supported at this time' % PLOT_TYPE_SCATTER_LOG)
+        return
+    else:
+        plotGraph(obs_align, data_list, 
+                  sizeX=figureX, sizeY=figureY,
+                 **kwargs)
+    # Output plot
+    filename = plottype
+    if outfileSuffix:
+        filename += '_' + outfileSuffix
+    plot_filename_png = "%s.png" % (filename,)
+    plot_filename_pdf = "%s.pdf" % (filename,)
+    plt.savefig(plot_filename_png)
+    plt.savefig(plot_filename_pdf)
 
 class RHESSysWorkflow(object):
  
@@ -98,11 +460,18 @@ class RHESSysWorkflow(object):
         ######################################
         ## Create project location
         if os.path.exists(self.output_folder_location):
-            print ('project folder exists...removing')
-            shutil.rmtree(self.output_folder_location)
+            res = raw_input('Project %s already exists, would you like to remove it [Y/n]?' % self.project_name)
+            if res != 'n':
+                print('Creating a clean directory for project: {0}'.format(self.project_name))
+                shutil.rmtree(self.output_folder_location)
         self.create_path(self.output_folder_location)
         self.create_path(self.sub_project_folder)
         self.setup_log()
+        
+        rp = jupyter_utils.get_relative_path(self.output_folder_location)
+        up = jupyter_utils.get_server_url_for_path(self.output_folder_location)
+        display(HTML('<pre>RHESSys project has been initialized at:<br>' +
+                     '<a href={0} target="_blank">{1}<a></pre>'.format(up, rp)))
         
         ######################################
         ## Create workflow
@@ -112,12 +481,13 @@ class RHESSysWorkflow(object):
 
         # prepare grass environment extensions
         if not os.path.exists(os.path.join(os.environ['HOME'], '.grassrc6')):
-            print('preparing grass6 installation')
+            print 'Preparing grass6 installation... ',
             try:
                 prepare_script = os.path.join(os.path.dirname(__file__), 'prepare_grass.sh')
                 my_command = 'sh %s jupyter' % prepare_script
                 self.logger.info(my_command)
                 output = subprocess.check_output(my_command, shell=True, stderr=subprocess.STDOUT)
+                print 'done'
             except Exception,e:
                 self.logger.error(str(e))
                 
