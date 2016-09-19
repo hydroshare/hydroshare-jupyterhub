@@ -1,3 +1,8 @@
+# HydroShare Jupyterhub Notebook Server
+
+The HydroShare Jupyterhub Notebook Server is an environment specifically designed to link HydroShare resources to user-generated web-based computations. It extends the FOSS [JupyerHub](https://github.com/jupyterhub/jupyterhub) project to incorporate libraries designed to provided seamless interaction with HydroShare web resources and core functionality.  This project also leverages [docker](https://www.docker.com/) containers to provide users with an isolated linux environment where they can build, modify, and store custom Jupyter notebooks and servers.  While this software can be deployed in a stand-alone manner, it is intended to interact with HydroShare via WebApp resources, e.g. [Jupyer-NCSA](https://www.hydroshare.org/resource/80d9f3b4bc914628a2d1df4ebebcc3fd/) (an instance deployed at the Resourcing Open Geo-spatial Education and Research (ROGER) supercomputer).
+
+
 
 This repository contains files for setting up and testing the HydroShare-Jupyterhub integration.  The project is subdivided into the following folders:
 
