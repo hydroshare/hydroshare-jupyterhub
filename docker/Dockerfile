@@ -140,8 +140,8 @@ ENV PATH=/opt/conda/envs/python2/bin:/home/jovyan/libs/TauDEM:$PATH PYTHONPATH=/
 
 # install odm2api, then upgrade it to renamevalueobjects branch
 RUN conda install -y -n python2 -c odm2 odm2api
-RUN /bin/bash -c "source /opt/conda/bin/activate python2 \
-&& pip install --upgrade --process-dependency-links git+https://github.com/ODM2/ODM2PythonAPI.git@renamevalueobjects"
+#RUN /bin/bash -c "source /opt/conda/bin/activate python2 \
+#&& pip install --upgrade --process-dependency-links git+https://github.com/ODM2/ODM2PythonAPI.git@renamevalueobjects"
 
 # prepare grass environment
 #RUN mkdir notebooks
