@@ -1,6 +1,6 @@
 FROM jupyter/scipy-notebook
 
-MAINTAINER Tony Castronova <tony.castronova@usu.edu>
+MAINTAINER Tony Castronova <acastronova@cuahsi.org>
 
 EXPOSE 8888
 

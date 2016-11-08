@@ -1,5 +1,5 @@
 FROM castrona/hs-jupyter-base:latest
-MAINTAINER Tony Castronova <tony.castronova@usu.edu>
+MAINTAINER Tony Castronova <acastronova@cuahsi.org>
 
 ######################################################
 ### Begin - JupyterHub Development Image Additions ###
