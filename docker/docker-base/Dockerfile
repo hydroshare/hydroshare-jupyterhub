@@ -135,7 +135,7 @@ ENV PATH=/opt/conda/envs/python2/bin:/home/jovyan/libs/TauDEM:$PATH PYTHONPATH=/
 ADD rhessys_wf.py /home/jovyan/libs/rhessys_wf.py
 ADD run.py /home/jovyan/libs/run.py
 
-CMD ["sh", "/srv/singleuser/singleuser.sh"]
+#CMD ["sh", "/srv/singleuser/singleuser.sh"]
 
 
 
