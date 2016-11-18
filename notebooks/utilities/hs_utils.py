@@ -14,6 +14,7 @@ import xml.etree.ElementTree as et
 from datetime import datetime as dt
 import pickle
 import shutil
+import urllib
 
 is_py2 = sys.version[0] == '2'
 if is_py2:
@@ -60,7 +61,8 @@ def check_for_ipynb(content_files):
             fname = os.path.basename(p)
             rel_path = os.path.relpath(p, os.environ['HOME'])
             url = '%s%s/notebooks/notebooks/%s' % (':'.join(os.environ['JUPYTER_HUB_IP'].split(':')[:-1]),os.environ['JPY_BASE_URL'], rel_path)
-            links[fname] = url
+            encoded_url = urllib.parse.quote(url)
+            links[fname] = encoded_url
     return links
             
 def display_resource_content_files(content_file_dictionary, text='Found the following content when parsing the HydroShare resource:'):
