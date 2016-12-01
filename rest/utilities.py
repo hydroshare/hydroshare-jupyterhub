@@ -3,9 +3,7 @@
 import os
 from pwd import getpwnam
 import grp
-import json
 import shutil
-from hs_restclient import HydroShare
 import logging
 
 log = logging.getLogger()
@@ -53,6 +51,7 @@ def build_userspace(username):
 
     userspace_dir = os.environ['JUPYTER_USERSPACE_DIR']
     ipynb_dir = os.environ['JUPYTER_NOTEBOOK_DIR']
+
     # check to see if user exists
     basepath = os.path.abspath(os.path.join(userspace_dir, '%s'%husername))
     path = os.path.abspath(os.path.join(basepath, 'notebooks'))
