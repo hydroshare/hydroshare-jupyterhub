@@ -166,15 +166,17 @@ class ResourceMetadata (object):
         
         
 class hydroshare():
-    def __init__(self):
+    def __init__(self, username=None):
         self.hs = None
         self.content = {}
         
         # load the HS environment variables
         self.load_environment()
         
+        uname = os.environ['HS_USR_NAME'] if username is None else username
+        
         # get a secure connection to hydroshare
-        auth = self.getSecureConnection(os.environ['HS_USR_NAME'])
+        auth = self.getSecureConnection(uname)
         
         try:
             self.hs = HydroShare(auth=auth)
@@ -209,17 +211,20 @@ class hydroshare():
             
         
     def load_environment(self):
-        env_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'env')
-        with open(env_path, 'r') as f:
-            lines = f.readlines()
-            print('Adding the following system variables:')
-            for line in lines:
-                k,v = line.strip().split('=')
-                os.environ[k] = v
-                print('   %s = %s' % (k, v))
-            print('\nThese can be accessed using the following command: ')
-            print('   os.environ[key]')
-            print('\n   (e.g.)\n   os.environ["HS_USR_NAME"]  => %s' % os.environ['HS_USR_NAME'])
+        try:
+            env_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'env')
+            with open(env_path, 'r') as f:
+                lines = f.readlines()
+                print('Adding the following system variables:')
+                for line in lines:
+                    k,v = line.strip().split('=')
+                    os.environ[k] = v
+                    print('   %s = %s' % (k, v))
+                print('\nThese can be accessed using the following command: ')
+                print('   os.environ[key]')
+                print('\n   (e.g.)\n   os.environ["HS_USR_NAME"]  => %s' % os.environ['HS_USR_NAME'])
+        except Exception as e:
+            print('Encountered and error when loading your environment.')
 
     def getSecureConnection(self, username):
         """
@@ -234,7 +239,7 @@ class hydroshare():
         auth_path = os.path.join(os.path.dirname(__file__), '../../../.auth')
         if not os.path.exists(auth_path):
             print('\nThe hs_utils library requires a secure connection to your HydroShare account.')
-            p = getpass.getpass('Enter you HydroShare Password: ')
+            p = getpass.getpass('Enter your HydroShare Password for \'%s\': ' % username)
             auth = HydroShareAuthBasic(username=username, password=p)
             
             with open(auth_path, 'wb') as f:
