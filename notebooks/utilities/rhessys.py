@@ -11,7 +11,7 @@ import wget
 import datetime
 import shutil
 from IPython.core.display import display, HTML
-import jupyter_utils
+import jupyter
 
 # Plotting libraries
 import math
@@ -469,8 +469,8 @@ class RHESSysWorkflow(object):
         self.create_path(self.sub_project_folder)
         self.setup_log()
         
-        rp = jupyter_utils.get_relative_path(self.output_folder_location)
-        up = jupyter_utils.get_server_url_for_path(self.output_folder_location)
+        rp = jupyter.get_relative_path(self.output_folder_location)
+        up = jupyter.get_server_url_for_path(self.output_folder_location)
         display(HTML('<pre>RHESSys project has been initialized at:<br>' +
                      '<a href={0} target="_blank">{1}<a></pre>'.format(up, rp)))
         
