@@ -25,7 +25,7 @@ else:
 
 class timeseries():
     def __init__(self):
-        self.hydroshare = hs_utils.hydroshare()
+        self.hydroshare = hydroshare.hydroshare()
         self.odm2db = None
         self._session = None
         self.read = None
