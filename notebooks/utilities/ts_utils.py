@@ -1,17 +1,15 @@
 from __future__ import print_function
 import os, sys
-from IPython.core.display import display, HTML
-import hs_utils  
+from IPython.core.display import display, HTML  
 import shutil
 import requests
 import threading
 import glob
-from odm2api.ODMconnection import dbconnection
-from odm2api.ODM2.services.readService import *
-from odm2api.ODM2.services.createService import *
 import math
 import matplotlib.pyplot as plt
 from matplotlib.dates import date2num, AutoDateFormatter, AutoDateLocator
+
+from . import hs_utils
 
 is_py2 = sys.version[0] == '2'
 if not is_py2:
@@ -20,6 +18,10 @@ if not is_py2:
 else:
     # set this for future python3 compatibility
     input = raw_input
+    
+    from odm2api.ODMconnection import dbconnection
+    from odm2api.ODM2.services.readService import *
+    from odm2api.ODM2.services.createService import *
 
 class timeseries():
     def __init__(self):

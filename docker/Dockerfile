@@ -24,6 +24,7 @@ RUN conda install -y -n python2 -c odm2 odm2api
 ### End - JupyterHub Development Image Additions ###
 ####################################################
 
+ENV PYTHONPATH=/home/jovyan/work/notebooks:$PYTHONPATH
 
 CMD ["sh", "/srv/singleuser/singleuser.sh"]
 
