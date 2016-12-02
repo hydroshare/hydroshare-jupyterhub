@@ -166,15 +166,19 @@ class ResourceMetadata (object):
         
         
 class hydroshare():
-    def __init__(self):
+    def __init__(self, username=None):
         self.hs = None
         self.content = {}
         
         # load the HS environment variables
         self.load_environment()
         
+        uname = username
+        if uname is None:
+            uname = os.environ['HS_USR_NAME']
+            
         # get a secure connection to hydroshare
-        auth = self.getSecureConnection(os.environ['HS_USR_NAME'])
+        auth = self.getSecureConnection(uname)
         
         try:
             self.hs = HydroShare(auth=auth)
@@ -233,7 +237,7 @@ class hydroshare():
         auth_path = os.path.join(os.path.dirname(__file__), '../../../.auth')
         if not os.path.exists(auth_path):
             print('\nThe hs_utils library requires a secure connection to your HydroShare account.')
-            p = getpass.getpass('Enter you HydroShare Password: ')
+            p = getpass.getpass('Enter the HydroShare password for user \'%s\': ' % username)
             auth = HydroShareAuthBasic(username=username, password=p)
             
             with open(auth_path, 'wb') as f:
