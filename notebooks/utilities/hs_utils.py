@@ -166,17 +166,15 @@ class ResourceMetadata (object):
         
         
 class hydroshare():
-    def __init__(self, username=None):
+    def __init__(self):
         self.hs = None
         self.content = {}
         
         # load the HS environment variables
         self.load_environment()
         
-        uname = os.environ['HS_USR_NAME'] if username is None else username
-        
         # get a secure connection to hydroshare
-        auth = self.getSecureConnection(uname)
+        auth = self.getSecureConnection(os.environ['HS_USR_NAME'])
         
         try:
             self.hs = HydroShare(auth=auth)
@@ -189,7 +187,6 @@ class hydroshare():
             # remove the cached authentication
             auth_path = os.path.join(os.path.dirname(__file__), '../../../.auth')
             os.remove(auth_path)
-            
             return None
         
     def _getResourceFromHydroShare(self, resourceid, destination='.', unzip=True):
@@ -211,20 +208,17 @@ class hydroshare():
             
         
     def load_environment(self):
-        try:
-            env_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'env')
-            with open(env_path, 'r') as f:
-                lines = f.readlines()
-                print('Adding the following system variables:')
-                for line in lines:
-                    k,v = line.strip().split('=')
-                    os.environ[k] = v
-                    print('   %s = %s' % (k, v))
-                print('\nThese can be accessed using the following command: ')
-                print('   os.environ[key]')
-                print('\n   (e.g.)\n   os.environ["HS_USR_NAME"]  => %s' % os.environ['HS_USR_NAME'])
-        except Exception as e:
-            print('Encountered and error when loading your environment.')
+        env_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'env')
+        with open(env_path, 'r') as f:
+            lines = f.readlines()
+            print('Adding the following system variables:')
+            for line in lines:
+                k,v = line.strip().split('=')
+                os.environ[k] = v
+                print('   %s = %s' % (k, v))
+            print('\nThese can be accessed using the following command: ')
+            print('   os.environ[key]')
+            print('\n   (e.g.)\n   os.environ["HS_USR_NAME"]  => %s' % os.environ['HS_USR_NAME'])
 
     def getSecureConnection(self, username):
         """
@@ -239,7 +233,7 @@ class hydroshare():
         auth_path = os.path.join(os.path.dirname(__file__), '../../../.auth')
         if not os.path.exists(auth_path):
             print('\nThe hs_utils library requires a secure connection to your HydroShare account.')
-            p = getpass.getpass('Enter your HydroShare Password for \'%s\': ' % username)
+            p = getpass.getpass('Enter you HydroShare Password: ')
             auth = HydroShareAuthBasic(username=username, password=p)
             
             with open(auth_path, 'wb') as f:
@@ -266,6 +260,7 @@ class hydroshare():
             res_type = restypes[resource_type]
         except KeyError:
             display(HTML('<b style="color:red;">[%s] is not a valid HydroShare resource type.</p>' % resource_type))
+            return None
         
         # get the 'derived resource' metadata
         if derivedFromId is not None:
@@ -277,6 +272,7 @@ class hydroshare():
                 
             except:
                 display(HTML('<b style="color:red;">[%s] is not a valid HydroShare resource id for setting the "derivedFrom" attribute.</p>' % derivedFromId))
+                return None
         
         else:
             response = input('You have indicated that this resource is NOT derived from any existing HydroShare resource.  Are you sure that this is what you intended? [Y/n]')
