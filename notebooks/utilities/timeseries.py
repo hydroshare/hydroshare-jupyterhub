@@ -9,7 +9,7 @@ import math
 import matplotlib.pyplot as plt
 from matplotlib.dates import date2num, AutoDateFormatter, AutoDateLocator
 
-from . import hs_utils
+from utilities import hydroshare
 
 is_py2 = sys.version[0] == '2'
 if not is_py2:
