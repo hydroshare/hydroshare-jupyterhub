@@ -579,7 +579,56 @@ class RHESSysWorkflow(object):
 
     ###############################################################################################
     ### Functions to execute RHESSysWorkflow
+    def RegisterDEMOptions(self, options):
+        try:
+            my_command = "RegisterDEM.py " + options
+            self.logger.info(my_command)
+            output = subprocess.check_output(my_command, shell=True, stderr=subprocess.STDOUT)
+            return output
+        except Exception,e:
+            self.logger.error(str(e))
+            return -1
+        
+    def RegisterDEM(self, sub_project_folder, dem_file):
+        try:
+            my_command = "RegisterDEM.py -p " + sub_project_folder + " -d " + dem_file
+            self.logger.info(my_command)
+            output = subprocess.check_output(my_command, shell=True, stderr=subprocess.STDOUT)
+            return output
+        except Exception,e:
+            self.logger.error(str(e))
+            return -1
+        
+    def RegisterGage(self, sub_project_folder, gage_file, layername, id_attribute, id_value):
+        try:
+            my_command = "RegisterGage.py -p " + sub_project_folder + " -g " + gage_file + " -l " + layername + " -a " + id_attribute + " -d " + id_value
+            self.logger.info(my_command)
+            output = subprocess.check_output(my_command, shell=True, stderr=subprocess.STDOUT)
+            return output
+        except Exception,e:
+            self.logger.error(str(e))
+            return -1
 
+    def RegisterRasterOptions(self, options):
+        try:
+            my_command = "RegisterRaster.py " + options
+            self.logger.info(my_command)
+            output = subprocess.check_output(my_command, shell=True, stderr=subprocess.STDOUT)
+            return output
+        except Exception,e:
+            self.logger.error(str(e))
+            return -1
+         
+    def RegisterRaster(self, sub_project_folder, raster_type, raster_file):
+        try:
+            my_command = "RegisterRaster.py -p " + sub_project_folder + " -t " + raster_type + " -r " + raster_file
+            self.logger.info(my_command)
+            output = subprocess.check_output(my_command, shell=True, stderr=subprocess.STDOUT)
+            return output
+        except Exception,e:
+            self.logger.error(str(e))
+            return -1
+        
     def get_NHDStreamflowGageIdentifiersAndLocation(self, sub_project_folder, gageid):
         try:
             my_command = "GetNHDStreamflowGageIdentifiersAndLocation.py -p " + sub_project_folder + " -g " + gageid
@@ -724,6 +773,15 @@ class RHESSysWorkflow(object):
             self.logger.error(str(e))
             return -1
 
+    def GeneratePatchMapOptions(self, options):
+        try:
+            my_command = "GeneratePatchMap.py " + options
+            self.logger.info(my_command)
+            output = subprocess.check_output(my_command, shell=True, stderr=subprocess.STDOUT)
+            return output
+        except Exception,e:
+            self.logger.error(str(e))
+            return -1
 
 ##TODO OTHER VARIABLES
     def GeneratePatchMap(self, sub_project_folder):
@@ -746,6 +804,15 @@ class RHESSysWorkflow(object):
             self.logger.error(str(e))
             return -1
 
+    def ImportRasterMapIntoGRASS(self, sub_project_folder, texture, mode):
+        try:
+            my_command = "ImportRasterMapIntoGRASS.py -p " + sub_project_folder + " -t " + texture + " -m " + mode
+            self.logger.info(my_command)
+            output = subprocess.check_output(my_command, shell=True, stderr=subprocess.STDOUT)
+            return output
+        except Exception,e:
+            self.logger.error(str(e))
+            return -1
 
     def ImportRasterMapIntoGRASS_LAI(self, sub_project_folder):
         try:
@@ -766,6 +833,16 @@ class RHESSysWorkflow(object):
         except Exception as e:
             self.logger.error(str(e))
             return -1
+        
+    def RegisterLandcoverReclassRulesOptions(self, options):
+        try:
+            my_command = "RegisterLandcoverReclassRules.py " + options
+            self.logger.info(my_command)
+            output = subprocess.check_output(my_command, shell=True, stderr=subprocess.STDOUT)
+            return output
+        except Exception,e:
+            self.logger.error(str(e))
+            return -1
 
     def RegisterLandcoverReclassRules(self, sub_project_folder):
         try:
@@ -774,6 +851,16 @@ class RHESSysWorkflow(object):
             output = subprocess.check_output(my_command, shell=True, stderr=subprocess.STDOUT)
             return output
         except Exception as e:
+            self.logger.error(str(e))
+            return -1
+        
+    def GenerateLandcoverMapsOptions(self, options):
+        try:
+            my_command = "GenerateLandcoverMaps.py " + options
+            self.logger.info(my_command)
+            output = subprocess.check_output(my_command, shell=True, stderr=subprocess.STDOUT)
+            return output
+        except Exception,e:
             self.logger.error(str(e))
             return -1
 
@@ -787,6 +874,16 @@ class RHESSysWorkflow(object):
             self.logger.error(str(e))
             return -1
 
+    def GenerateWorldTemplateOptions(self, options):
+        try:
+            my_command = "GenerateWorldTemplate.py " + options
+            self.logger.info(my_command)
+            output = subprocess.check_output(my_command, shell=True, stderr=subprocess.STDOUT)
+            return output
+        except Exception,e:
+            self.logger.error(str(e))
+            return -1
+        
 #TODO NAME OF CLIMATE STATION
     def GenerateWorldTemplate(self, sub_project_folder):
         try:
@@ -808,6 +905,16 @@ class RHESSysWorkflow(object):
             self.logger.error(str(e))
             return -1
 
+    def CreateFlowtableOptions(self, options):
+        try:
+            my_command = "CreateFlowtable.py " + options
+            self.logger.info(my_command)
+            output = subprocess.check_output(my_command, shell=True, stderr=subprocess.STDOUT)
+            return output
+        except Exception,e:
+            self.logger.error(str(e))
+            return -1
+        
     def CreateFlowtable(self, sub_project_folder):
         try:
             my_command = "CreateFlowtable.py -p " + sub_project_folder + " --routeRoads"
@@ -828,6 +935,18 @@ class RHESSysWorkflow(object):
             self.logger.error(str(e))
             return -1
 
+    def RunCmdOptions(self, options):
+        try:
+            
+            my_command = "RunCmd.py " + options
+
+            self.logger.info(my_command)
+            output = subprocess.check_output(my_command, shell=True, stderr=subprocess.STDOUT)
+            return output
+        except Exception,e:
+            self.logger.error(str(e))
+            return -1
+        
     ##TODO MORE OPTIONS
     def RunCmd(self, sub_project_folder, addmonths):
         try:
@@ -841,7 +960,18 @@ class RHESSysWorkflow(object):
             self.logger.error(str(e))
             return -1
 
+    def RunModelOptions(self, options):
+        try:
 
+            my_command = "RunModel.py " + options
+
+            self.logger.info(my_command)
+            output = subprocess.check_output(my_command, shell=True, stderr=subprocess.STDOUT)
+            return output
+        except Exception,e:
+            self.logger.error(str(e))
+            return -1
+        
     ##TODO MORE OPTIONS
     def RunModel(self, sub_project_folder):
         try:
