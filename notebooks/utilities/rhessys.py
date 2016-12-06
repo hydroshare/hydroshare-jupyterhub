@@ -1,3 +1,4 @@
+from __future__ import print_function
 import urllib, json, time
 import sys
 import os
@@ -10,7 +11,7 @@ import wget
 import datetime
 import shutil
 from IPython.core.display import display, HTML
-import jupyter_utils
+import jupyter
 
 # Plotting libraries
 import math
@@ -468,8 +469,8 @@ class RHESSysWorkflow(object):
         self.create_path(self.sub_project_folder)
         self.setup_log()
         
-        rp = jupyter_utils.get_relative_path(self.output_folder_location)
-        up = jupyter_utils.get_server_url_for_path(self.output_folder_location)
+        rp = jupyter.get_relative_path(self.output_folder_location)
+        up = jupyter.get_server_url_for_path(self.output_folder_location)
         display(HTML('<pre>RHESSys project has been initialized at:<br>' +
                      '<a href={0} target="_blank">{1}<a></pre>'.format(up, rp)))
         
@@ -481,14 +482,14 @@ class RHESSysWorkflow(object):
 
         # prepare grass environment extensions
         if not os.path.exists(os.path.join(os.environ['HOME'], '.grassrc6')):
-            print 'Preparing grass6 installation... ',
+            print('Preparing grass6 installation... ', end='')
             try:
                 prepare_script = os.path.join(os.path.dirname(__file__), 'prepare_grass.sh')
                 my_command = 'sh %s jupyter' % prepare_script
                 self.logger.info(my_command)
                 output = subprocess.check_output(my_command, shell=True, stderr=subprocess.STDOUT)
-                print 'done'
-            except Exception,e:
+                print('done')
+            except Exception as e:
                 self.logger.error(str(e))
                 
             
@@ -507,7 +508,7 @@ class RHESSysWorkflow(object):
 
     def setup_log(self):
         log_file = self.output_folder_location + "/" + self.project_name + ".log"
-        print 'Log file location: ' + log_file
+        print('Log file location: ' + log_file)
         self.logger = logging.getLogger("myApp")
         self.hdlr = logging.FileHandler(log_file)
         self.logger.addHandler(self.hdlr)
@@ -519,8 +520,8 @@ class RHESSysWorkflow(object):
             zfile = zipfile.ZipFile(input_location)
             zfile.extractall(etv_output_folder_location)
             zfile.close()
-        except Exception,e:
-            print str(e)
+        except Exception as e:
+            print(str(e))
 
 
 
@@ -571,7 +572,7 @@ class RHESSysWorkflow(object):
             result = Extent(extent_min_x,extent_min_y,extent_max_x,extent_max_y)
             self.logger.info(result)
             return result
-        except Exception,e:
+        except Exception as e:
             self.logger.error(str(e))
             return -1
 
@@ -634,7 +635,7 @@ class RHESSysWorkflow(object):
             self.logger.info(my_command)
             output = subprocess.check_output(my_command, shell=True, stderr=subprocess.STDOUT)
             return output
-        except Exception,e:
+        except Exception as e:
             self.logger.error(str(e))
             return -1
 
@@ -644,7 +645,7 @@ class RHESSysWorkflow(object):
             self.logger.info(my_command)
             output = subprocess.check_output(my_command, shell=True, stderr=subprocess.STDOUT)
             return output
-        except Exception,e:
+        except Exception as e:
             self.logger.error(str(e))
             return -1
 
@@ -657,7 +658,7 @@ class RHESSysWorkflow(object):
         except subprocess.CalledProcessError as e:
             self.logger.error(str(e))
             return -1
-        except Exception,e:
+        except Exception as e:
             self.logger.error(str(e))
             return -1
 
@@ -668,7 +669,7 @@ class RHESSysWorkflow(object):
 
             output = subprocess.check_output(my_command, shell=True, stderr=subprocess.STDOUT)
             return output
-        except Exception,e:
+        except Exception as e:
             self.logger.error(str(e))
             return -1
 
@@ -678,7 +679,7 @@ class RHESSysWorkflow(object):
             self.logger.info(my_command)
             output = subprocess.check_output(my_command, shell=True, stderr=subprocess.STDOUT)
             return output
-        except Exception,e:
+        except Exception as e:
             self.logger.error(str(e))
             return -1
 
@@ -688,7 +689,7 @@ class RHESSysWorkflow(object):
             self.logger.info(my_command)
             output = subprocess.check_output(my_command, shell=True, stderr=subprocess.STDOUT)
             return output
-        except Exception,e:
+        except Exception as e:
             self.logger.error(str(e))
             return -1
 
@@ -698,7 +699,7 @@ class RHESSysWorkflow(object):
             self.logger.info(my_command)
             output = subprocess.check_output(my_command, shell=True, stderr=subprocess.STDOUT)
             return output
-        except Exception,e:
+        except Exception as e:
             self.logger.error(str(e))
             return -1
 
@@ -709,7 +710,7 @@ class RHESSysWorkflow(object):
             self.logger.info(my_command) 
             output = subprocess.check_output(my_command, shell=True, stderr=subprocess.STDOUT)
             return output
-        except Exception,e:
+        except Exception as e:
             self.logger.error(str(e))
             return -1
 
@@ -720,7 +721,7 @@ class RHESSysWorkflow(object):
             self.logger.info(my_command)
             output = subprocess.check_output(my_command, shell=True, stderr=subprocess.STDOUT)
             return output
-        except Exception,e:
+        except Exception as e:
             self.logger.error(str(e))
             return -1
 
@@ -734,7 +735,7 @@ class RHESSysWorkflow(object):
             self.logger.info(my_command)
             output = subprocess.check_output(my_command, shell=True, stderr=subprocess.STDOUT)
             return output
-        except Exception,e:
+        except Exception as e:
             self.logger.error(str(e))
             return -1
 
@@ -745,7 +746,7 @@ class RHESSysWorkflow(object):
             self.logger.info(my_command)
             output = subprocess.check_output(my_command, shell=True, stderr=subprocess.STDOUT)
             return output
-        except Exception,e:
+        except Exception as e:
             self.logger.error(str(e))
             return -1
 
@@ -756,7 +757,7 @@ class RHESSysWorkflow(object):
             self.logger.info(my_command)
             output = subprocess.check_output(my_command, shell=True, stderr=subprocess.STDOUT)
             return output
-        except Exception,e:
+        except Exception as e:
             self.logger.error(str(e))
             return -1
 
@@ -768,7 +769,7 @@ class RHESSysWorkflow(object):
             self.logger.info(my_command)
             output = subprocess.check_output(my_command, shell=True, stderr=subprocess.STDOUT)
             return output
-        except Exception,e:
+        except Exception as e:
             self.logger.error(str(e))
             return -1
 
@@ -789,7 +790,7 @@ class RHESSysWorkflow(object):
             self.logger.info(my_command)
             output = subprocess.check_output(my_command, shell=True, stderr=subprocess.STDOUT)
             return output
-        except Exception,e:
+        except Exception as e:
             self.logger.error(str(e))
             return -1
 
@@ -799,7 +800,7 @@ class RHESSysWorkflow(object):
             self.logger.info(my_command)
             output = subprocess.check_output(my_command, shell=True, stderr=subprocess.STDOUT)
             return output
-        except Exception,e:
+        except Exception as e:
             self.logger.error(str(e))
             return -1
 
@@ -819,7 +820,7 @@ class RHESSysWorkflow(object):
             self.logger.info(my_command)
             output = subprocess.check_output(my_command, shell=True, stderr=subprocess.STDOUT)
             return output
-        except Exception,e:
+        except Exception as e:
             self.logger.error(str(e))
             return -1
 
@@ -829,7 +830,7 @@ class RHESSysWorkflow(object):
             self.logger.info(my_command)
             output = subprocess.check_output(my_command, shell=True, stderr=subprocess.STDOUT)
             return output
-        except Exception,e:
+        except Exception as e:
             self.logger.error(str(e))
             return -1
         
@@ -849,7 +850,7 @@ class RHESSysWorkflow(object):
             self.logger.info(my_command)
             output = subprocess.check_output(my_command, shell=True, stderr=subprocess.STDOUT)
             return output
-        except Exception,e:
+        except Exception as e:
             self.logger.error(str(e))
             return -1
         
@@ -869,7 +870,7 @@ class RHESSysWorkflow(object):
             self.logger.info(my_command)
             output = subprocess.check_output(my_command, shell=True, stderr=subprocess.STDOUT)
             return output
-        except Exception,e:
+        except Exception as e:
             self.logger.error(str(e))
             return -1
 
@@ -890,7 +891,7 @@ class RHESSysWorkflow(object):
             self.logger.info(my_command)
             output = subprocess.check_output(my_command, shell=True, stderr=subprocess.STDOUT)
             return output
-        except Exception,e:
+        except Exception as e:
             self.logger.error(str(e))
             return -1
 
@@ -900,7 +901,7 @@ class RHESSysWorkflow(object):
             self.logger.info(my_command)
             output = subprocess.check_output(my_command, shell=True, stderr=subprocess.STDOUT)
             return output
-        except Exception,e:
+        except Exception as e:
             self.logger.error(str(e))
             return -1
 
@@ -920,7 +921,7 @@ class RHESSysWorkflow(object):
             self.logger.info(my_command)
             output = subprocess.check_output(my_command, shell=True, stderr=subprocess.STDOUT)
             return output
-        except Exception,e:
+        except Exception as e:
             self.logger.error(str(e))
             return -1
 
@@ -930,7 +931,7 @@ class RHESSysWorkflow(object):
             self.logger.info(my_command)
             output = subprocess.check_output(my_command, shell=True, stderr=subprocess.STDOUT)
             return output
-        except Exception,e:
+        except Exception as e:
             self.logger.error(str(e))
             return -1
 
@@ -955,7 +956,7 @@ class RHESSysWorkflow(object):
             self.logger.info(my_command)
             output = subprocess.check_output(my_command, shell=True, stderr=subprocess.STDOUT)
             return output
-        except Exception,e:
+        except Exception as e:
             self.logger.error(str(e))
             return -1
 
@@ -984,7 +985,7 @@ class RHESSysWorkflow(object):
             self.logger.info(my_command)
             output = subprocess.check_output(my_command, shell=True, stderr=subprocess.STDOUT)
             return output
-        except Exception,e:
+        except Exception as e:
             self.logger.error(str(e))
             return -1
 
@@ -996,7 +997,7 @@ class RHESSysWorkflow(object):
             self.logger.info(my_command)
             output = subprocess.check_output(my_command, shell=True, stderr=subprocess.STDOUT, cwd=sub_project_folder)
             return output
-        except Exception,e:
+        except Exception as e:
             self.logger.error(str(e))
             return -1
 
@@ -1007,7 +1008,7 @@ class RHESSysWorkflow(object):
         try:
             self.huc_list = huc_list_as_string.split(';')
             self.huc_list_count = len(self.huc_list)
-        except Exception,e:
+        except Exception as e:
             self.logger.error(str(e))
             return -1
 
@@ -1048,7 +1049,7 @@ class RHESSysWorkflow(object):
                 jobUrl = taskUrl + "/jobs/" + jobID            
                     
                 while status == "esriJobSubmitted" or status == "esriJobExecuting":
-                    print "checking to see if HydroTerre job is completed..."
+                    print("checking to see if HydroTerre job is completed...")
                     time.sleep(check_interval)
                     
                     jobResponse = urllib.urlopen(jobUrl, "f=json")     
@@ -1084,7 +1085,7 @@ class RHESSysWorkflow(object):
                 self.logger.error("no HydroTerre jobId found in the response get_HUC12_IDs_from_RhyessSys_Domain")
                 sys.exit(-101)
     
-        except Exception,e:
+        except Exception as e:
             self.logger.error( str(e) )
         
         self.set_huc12_list(huc_list_result)    
@@ -1129,7 +1130,7 @@ class RHESSysWorkflow(object):
                 jobUrl = taskUrl + "/jobs/" + jobID            
                     
                 while status == "esriJobSubmitted" or status == "esriJobExecuting":
-                    print "checking to see if HydroTerre job is completed..."
+                    print("checking to see if HydroTerre job is completed...")
                     time.sleep(check_interval)
                     
                     jobResponse = urllib.urlopen(jobUrl, "f=json")     
@@ -1157,21 +1158,21 @@ class RHESSysWorkflow(object):
                                 #print jobJson
                         if status == "esriJobFailed":                                        
                                 if 'messages' in jobJson:                        
-                                    print jobJson['messages']
-                                    print 'HydroTerre job failed'
+                                    print(jobJson['messages'])
+                                    print('HydroTerre job failed')
                                     sys.exit(-100)
                                                        
             else:
-                print "no HydroTerre jobId found in the response"
+                print("no HydroTerre jobId found in the response")
                 sys.exit(-101)
 
             ###############################################################################################
             # Get HydroTerre Service Data Bundle
 
-            print '--------Download Start-------------'
-            print 'Retrieving result from: '+ url_result
+            print('--------Download Start-------------')
+            print('Retrieving result from: '+ url_result)
             wget.download(url_result, out=output_folder_location)
-            print '--------Download End-------------' 
+            print('--------Download End-------------')
             
             ###############################################################################################
             #print '--------Unzip Start-------------'
@@ -1182,13 +1183,13 @@ class RHESSysWorkflow(object):
             #print '--------Unzip End-------------'
 
             ###############################################################################################
-            print '--------HUC12 Area-------------'
-            print huc12areas + ' SQKM'
+            print('--------HUC12 Area-------------')
+            print(huc12areas + ' SQKM')
             self.areaEstimate = huc12areas
 
 
-        except Exception,e:
-            print str(e)
+        except Exception as e:
+            print(str(e))
 
             
         return
@@ -1238,12 +1239,12 @@ class RHESSysWorkflow(object):
             output = self.HydroTerre_RHESSys_ByExtent(self.extent, self.ht_start_date, self.ht_end_date, self.sub_project_folder)
             self.logger.info(output)
 
-            print '--------Unzip Start-------------'
+            print('--------Unzip Start-------------')
             zipfolder = self.sub_project_folder + '/RHESSys_ETV'
             self.create_path(zipfolder)
             zipfilepathname = self.sub_project_folder + '/RHESSys_ETV_Data.zip'
             self.unzip_etv_zip_file_at_path(zipfilepathname, zipfolder)
-            print '--------Unzip End-------------'
+            print('--------Unzip End-------------')
 
 ##TODO ERROR MESSAGE -> NEED TO RETURN MEANINGFUL MESSAGES FROM SERVICE. i.e. return message when too many huc12s
 
@@ -1435,7 +1436,7 @@ class RHESSysWorkflow(object):
             self.timespan = self.end_time - self.start_time
             self.logger.info("Workflow took: " + self.timespan)
  
-        except Exception,e:
+        except Exception as e:
             return str(e)
 
 

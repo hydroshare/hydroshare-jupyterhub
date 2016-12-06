@@ -1,5 +1,18 @@
 import os
 from os.path import *
+import sys
+
+# get the project root
+root = abspath(dirname(__file__))
+
+# append the dockerspawner submodule to the path
+sys.path.append(abspath(join(root, '../dockerspawner/dockerspawner')))
+
+# append the oauthenticator submodule to the path
+sys.path.append(abspath(join(root, '../oauthenticator/oauthenticator')))
+
+# append the parent dir
+sys.path.append(abspath(join(root, '../')))
 
 # Configuration file for Jupyter Hub
 c = get_config()
@@ -16,6 +29,7 @@ try:
     c.JupyterHub.hub_ip = os.environ['DOCKER_SPAWNER_IP']
     c.JupyterHub.extra_log_file = os.environ['JUPYTER_LOG']
     userspace = os.path.join(os.environ['JUPYTER_USERSPACE_DIR'], '{username}')
+    #userspace = os.path.join(os.environ['JUPYTER_USERSPACE_DIR'], 'jupyter')
 except Exception as e:
     print('Error setting JupyterHub settings from environment variables.  Please make sure that the following environment variables are set properly in ./env:\n  JUPYER_PORT\n  JUPYTER_IP\n  JUPYTER_LOG\n  JUPYTER_USERSPACE_DIR\n\n%s' % e)
 
@@ -24,7 +38,6 @@ c.JupyterHub.authenticator_class = 'oauthenticator.HydroShareOAuthenticator'
 c.HydroShareOAuthenticator.oauth_callback_url = os.environ['OAUTH_CALLBACK_URL']
 
 static = abspath(join(basename(__file__), '../../static/custom'))
-
 
 # mount the userspace directory
 c.DockerSpawner.volumes = {
@@ -41,4 +54,7 @@ c.DockerSpawner.extra_host_config = {
 }
 
 #c.NotebookApp.extra_static_paths = ['/home/jovyan/work/notebooks/.ipython/profile_default/static']
+
+#c.Authenticator.whitelist = {'jupyter'}
+#c.Authenticator.admin_users = {'jupyter'}
 

@@ -14,6 +14,7 @@ import xml.etree.ElementTree as et
 from datetime import datetime as dt
 import pickle
 import shutil
+import urllib
 
 is_py2 = sys.version[0] == '2'
 if is_py2:
@@ -60,7 +61,8 @@ def check_for_ipynb(content_files):
             fname = os.path.basename(p)
             rel_path = os.path.relpath(p, os.environ['HOME'])
             url = '%s%s/notebooks/notebooks/%s' % (':'.join(os.environ['JUPYTER_HUB_IP'].split(':')[:-1]),os.environ['JPY_BASE_URL'], rel_path)
-            links[fname] = url
+            encoded_url = urllib.parse.quote(url)
+            links[fname] = encoded_url
     return links
             
 def display_resource_content_files(content_file_dictionary, text='Found the following content when parsing the HydroShare resource:'):
@@ -164,15 +166,19 @@ class ResourceMetadata (object):
         
         
 class hydroshare():
-    def __init__(self):
+    def __init__(self, username=None):
         self.hs = None
         self.content = {}
         
         # load the HS environment variables
         self.load_environment()
         
+        uname = username
+        if uname is None:
+            uname = os.environ['HS_USR_NAME']
+            
         # get a secure connection to hydroshare
-        auth = self.getSecureConnection(os.environ['HS_USR_NAME'])
+        auth = self.getSecureConnection(uname)
         
         try:
             self.hs = HydroShare(auth=auth)
@@ -185,7 +191,6 @@ class hydroshare():
             # remove the cached authentication
             auth_path = os.path.join(os.path.dirname(__file__), '../../../.auth')
             os.remove(auth_path)
-            
             return None
         
     def _getResourceFromHydroShare(self, resourceid, destination='.', unzip=True):
@@ -232,7 +237,7 @@ class hydroshare():
         auth_path = os.path.join(os.path.dirname(__file__), '../../../.auth')
         if not os.path.exists(auth_path):
             print('\nThe hs_utils library requires a secure connection to your HydroShare account.')
-            p = getpass.getpass('Enter you HydroShare Password: ')
+            p = getpass.getpass('Enter the HydroShare password for user \'%s\': ' % username)
             auth = HydroShareAuthBasic(username=username, password=p)
             
             with open(auth_path, 'wb') as f:
@@ -259,6 +264,7 @@ class hydroshare():
             res_type = restypes[resource_type]
         except KeyError:
             display(HTML('<b style="color:red;">[%s] is not a valid HydroShare resource type.</p>' % resource_type))
+            return None
         
         # get the 'derived resource' metadata
         if derivedFromId is not None:
@@ -270,6 +276,7 @@ class hydroshare():
                 
             except:
                 display(HTML('<b style="color:red;">[%s] is not a valid HydroShare resource id for setting the "derivedFrom" attribute.</p>' % derivedFromId))
+                return None
         
         else:
             response = input('You have indicated that this resource is NOT derived from any existing HydroShare resource.  Are you sure that this is what you intended? [Y/n]')

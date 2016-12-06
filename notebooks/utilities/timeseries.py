@@ -1,17 +1,15 @@
 from __future__ import print_function
 import os, sys
-from IPython.core.display import display, HTML
-import hs_utils  
+from IPython.core.display import display, HTML  
 import shutil
 import requests
 import threading
 import glob
-from odm2api.ODMconnection import dbconnection
-from odm2api.ODM2.services.readService import *
-from odm2api.ODM2.services.createService import *
 import math
 import matplotlib.pyplot as plt
 from matplotlib.dates import date2num, AutoDateFormatter, AutoDateLocator
+
+from utilities import hydroshare
 
 is_py2 = sys.version[0] == '2'
 if not is_py2:
@@ -20,10 +18,14 @@ if not is_py2:
 else:
     # set this for future python3 compatibility
     input = raw_input
+    
+    from odm2api.ODMconnection import dbconnection
+    from odm2api.ODM2.services.readService import *
+    from odm2api.ODM2.services.createService import *
 
 class timeseries():
     def __init__(self):
-        self.hydroshare = hs_utils.hydroshare()
+        self.hydroshare = hydroshare.hydroshare()
         self.odm2db = None
         self._session = None
         self.read = None
@@ -206,8 +208,9 @@ class timeseries():
         """
         
         # get the resource to download. default is the id that launched jupyter
-        if resourceid is None:
-            while 1:
+        while 1:
+            if resourceid is None:
+            
                 res = input('It looks like you have launched JupyterHub from a resource with the id: %s.\n'
                        'Would you like to download content for this resource? [Y/n/e] ' % (os.environ['HS_RES_ID'] ))
                 res_lower = res.strip().lower()
@@ -217,12 +220,14 @@ class timeseries():
                     resourceid = input('Enter the resource id to download: ')
                 elif res_lower == 'e':
                     return None
-                resourceid = str(resourceid)
-                if resourceid.strip() == '':
-                    resourceid = os.environ['HS_RES_ID'] 
+            resourceid = str(resourceid)
+            if resourceid.strip() == '':
+                resourceid = os.environ['HS_RES_ID'] 
 
-                # make sure this is a TimeSeries resource. 
+            # make sure this is a TimeSeries resource.
+            try:
                 res_meta = self.hydroshare.hs.getSystemMetadata(resourceid)
+                
                 if res_meta['resource_type'].lower() != 'timeseriesresource':
                     display(HTML('<b style="color:red;">Attempting to download resource of type %s.<br> The'
                                  '`getTimeSeriesResource` function can only be used to download resources'
@@ -230,6 +235,13 @@ class timeseries():
                                  % res_meta['resource_type']))
                 else: 
                     break
+                    
+            except Exception as e:
+                display(HTML('<b style="color:red">Failed to retrieve resource content from HydroShare: %s</b>' % e))
+                return None
+                    
+               
+                
                
         
         print('\nDownloading resource: %s' % resourceid)
