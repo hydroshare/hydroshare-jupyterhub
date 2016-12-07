@@ -37,7 +37,7 @@ install() {
 
     # build the jupyterhub docker image  
     printf "Building the JupyterHub Docker image\n"
-    cd ./docker && docker build -t jupyterhub/singluser .
+    cd ./docker && docker build -t jupyterhub/singleuser .
 
     # install dockerspawner dependencies
     sudo pip3 install -r $DOCKERSPAWNER_PATH/requirements.txt
