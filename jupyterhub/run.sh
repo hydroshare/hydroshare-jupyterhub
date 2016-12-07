@@ -19,6 +19,18 @@ run() {
 
 }
 
+run-debug() {
+
+    echo "RUNNING JUPYTERHUB IN DEBUG MODE"
+
+    # remove all docker containers
+    docker rm -f $(docker ps -a -q) 2> /dev/null || true
+
+    # start the jupyterhub server as usual
+    run "$@"
+
+}
+
 usage() {
 
     echo -e "\n*** General Usage ***"
@@ -35,6 +47,8 @@ fi
 
 case "$1" in
     start) run "$@"
+        ;;
+    start-debug) run-debug "$@"
         ;;
     *) usage
         ;;
