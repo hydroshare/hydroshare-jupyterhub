@@ -31,7 +31,6 @@ try:
     c.JupyterHub.extra_log_file = os.environ['JUPYTER_LOG']
     userspace = os.path.join(os.environ['JUPYTER_USERSPACE_DIR'], '{username}')
 except Exception as e:
-    print('9')
     print('Error setting JupyterHub settings from environment variables.\n',
           'Please make sure that the following environment variables are set properly in ./env:\n',
           '  JUPYTER_PORT\n',
@@ -46,14 +45,14 @@ except Exception as e:
 #c.JupyterHub.authenticator_class = 'oauthenticator.HydroShareOAuthenticator'
 #c.HydroShareOAuthenticator.oauth_callback_url = os.environ['OAUTH_CALLBACK_URL']
 
-static = abspath(join(basename(__file__), '../../static/custom'))
+notebook_path = abspath(join(dirname(__file__), '../notebooks'))
+static = abspath(join(dirname(__file__), '../static/custom'))
 
 # TURN OFF FILE MOUNTING B/C OF PERMISSION ERRORS USING VIRTUALBOX
 #mount the userspace directory
 c.DockerSpawner.volumes = {
-    # userspace: '/home/jovyan/work',
-    os.environ['JUPYTER_NOTEBOOK_DIR']: '/home/jovyan/work/notebooks'
-#     static: '/home/jovyan/work/notebooks/.jupyter/custom',
+    notebook_path: '/home/jovyan/work/notebooks',
+    static: '/home/jovyan/work/notebooks/.jupyter/custom',
 }
 
 # http://stackoverflow.com/questions/37144357/link-containers-with-the-docker-python-api
