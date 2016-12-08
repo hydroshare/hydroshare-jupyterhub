@@ -63,8 +63,8 @@ ADD https://raw.github.com/selimnairb/RHESSysWorkflows/master/docs/config/ecohyd
 RUN chown jovyan:users /home/jovyan/.ecohydro.cfg
 
 # install taudem (must happend before rhesyss b/c of gdal conflicts)
-RUN git clone https://github.com/dtarb/TauDEM.git ../libs/TauDEM && \
-cd ../libs/TauDEM/src && make 
+RUN git clone https://github.com/dtarb/TauDEM.git /home/jovyan/libs/TauDEM && \
+cd /home/jovyan/libs/TauDEM/src && make 
 
 # link conda python2 (used by jupyterhub) to python22
 RUN ln -s /opt/conda/envs/python2/bin/python2 /usr/bin/python22
