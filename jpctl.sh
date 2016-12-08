@@ -91,10 +91,10 @@ start_services() {
   
   echo -e "\nRestarting screen instances"
   echo -n "--> starting rest..."
-  sudo screen -dmS rest sh -c "cd $REST_PATH && sh run.sh 2> $ERR_PATH/rest.err"
+  sudo screen -dmS rest sh -c "cd $REST_PATH &&  ./run.sh >$ERR_PATH/rest.out 2> $ERR_PATH/rest.err"
   sleep 1 # give the session time to spin up
   if ! sudo screen -list | grep -q "rest"; then
-    echo "**********************"
+    echo -e "\n**********************"
     echo -e "\nFailed to start rest"
     echo "**********************"
     cat rest.err
@@ -103,10 +103,10 @@ start_services() {
   echo "done"
 
   echo -n "--> starting jupyter..."
-  sudo screen -dmS jupyter sh -c "cd $JUPYTER_PATH && sh run.sh 2> $ERR_PATH/jupyter.err"
+  sudo screen -dmS jupyter sh -c "cd $JUPYTER_PATH && ./run.sh start > $ERR_PATH/jupyter.out > $ERR_PATH/jupyter.err"
   sleep 1 # give the session time to spin up
   if ! sudo screen -list | grep -q "jupyter"; then
-    echo "**********************"
+    echo -e "\n**********************"
     echo -e "\nFailed to start jupyter"
     echo "**********************"
     cat jupyter.err
@@ -116,10 +116,10 @@ start_services() {
 
 
   echo -n "--> starting collector..."
-  sudo screen -dmS collector sh -c "cd $JUPYTER_PATH && sh run_cull.sh 2> $ERR_PATH/cull.err"
+  sudo screen -dmS collector sh -c "cd $JUPYTER_PATH && ./run_cull.sh > $ERR_PATH/cull.out 2> $ERR_PATH/cull.err"
   sleep 1 # give the session time to spin up
   if ! sudo screen -list | grep -q "collector"; then
-    echo "**********************"
+    echo -e "\n**********************"
     echo -e "\nFailed to start collector"
     echo "**********************"
     cat cull.err

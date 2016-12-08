@@ -1,8 +1,19 @@
 import os
 from os.path import *
 import sys
-import shutil
 
+# load environment variables
+os.environ['HYDROSHARE_USE_WHITELIST'] = '0'
+os.environ['HYDROSHARE_REDIRECT_COOKIE_PATH'] = '/usr/local/etc'
+os.environ['JUPYTER_NOTEBOOK_DIR'] = '/home/hydro/hydroshare-jupyterhub/notebooks'
+os.environ['JUPYTER_USERSPACE_DIR'] = '/home/hydro/userspace'
+os.environ['JUPYTER_HUB_IP']='192.168.56.101'
+os.environ['DOCKER_SPAWNER_IP']='192.168.56.101'
+os.environ['JUPYTER_PORT']='8000'
+os.environ['JUPYTER_LOG']='./jupyterhub.log'
+os.environ['JUPYTER_USER']='hydro'
+os.environ['JUPYTER_REST_PORT']='8080'
+os.environ['JUPYTER_REST_IP']='192.168.56.101'
 
 # get the project root
 root = abspath(dirname(__file__))
@@ -45,13 +56,11 @@ except Exception as e:
 #c.JupyterHub.authenticator_class = 'oauthenticator.HydroShareOAuthenticator'
 #c.HydroShareOAuthenticator.oauth_callback_url = os.environ['OAUTH_CALLBACK_URL']
 
-notebook_path = abspath(join(dirname(__file__), '../notebooks'))
+# notebook_path = abspath(join(dirname(__file__), '../notebooks'))
 static = abspath(join(dirname(__file__), '../static/custom'))
 
-# TURN OFF FILE MOUNTING B/C OF PERMISSION ERRORS USING VIRTUALBOX
-#mount the userspace directory
 c.DockerSpawner.volumes = {
-    notebook_path: '/home/jovyan/work/notebooks',
+    userspace: '/home/jovyan/work',
     static: '/home/jovyan/work/notebooks/.jupyter/custom',
 }
 
@@ -62,8 +71,6 @@ c.DockerSpawner.extra_host_config = {
     'devices':['/dev/fuse'],
     'security_opt':['apparmor:unconfined']
 }
-
-#c.NotebookApp.extra_static_paths = ['/home/jovyan/work/notebooks/.ipython/profile_default/static']
 
 # ADD AUTHENTICATED USER THAT MATCHES VIRTUALBOX USER
 c.Authenticator.whitelist = {'jupyter'}
