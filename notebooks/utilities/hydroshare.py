@@ -6,7 +6,7 @@ import glob
 import requests
 import threading
 import time
-import utils
+from . import utils
 import yaml
 from IPython.core.display import display, HTML
 from hs_restclient import HydroShare, HydroShareAuthBasic, HydroShareHTTPException
