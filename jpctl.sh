@@ -46,6 +46,45 @@ install() {
     sudo pip3 install -r $OAUTHENTICATOR_PATH/requirements.txt
 }
 
+
+build_docker() {
+
+  # parse args if they are provided
+  if [[ $# -ne 0 ]] ;  then
+
+    # clean the jupyterhub/single user image
+    if [[ $1 == "--clean" ]]; then
+       
+       # stop all the containers
+       echo -e "--> stopping all containers"
+       docker stop $(docker ps -a -q) 2> /dev/null || true
+       
+       # remove all containers  
+       echo -e "--> removing all containers"
+       docker rm -fv $(docker ps -a -q) 2> /dev/null || true
+       
+       # remove dangline images 
+       echo -e "--> removing dangling images"
+       docker rmi $(docker images -q -f dangling=true) 2> /dev/null || true
+
+       # remove the jupyterhub/singleuser image
+       echo -e "--> removing the \"jupyterhub/singleuser\" image"
+       docker rmi jupyterhub/singleuser 2> /dev/null || true
+
+    fi
+  fi
+
+  
+  if [[ "$(docker images -q jupyterhub/singleuser 2> /dev/null)" != "" ]]; then
+    echo "Docker image \"jupyterhub/singleuser\" alread exists.  Use --clean option to force rebuild"
+    return 1
+  else
+    # remove the jupyterhub/singleuser image
+    echo -e "--> rebuilding the \"jupyterhub/singleuser\" image"
+    cd ./docker && docker build -t jupyterhub/singleuser . 
+  fi
+}
+
 start_services() {
     
 
@@ -175,10 +214,12 @@ display_usage() {
 }
 
 ### Display usage if exactly one argument is not provided ###
-if [  $# -ne 1 ]; then
-    display_usage
-    exit 1
-fi
+#if [  $# -ne 1 ]; then
+#    display_usage
+#    exit 1
+#fi
+
+echo $1 ${2:-} 
 
 case "$1" in
     install) install $1
@@ -186,6 +227,8 @@ case "$1" in
     start) start_services "$1"
         ;;
     clean) clean $1
+        ;;
+    build) build_docker ${2:-}
         ;;
     *) display_usage
         ;;
