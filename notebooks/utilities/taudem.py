@@ -1,9 +1,17 @@
 import os
+import sys
 import matplotlib.pyplot as plt
 import numpy as np
 from osgeo import gdal
 import subprocess
 import shutil
+
+is_py2 = sys.version[0] == '2'
+if is_py2:
+    import Queue as queue
+    input = raw_input
+else:
+    import queue as queue
 
 def create_workspace(folder_name):
 
