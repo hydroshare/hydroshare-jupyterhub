@@ -3,10 +3,9 @@
 import os
 from pwd import getpwnam
 import grp
-import json
 import shutil
-from hs_restclient import HydroShare
 import logging
+#import getpass
 
 log = logging.getLogger()
 
@@ -42,8 +41,14 @@ def set_hydroshare_args(username, resourceid, resourcetype):
 def build_userspace(username):
     
 
+
     # make all usernames lowercase
     husername = username.lower()
+
+    # # get the current user (whoever is running jupyterhub)
+    # executor_name = getpass.getuser()
+    # # get the jupyter username
+    # user = getpwnam(executor_name)
 
     # get the jupyter username
     user = getpwnam(os.environ['JUPYTER_USER'])
@@ -53,6 +58,7 @@ def build_userspace(username):
 
     userspace_dir = os.environ['JUPYTER_USERSPACE_DIR']
     ipynb_dir = os.environ['JUPYTER_NOTEBOOK_DIR']
+
     # check to see if user exists
     basepath = os.path.abspath(os.path.join(userspace_dir, '%s'%husername))
     path = os.path.abspath(os.path.join(basepath, 'notebooks'))
@@ -78,7 +84,10 @@ def build_userspace(username):
     # change file ownership so that it can be accessed inside docker container
     print('Modifying permissions for %s' % basepath)
     os.chown(basepath, uid, gid)
+    os.chown(os.path.dirname(basepath), uid, gid)
+
     for root, dirs, files in os.walk(basepath):
+
         for d in dirs:
             print('Modifying permissions for %s' % os.path.join(root,d))
             os.chown(os.path.join(root, d), uid, gid)
