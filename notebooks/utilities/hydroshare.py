@@ -20,8 +20,10 @@ is_py2 = sys.version[0] == '2'
 if is_py2:
     import Queue as queue
     input = raw_input
+    urlencode = urllib.pathname2url
 else:
     import queue as queue
+    urlencode = urllib.parse.quote
 
 threadResults = queue.Queue()
 
@@ -61,7 +63,7 @@ def check_for_ipynb(content_files):
             fname = os.path.basename(p)
             rel_path = os.path.relpath(p, os.environ['HOME'])
             url = '%s%s/notebooks/notebooks/%s' % (':'.join(os.environ['JUPYTER_HUB_IP'].split(':')[:-1]),os.environ['JPY_BASE_URL'], rel_path)
-            encoded_url = urllib.parse.quote(url)
+            encoded_url = urlencode(url)
             links[fname] = encoded_url
     return links
             
