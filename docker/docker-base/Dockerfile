@@ -32,7 +32,7 @@ RUN apt-get update && apt-get install --fix-missing -y \
     python-scipy \
     libxml2-dev \
     libxslt-dev \
-    libgdal-dev \
+    libgdal-dev \  
     libgdal-doc \
     gdal-bin \
     python-gdal \
@@ -41,12 +41,6 @@ RUN apt-get update && apt-get install --fix-missing -y \
     libbsd-dev \
     vlc  \
 && rm -rf /var/lib/apt/lists/*
-
-# install irods 4.1.8 packages
-RUN wget -q ftp://ftp.renci.org/pub/irods/releases/4.1.8/ubuntu12/irods-icommands-4.1.8-ubuntu12-x86_64.deb -O /tmp/irods-icommands-4.1.8-ubuntu12-x86_64.deb
-RUN dpkg -i /tmp/irods-icommands-4.1.8-ubuntu12-x86_64.deb
-RUN groupadd fuse && usermod -aG fuse jovyan
-RUN chmod g+rw /dev/fuse && chgrp fuse /dev/fuse
 
 # create directories
 RUN mkdir /home/jovyan/libs && chown -R jovyan:users /home/jovyan/libs
@@ -59,6 +53,12 @@ ADD singleuser.sh /srv/singleuser/singleuser.sh
 
 # link conda python2 (used by jupyterhub) to python22
 RUN ln -s /opt/conda/envs/python2/bin/python2 /usr/bin/python22
+
+# TAUDEM v5.3.7 - build and install taudem (must happen before rhesyss b/c of gdal conflicts)
+RUN git clone https://github.com/dtarb/TauDEM.git /home/jovyan/libs/TauDEM
+RUN cd /home/jovyan/libs/TauDEM && git checkout tags/v5.3.7
+RUN cd /home/jovyan/libs/TauDEM/src && make
+
 
 #########################
 # SWITCH TO JOVYAN USER #
@@ -78,15 +78,11 @@ gdal \
 basemap \
 landlab -c landlab
 
-RUN git clone -b 2_and_3 https://github.com/hydroshare/hs_restclient.git ../libs/hs_restclient
-RUN /bin/bash -c "source /opt/conda/bin/activate root \
-&& cd ../libs/hs_restclient \
-&& python setup.py install "
+RUN git clone -b 2_and_3 https://github.com/hydroshare/hs_restclient.git /home/jovyan/libs/hs_restclient
+RUN /bin/bash -c "source /opt/conda/bin/activate root && cd /home/jovyan/libs/hs_restclient && python setup.py install "
 
 # Python 2
-RUN /bin/bash -c "source /opt/conda/bin/activate python2 \
-&& pip install --upgrade pip \
-&& pip install wget "
+RUN /bin/bash -c "source /opt/conda/bin/activate python2 && pip install --upgrade pip && pip install wget "
 
 RUN conda install -y -n python2 \
 gdal \
