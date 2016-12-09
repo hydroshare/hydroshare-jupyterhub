@@ -1,6 +1,7 @@
-from rhessys_wf import *
 import os
 import shutil
+
+from docker.rhessys_wf import *
 
 project_location = './test'
 project_name = 'mytest'

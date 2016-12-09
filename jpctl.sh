@@ -7,10 +7,10 @@ set -o pipefail
 sudo ls > /dev/null # get sudo rights before user walks away
 
 
-# start jupyterhub in individual screens  
+# start jupyterhub in individual screens
 REST_PATH="$(pwd)/rest"
 JUPYTER_PATH="$(pwd)/jupyterhub"
-ERR_PATH="$(pwd)"
+LOG_PATH="log/$(pwd)"
 DOCKERSPAWNER_PATH="$(pwd)/dockerspawner"
 OAUTHENTICATOR_PATH="$(pwd)/oauthenticator"
 
@@ -63,7 +63,7 @@ build_docker() {
        echo -e "--> removing all containers"
        docker rm -fv $(docker ps -a -q) 2> /dev/null || true
        
-       # remove dangline images 
+       # remove dangling images
        echo -e "--> removing dangling images"
        docker rmi $(docker images -q -f dangling=true) 2> /dev/null || true
 
@@ -71,22 +71,23 @@ build_docker() {
        echo -e "--> removing the \"jupyterhub/singleuser\" image"
        docker rmi jupyterhub/singleuser 2> /dev/null || true
 
+       echo -e "--> removing all docker images"
+       docker rmi $(docker images -q)
     fi
   fi
 
-  
+
   if [[ "$(docker images -q jupyterhub/singleuser 2> /dev/null)" != "" ]]; then
     echo "Docker image \"jupyterhub/singleuser\" alread exists.  Use --clean option to force rebuild"
     return 1
   else
     # remove the jupyterhub/singleuser image
-    echo -e "--> rebuilding the \"jupyterhub/singleuser\" image"
-    cd ./docker && docker build -t jupyterhub/singleuser . 
+    echo -e "--> building the \"jupyterhub/singleuser\" image"
+    docker build -f ./docker/Dockerfile -t jupyterhub/singleuser .
   fi
 }
 
 start_services() {
-    
 
   echo "Shutting screen instances"
 
@@ -127,10 +128,13 @@ start_services() {
   if ls | grep -q "cull.err"; then
       sudo rm cull.err > /dev/null
   fi
-  
+
+  # make output dir
+  mkdir -p ./log
+
   echo -e "\nRestarting screen instances"
   echo -n "--> starting rest..."
-  sudo screen -dmS rest sh -c "cd $REST_PATH &&  ./run.sh >$ERR_PATH/rest.out 2> $ERR_PATH/rest.err"
+  sudo screen -dmS rest sh -c "cd $REST_PATH &&  ./run.sh >$LOG_PATH/rest.out 2> $LOG_PATH/rest.err"
   sleep 1 # give the session time to spin up
   if ! sudo screen -list | grep -q "rest"; then
     echo -e "\n**********************"
@@ -142,7 +146,7 @@ start_services() {
   echo "done"
 
   echo -n "--> starting jupyter..."
-  sudo screen -dmS jupyter sh -c "cd $JUPYTER_PATH && ./run.sh start > $ERR_PATH/jupyter.out > $ERR_PATH/jupyter.err"
+  sudo screen -dmS jupyter sh -c "cd $JUPYTER_PATH && ./run.sh start > $LOG_PATH/jupyter.out > $LOG_PATH/jupyter.err"
   sleep 1 # give the session time to spin up
   if ! sudo screen -list | grep -q "jupyter"; then
     echo -e "\n**********************"
@@ -153,9 +157,8 @@ start_services() {
   fi
   echo "done"
 
-
   echo -n "--> starting collector..."
-  sudo screen -dmS collector sh -c "cd $JUPYTER_PATH && ./run_cull.sh > $ERR_PATH/cull.out 2> $ERR_PATH/cull.err"
+  sudo screen -dmS collector sh -c "cd $JUPYTER_PATH && ./run_cull.sh > $LOG_PATH/cull.out 2> $LOG_PATH/cull.err"
   sleep 1 # give the session time to spin up
   if ! sudo screen -list | grep -q "collector"; then
     echo -e "\n**********************"
@@ -166,17 +169,13 @@ start_services() {
   fi
   echo "done"
 
-
   echo -e "\nRunning Screens"
   sudo screen -list 
-
-
-
 }
 
 clean() {
   # remove error files
-  sudo rm $ERR_PATH/*.err 2> /dev/null || true
+  sudo rm $LOG_PATH/*.err 2> /dev/null || true
   
   # remove jupyterhub files
   sudo rm $JUPYTER_PATH/jupyter.sqlite 2> /dev/null || true
@@ -202,24 +201,18 @@ old() {
 
     printf "List of Screen Instances\n"
     sudo screen -list 
-
 }
 
 display_usage() {
    echo "*** JupyterHub Control Script ***"
-   echo "usage: $0 install       # installs required software and build jupyterhub docker containers"
-   echo "usage: $0 start         # starts the jupyterhub screens"
-   echo "usage: $0 clean         # cleans all jupyterhub screen instances and removes docker containers"
+   echo "usage: $0 install            # installs required software and build jupyterhub docker containers"
+   echo "usage: $0 build [--clean]    # build the jupyter docker images. --clean forces a clean build"
+   echo "usage: $0 start              # starts the jupyterhub inside screen instances"
+   echo "usage: $0 clean              # cleans all jupyterhub screen instances and removes docker containers"
    echo "***"
 }
 
-### Display usage if exactly one argument is not provided ###
-#if [  $# -ne 1 ]; then
-#    display_usage
-#    exit 1
-#fi
-
-echo $1 ${2:-} 
+echo $1 ${2:-}
 
 case "$1" in
     install) install $1
@@ -235,5 +228,3 @@ case "$1" in
 esac
 
 exit 0;
-
-
