@@ -67,12 +67,8 @@ build_docker() {
        echo -e "--> removing dangling images"
        docker rmi $(docker images -q -f dangling=true) 2> /dev/null || true
 
-       # remove the jupyterhub/singleuser image
-       echo -e "--> removing the \"jupyterhub/singleuser\" image"
-       docker rmi jupyterhub/singleuser 2> /dev/null || true
-
        echo -e "--> removing all docker images"
-       docker rmi $(docker images -q)
+       docker rmi $(docker images -q) 2> /dev/null || true
     fi
   fi
 
