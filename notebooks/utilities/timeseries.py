@@ -117,15 +117,6 @@ class timeseries():
         rows = math.ceil(float(len(resids)) / float(cols))
         fig = plt.figure(figsize=(15,rows*5))
         fig.subplots_adjust(hspace=.5)
-        #fig.autofmt_xdate()
-        
-        #years = mdates.YearLocator()   # every year
-        #months = mdates.MonthLocator()  # every month
-        #days = DayLocator()              # minor ticks on the days
-        #yearsFmt = mdates.DateFormatter('%Y')
-        #dayFormatter = DateFormatter('%d')      # e.g., 12
-        #monthFormatter = DateFormatter('%m')
-            
         
         # plot the results, each in its own subplot
         for i in range(1, len(resids)+1):
@@ -149,14 +140,7 @@ class timeseries():
             labels = ax.get_xticklabels()
             plt.setp(labels, rotation=30, fontsize=10)
             
-            # format the ticks
-            #ax.xaxis.set_major_locator(years)
-            #ax.xaxis.set_major_formatter(yearsFmt)
-            #ax.xaxis.set_minor_locator(months)
-
             ax.grid(True)
-
-
 
     def plotTimeSeries(self, ids=[]):
         # assemble a list if ids to download data for
@@ -233,6 +217,7 @@ class timeseries():
                                  '`getTimeSeriesResource` function can only be used to download resources'
                                  'of type TimeSeriesResource.<br>Please specify a TimeSeries resource to download</b>'
                                  % res_meta['resource_type']))
+                    resourceid=None
                 else: 
                     break
                     
@@ -268,7 +253,7 @@ class timeseries():
                 header = requests.head(res_meta['bag_url'])
                 t = threading.Thread(target=self.hydroshare._getResourceFromHydroShare, 
                                      args=(resourceid,), kwargs={'destination':dst, 'unzip':True})
-                hs_utils.runThreadedFunction(t, msg='Downloading', success='Download Completed Successfully')
+                hydroshare.runThreadedFunction(t, msg='Downloading', success='Download Completed Successfully')
             except Exception as e:
                 display(HTML('<b style="color:red">Failed to retrieve resource content from HydroShare: %s</b>' % e))
                 return None
@@ -286,7 +271,7 @@ class timeseries():
         self.hydroshare.content.update(content)
         
         # display the content files
-        hs_utils.display_resource_content_files(self.content())
+        hydroshare.display_resource_content_files(self.content())
         
         # load the odm2db into memory
         try:
