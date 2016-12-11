@@ -217,6 +217,7 @@ class timeseries():
                                  '`getTimeSeriesResource` function can only be used to download resources'
                                  'of type TimeSeriesResource.<br>Please specify a TimeSeries resource to download</b>'
                                  % res_meta['resource_type']))
+                    resourceid=None
                 else: 
                     break
                     
