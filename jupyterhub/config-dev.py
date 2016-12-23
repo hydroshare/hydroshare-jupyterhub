@@ -59,9 +59,13 @@ except Exception as e:
 # notebook_path = abspath(join(dirname(__file__), '../notebooks'))
 static = abspath(join(dirname(__file__), '../static/custom'))
 
+# mount the unittest directory
+tests = abspath(join(dirname(__file__), '../tests'))
+
 c.DockerSpawner.volumes = {
     userspace: '/home/jovyan/work',
     static: '/home/jovyan/work/notebooks/.jupyter/custom',
+    tests: '/home/jovyan/libs/tests',
 }
 
 # http://stackoverflow.com/questions/37144357/link-containers-with-the-docker-python-api
