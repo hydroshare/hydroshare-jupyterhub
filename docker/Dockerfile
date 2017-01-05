@@ -4,8 +4,14 @@ MAINTAINER Tony Castronova <acastronova@cuahsi.org>
 ######################################################
 ### Begin - JupyterHub Development Image Additions ###
 ######################################################
+USER root
+ADD tests /home/jovyan/tests
+RUN chown -R jovyan:users /home/jovyan/tests
+
+USER jovyan
 RUN pip install mock
 RUN pip3 install mock
+
 ###################################################
 ## End - JupyterHub Development Image Additions ###
 ###################################################

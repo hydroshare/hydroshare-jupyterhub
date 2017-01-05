@@ -73,14 +73,14 @@ build_docker() {
   fi
 
 
-  if [[ "$(docker images -q jupyterhub/singleuser 2> /dev/null)" != "" ]]; then
-    echo "Docker image \"jupyterhub/singleuser\" alread exists.  Use --clean option to force rebuild"
-    return 1
-  else
+#  if [[ "$(docker images -q jupyterhub/singleuser 2> /dev/null)" != "" ]]; then
+#    echo "Docker image \"jupyterhub/singleuser\" alread exists.  Use --clean option to force rebuild"
+#    return 1
+#  else
     # remove the jupyterhub/singleuser image
     echo -e "--> building the \"jupyterhub/singleuser\" image"
     docker build -f ./docker/Dockerfile -t jupyterhub/singleuser .
-  fi
+#  fi
 }
 
 start_services() {
@@ -185,13 +185,27 @@ start_services() {
 
 clean() {
   # remove error files
+  echo -n "--> removing error logs..."
   sudo rm $LOG_PATH/*.err 2> /dev/null || true
-  
-  # remove jupyterhub files
-  sudo rm $JUPYTER_PATH/jupyter.sqlite 2> /dev/null || true
   sudo rm $JUPYTER_PATH/jupyter.log 2> /dev/null || true
-  sudo rm $JUPYTER_PATH/jupyterhub_cookie_secret 2> /dev/null || true
+  echo "done"
 
+  # remove jupyterhub files
+  echo -n "--> removing database..."
+  sudo rm $JUPYTER_PATH/jupyter.sqlite 2> /dev/null || true
+  echo "done"
+
+  echo -n "--> removing cookies..."
+  sudo rm $JUPYTER_PATH/jupyterhub_cookie_secret 2> /dev/null || true
+  echo "done"
+
+  echo -n "--> removing containers..."
+  sudo docker rm -fv $(docker ps -a -q) 2> /dev/null || true
+  echo "done"
+       
+  # remove dangling images
+  echo -n "--> removing dangling images..."
+  docker rmi $(docker images -q -f dangling=true) 2> /dev/null || true
   echo "done"
 }
 

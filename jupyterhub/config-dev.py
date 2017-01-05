@@ -65,7 +65,7 @@ tests = abspath(join(dirname(__file__), '../tests'))
 c.DockerSpawner.volumes = {
     userspace: '/home/jovyan/work',
     static: '/home/jovyan/work/notebooks/.jupyter/custom',
-    tests: '/home/jovyan/libs/tests',
+    tests: '/home/jovyan/tests',  # this is here so that we can easily move the tests into the container without rebuilding the image.  In production mode, we will just run the tests that are mounted via DockerFile
 }
 
 # http://stackoverflow.com/questions/37144357/link-containers-with-the-docker-python-api
