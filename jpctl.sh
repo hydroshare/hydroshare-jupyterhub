@@ -10,7 +10,7 @@ sudo ls > /dev/null # get sudo rights before user walks away
 # start jupyterhub in individual screens
 REST_PATH="$(pwd)/rest"
 JUPYTER_PATH="$(pwd)/jupyterhub"
-LOG_PATH="log/$(pwd)"
+LOG_PATH="$(pwd)/log"
 DOCKERSPAWNER_PATH="$(pwd)/dockerspawner"
 OAUTHENTICATOR_PATH="$(pwd)/oauthenticator"
 
@@ -85,6 +85,16 @@ build_docker() {
 
 start_services() {
 
+  JUPYTER_CMD="start"
+  RUN_CULL=true
+  # parse args if they are provided
+  if [[ $# -ne 0 ]] ;  then
+    if [[ $1 == "--debug" ]]; then
+       JUPYTER_CMD="start-debug"
+       RUN_CULL=false
+    fi
+  fi
+ 
   echo "Shutting screen instances"
 
   echo -n "--> killing rest..."
@@ -133,37 +143,41 @@ start_services() {
   sudo screen -dmS rest sh -c "cd $REST_PATH &&  ./run.sh >$LOG_PATH/rest.out 2> $LOG_PATH/rest.err"
   sleep 1 # give the session time to spin up
   if ! sudo screen -list | grep -q "rest"; then
-    echo -e "\n**********************"
-    echo -e "\nFailed to start rest"
+    echo -e "\n\n**********************"
+    echo -e "Failed to start rest"
     echo "**********************"
-    cat rest.err
+    cat $LOG_PATH/rest.err
     return -1
   fi
   echo "done"
 
   echo -n "--> starting jupyter..."
-  sudo screen -dmS jupyter sh -c "cd $JUPYTER_PATH && ./run.sh start > $LOG_PATH/jupyter.out > $LOG_PATH/jupyter.err"
+  sudo screen -dmS jupyter sh -c "cd $JUPYTER_PATH && ./run.sh $JUPYTER_CMD > $LOG_PATH/jupyter.out 2> $LOG_PATH/jupyter.err"
   sleep 1 # give the session time to spin up
   if ! sudo screen -list | grep -q "jupyter"; then
-    echo -e "\n**********************"
-    echo -e "\nFailed to start jupyter"
+    echo -e "\n\n**********************"
+    echo -e "Failed to start jupyter"
     echo "**********************"
-    cat jupyter.err
+    cat $LOG_PATH/jupyter.err
     return -1
   fi
   echo "done"
-
-  echo -n "--> starting collector..."
-  sudo screen -dmS collector sh -c "cd $JUPYTER_PATH && ./run_cull.sh > $LOG_PATH/cull.out 2> $LOG_PATH/cull.err"
-  sleep 1 # give the session time to spin up
-  if ! sudo screen -list | grep -q "collector"; then
-    echo -e "\n**********************"
-    echo -e "\nFailed to start collector"
-    echo "**********************"
-    cat cull.err
-    return -1
+  
+  if "$RUN_CULL" = true; then
+    echo -n "--> starting collector..."
+    sudo screen -dmS collector sh -c "cd $JUPYTER_PATH && ./run_cull.sh > $LOG_PATH/cull.out 2> $LOG_PATH/cull.err"
+    sleep 1 # give the session time to spin up
+    if ! sudo screen -list | grep -q "collector"; then
+      echo -e "\n\n**********************"
+      echo -e "Failed to start collector"
+      echo "**********************"
+      cat $LOG_PATH/cull.err
+      return -1
+    fi
+    echo "done"
+  else 
+    echo "--> skipping collector startup because you are running in debug mode" 
   fi
-  echo "done"
 
   echo -e "\nRunning Screens"
   sudo screen -list 
@@ -201,19 +215,25 @@ old() {
 
 display_usage() {
    echo "*** JupyterHub Control Script ***"
-   echo "usage: $0 install            # installs required software and build jupyterhub docker containers"
-   echo "usage: $0 build [--clean]    # build the jupyter docker images. --clean forces a clean build"
-   echo "usage: $0 start              # starts the jupyterhub inside screen instances"
-   echo "usage: $0 clean              # cleans all jupyterhub screen instances and removes docker containers"
+   echo "usage: $0 install            # install required software and build jupyterhub docker containers"
+   echo "usage: $0 build              # build the jupyter docker images"
+   echo "usage: $0 build --clean      # force a clean build the jupyter docker images"
+   echo "usage: $0 start              # start the jupyterhub in production mode"
+   echo "usage: $0 start --debug      # start the jupyterhub in debug mode, necessary for development"
+   echo "usage: $0 clean              # clean all jupyterhub screen instances and removes docker containers"
    echo "***"
 }
 
-echo $1 ${2:-}
+#echo $1 ${2:-}
+if [ $# -eq 0 ] ; then
+    display_usage
+    exit 1
+fi
 
 case "$1" in
     install) install $1
         ;;
-    start) start_services "$1"
+    start) start_services ${2:-}
         ;;
     clean) clean $1
         ;;
