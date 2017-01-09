@@ -1,4 +1,5 @@
-FROM castrona/hydroshare-jupyterhub:latest
+#FROM castrona/hydroshare-jupyterhub:latest
+FROM docker.io/castrona/hydroshare-jupyterhub:latest
 MAINTAINER Tony Castronova <acastronova@cuahsi.org>
 
 ######################################################
