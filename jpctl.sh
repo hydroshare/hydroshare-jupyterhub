@@ -14,6 +14,31 @@ LOG_PATH="$(pwd)/log"
 DOCKERSPAWNER_PATH="$(pwd)/dockerspawner"
 OAUTHENTICATOR_PATH="$(pwd)/oauthenticator"
 
+clean() {
+  # remove error files
+  echo -n "--> removing error logs..."
+  sudo rm $LOG_PATH/*.err 2> /dev/null || true
+  sudo rm $JUPYTER_PATH/jupyter.log 2> /dev/null || true
+  echo "done"
+
+  # remove jupyterhub files
+  echo -n "--> removing database..."
+  sudo rm $JUPYTER_PATH/jupyter.sqlite 2> /dev/null || true
+  echo "done"
+
+  echo -n "--> removing cookies..."
+  sudo rm $JUPYTER_PATH/jupyterhub_cookie_secret 2> /dev/null || true
+  echo "done"
+
+  echo -n "--> removing containers..."
+  sudo docker rm -fv $(docker ps -a -q) 2> /dev/null || true
+  echo "done"
+       
+  # remove dangling images
+  echo -n "--> removing dangling images..."
+  docker rmi $(docker images -q -f dangling=true) 2> /dev/null || true
+  echo "done"
+}
 
 install() {
     # install jupyterhub dependencies
@@ -58,14 +83,16 @@ build_docker() {
        # stop all the containers
        echo -e "--> stopping all containers"
        docker stop $(docker ps -a -q) 2> /dev/null || true
-       
-       # remove all containers  
-       echo -e "--> removing all containers"
-       docker rm -fv $(docker ps -a -q) 2> /dev/null || true
-       
-       # remove dangling images
-       echo -e "--> removing dangling images"
-       docker rmi $(docker images -q -f dangling=true) 2> /dev/null || true
+      
+       clean()
+ 
+#       # remove all containers  
+#       echo -e "--> removing all containers"
+#       docker rm -fv $(docker ps -a -q) 2> /dev/null || true
+#       
+#       # remove dangling images
+#       echo -e "--> removing dangling images"
+#       docker rmi $(docker images -q -f dangling=true) 2> /dev/null || true
 
        echo -e "--> removing all docker images"
        docker rmi $(docker images -q) 2> /dev/null || true
@@ -73,16 +100,32 @@ build_docker() {
   fi
 
 
-#  if [[ "$(docker images -q jupyterhub/singleuser 2> /dev/null)" != "" ]]; then
-#    echo "Docker image \"jupyterhub/singleuser\" alread exists.  Use --clean option to force rebuild"
-#    return 1
-#  else
+  if [[ "$(docker images -q docker.io/castrona/hydroshare-jupyterhub 2> /dev/null)" != "" ]]; then
+    echo -e "--> reusing existing base image.  Use --clean option to force rebuild of base image"
+  fi
+  
     # remove the jupyterhub/singleuser image
     echo -e "--> building the \"jupyterhub/singleuser\" image"
     docker build -f ./docker/Dockerfile -t jupyterhub/singleuser .
-#  fi
 }
 
+update_docker_images){
+  #
+  # Updates the docker base-image without shutting down the server to minimize downtime
+  #
+
+  # pull the latest base image
+  echo -e "--> pulling the latest \"hydroshare-jupyterhub\" base image"
+  docker pull castrona/hydroshare-jupyterhub:latest
+
+  # remove the jupyterhub/singleuser image
+  echo -e "--> building the \"jupyterhub/singleuser\" image"
+  docker build -f ./docker/Dockerfile -t jupyterhub/singleuser .
+
+  # clean dangling images and old jupyterhub files
+  clean() 
+
+}
 start_services() {
 
   JUPYTER_CMD="start"
@@ -183,55 +226,13 @@ start_services() {
   sudo screen -list 
 }
 
-clean() {
-  # remove error files
-  echo -n "--> removing error logs..."
-  sudo rm $LOG_PATH/*.err 2> /dev/null || true
-  sudo rm $JUPYTER_PATH/jupyter.log 2> /dev/null || true
-  echo "done"
-
-  # remove jupyterhub files
-  echo -n "--> removing database..."
-  sudo rm $JUPYTER_PATH/jupyter.sqlite 2> /dev/null || true
-  echo "done"
-
-  echo -n "--> removing cookies..."
-  sudo rm $JUPYTER_PATH/jupyterhub_cookie_secret 2> /dev/null || true
-  echo "done"
-
-  echo -n "--> removing containers..."
-  sudo docker rm -fv $(docker ps -a -q) 2> /dev/null || true
-  echo "done"
-       
-  # remove dangling images
-  echo -n "--> removing dangling images..."
-  docker rmi $(docker images -q -f dangling=true) 2> /dev/null || true
-  echo "done"
-}
-
-old() {
-    # start jupyterhub in individual screens  
-    REST_PATH="$(pwd)/rest"
-    JUPYTER_PATH="$(pwd)/jupyterhub"
-
-    printf "Starting the REST Server in Screen\n"
-    sudo screen -dmS rest sh -c "cd $REST_PATH && sh run.sh 2> rest.err"
-
-    printf "Starting the JupyterHub Server in Screen\n"
-    sudo screen -dmS jupyter sh -c "cd $JUPYTER_PATH && sh run.sh 2> jupyter.err"
-
-    printf "Starting the Docker Image Collector in Screen\n"
-    sudo screen -dmS collector sh -c "cd $JUPYTER_PATH && sh run_cull.sh 2> cull.err"
-
-    printf "List of Screen Instances\n"
-    sudo screen -list 
-}
 
 display_usage() {
    echo "*** JupyterHub Control Script ***"
    echo "usage: $0 install            # install required software and build jupyterhub docker containers"
    echo "usage: $0 build              # build the jupyter docker images"
    echo "usage: $0 build --clean      # force a clean build the jupyter docker images"
+   echo "usage: $0 update             # update the base docker image on a production server (designed to minimize server downtime)"
    echo "usage: $0 start              # start the jupyterhub in production mode"
    echo "usage: $0 start --debug      # start the jupyterhub in debug mode, necessary for development"
    echo "usage: $0 clean              # clean all jupyterhub screen instances and removes docker containers"
