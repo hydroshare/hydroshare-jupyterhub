@@ -19,11 +19,6 @@ clean() {
   sudo docker rm -fv $(docker ps -a -q) 2> /dev/null || true
   echo "done"
        
-  # remove dangling images
-  echo -n "--> removing dangling images..."
-  docker rmi $(docker images -q -f dangling=true) 2> /dev/null || true
-  echo "done" 
-
   # remove error files
   echo -n "--> removing error logs..."
   sudo rm $LOG_PATH/*.err 2> /dev/null || true
@@ -38,6 +33,12 @@ clean() {
   echo -n "--> removing cookies..."
   sudo rm $JUPYTER_PATH/jupyterhub_cookie_secret 2> /dev/null || true
   echo "done"
+  
+  # remove dangling images
+  echo -n "--> removing dangling images..."
+  docker rmi $(docker images -q -f dangling=true) 2> /dev/null || true
+  echo "done" 
+
 }
 
 install() {
@@ -89,12 +90,18 @@ build_docker() {
  
        echo -e "--> removing all docker images"
        docker rmi $(docker images -q) 2> /dev/null || true
+
+
     fi
   fi
 
 
   if [[ "$(docker images -q docker.io/castrona/hydroshare-jupyterhub 2> /dev/null)" != "" ]]; then
     echo -e "--> reusing existing base image.  Use --clean option to force rebuild of base image"
+  else
+    # pull the latest base image
+    echo -e "--> pulling the latest \"hydroshare-jupyterhub\" base image"
+    docker pull castrona/hydroshare-jupyterhub:latest
   fi
   
   # remove the jupyterhub/singleuser image
