@@ -15,6 +15,15 @@ DOCKERSPAWNER_PATH="$(pwd)/dockerspawner"
 OAUTHENTICATOR_PATH="$(pwd)/oauthenticator"
 
 clean() {
+  echo -n "--> removing containers..."
+  sudo docker rm -fv $(docker ps -a -q) 2> /dev/null || true
+  echo "done"
+       
+  # remove dangling images
+  echo -n "--> removing dangling images..."
+  docker rmi $(docker images -q -f dangling=true) 2> /dev/null || true
+  echo "done" 
+
   # remove error files
   echo -n "--> removing error logs..."
   sudo rm $LOG_PATH/*.err 2> /dev/null || true
@@ -28,15 +37,6 @@ clean() {
 
   echo -n "--> removing cookies..."
   sudo rm $JUPYTER_PATH/jupyterhub_cookie_secret 2> /dev/null || true
-  echo "done"
-
-  echo -n "--> removing containers..."
-  sudo docker rm -fv $(docker ps -a -q) 2> /dev/null || true
-  echo "done"
-       
-  # remove dangling images
-  echo -n "--> removing dangling images..."
-  docker rmi $(docker images -q -f dangling=true) 2> /dev/null || true
   echo "done"
 }
 
@@ -84,16 +84,9 @@ build_docker() {
        echo -e "--> stopping all containers"
        docker stop $(docker ps -a -q) 2> /dev/null || true
       
-       clean()
+       # clean dangling images and old jupyterhub files
+       clean
  
-#       # remove all containers  
-#       echo -e "--> removing all containers"
-#       docker rm -fv $(docker ps -a -q) 2> /dev/null || true
-#       
-#       # remove dangling images
-#       echo -e "--> removing dangling images"
-#       docker rmi $(docker images -q -f dangling=true) 2> /dev/null || true
-
        echo -e "--> removing all docker images"
        docker rmi $(docker images -q) 2> /dev/null || true
     fi
@@ -104,12 +97,12 @@ build_docker() {
     echo -e "--> reusing existing base image.  Use --clean option to force rebuild of base image"
   fi
   
-    # remove the jupyterhub/singleuser image
-    echo -e "--> building the \"jupyterhub/singleuser\" image"
-    docker build -f ./docker/Dockerfile -t jupyterhub/singleuser .
+  # remove the jupyterhub/singleuser image
+  echo -e "--> building the \"jupyterhub/singleuser\" image"
+  docker build -f ./docker/Dockerfile -t jupyterhub/singleuser .
 }
 
-update_docker_images){
+update_docker_images() {
   #
   # Updates the docker base-image without shutting down the server to minimize downtime
   #
@@ -123,7 +116,7 @@ update_docker_images){
   docker build -f ./docker/Dockerfile -t jupyterhub/singleuser .
 
   # clean dangling images and old jupyterhub files
-  clean() 
+  clean
 
 }
 start_services() {
@@ -253,6 +246,8 @@ case "$1" in
     clean) clean $1
         ;;
     build) build_docker ${2:-}
+        ;;
+    update) update_docker_images $1
         ;;
     *) display_usage
         ;;
