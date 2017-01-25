@@ -573,8 +573,9 @@ class RHESSysWorkflow(object):
             self.logger.info(result)
             return result
         except Exception as e:
+            self.logger.info("FAILED->get_Extent_from_RHESSysWorkflows_Metadata_File")
             self.logger.error(str(e))
-            return -1
+            return -1101
 
 
     ###############################################################################################
@@ -586,8 +587,9 @@ class RHESSysWorkflow(object):
             output = subprocess.check_output(my_command, shell=True, stderr=subprocess.STDOUT)
             return output
         except Exception,e:
+            self.logger.info("FAILED->RegisterDEMOptions")
             self.logger.error(str(e))
-            return -1
+            return -1102
         
     def RegisterDEM(self, sub_project_folder, dem_file):
         try:
@@ -596,8 +598,9 @@ class RHESSysWorkflow(object):
             output = subprocess.check_output(my_command, shell=True, stderr=subprocess.STDOUT)
             return output
         except Exception,e:
+            self.logger.info("FAILED->RegisterDEM")
             self.logger.error(str(e))
-            return -1
+            return -1103
         
     def RegisterGage(self, sub_project_folder, gage_file, layername, id_attribute, id_value):
         try:
@@ -606,8 +609,9 @@ class RHESSysWorkflow(object):
             output = subprocess.check_output(my_command, shell=True, stderr=subprocess.STDOUT)
             return output
         except Exception,e:
+            self.logger.info("FAILED->RegisterGage")
             self.logger.error(str(e))
-            return -1
+            return -1104
 
     def RegisterRasterOptions(self, options):
         try:
@@ -616,8 +620,9 @@ class RHESSysWorkflow(object):
             output = subprocess.check_output(my_command, shell=True, stderr=subprocess.STDOUT)
             return output
         except Exception,e:
+            self.logger.info("FAILED->RegisterRasterOptions")
             self.logger.error(str(e))
-            return -1
+            return -1105
          
     def RegisterRaster(self, sub_project_folder, raster_type, raster_file):
         try:
@@ -626,8 +631,9 @@ class RHESSysWorkflow(object):
             output = subprocess.check_output(my_command, shell=True, stderr=subprocess.STDOUT)
             return output
         except Exception,e:
+            self.logger.info("FAILED->RegisterRaster")
             self.logger.error(str(e))
-            return -1
+            return -1106
         
     def get_NHDStreamflowGageIdentifiersAndLocation(self, sub_project_folder, gageid):
         try:
@@ -636,8 +642,9 @@ class RHESSysWorkflow(object):
             output = subprocess.check_output(my_command, shell=True, stderr=subprocess.STDOUT)
             return output
         except Exception as e:
+            self.logger.info("FAILED->get_NHDStreamflowGageIdentifiersAndLocation")
             self.logger.error(str(e))
-            return -1
+            return -1107
 
     def get_CatchmentShapefileForNHDStreamflowGage(self, sub_project_folder):
         try:
@@ -646,8 +653,9 @@ class RHESSysWorkflow(object):
             output = subprocess.check_output(my_command, shell=True, stderr=subprocess.STDOUT)
             return output
         except Exception as e:
+            self.logger.info("FAILED->get_CatchmentShapefileForNHDStreamflowGage")
             self.logger.error(str(e))
-            return -1
+            return -1108
 
     def get_BoundingboxFromStudyareaShapefile(self, sub_project_folder):
         try:
@@ -656,11 +664,13 @@ class RHESSysWorkflow(object):
             output = subprocess.check_output(my_command, shell=True, stderr=subprocess.STDOUT)
             return output
         except subprocess.CalledProcessError as e:
+            self.logger.info("FAILED->get_BoundingboxFromStudyareaShapefile")
             self.logger.error(str(e))
-            return -1
+            return -1109
         except Exception as e:
+            self.logger.info("FAILED->get_BoundingboxFromStudyareaShapefile")
             self.logger.error(str(e))
-            return -1
+            return -1110
 
     def get_USGSDEMForBoundingbox(self, sub_project_folder):
         try:
@@ -670,8 +680,9 @@ class RHESSysWorkflow(object):
             output = subprocess.check_output(my_command, shell=True, stderr=subprocess.STDOUT)
             return output
         except Exception as e:
+            self.logger.info("FAILED->get_USGSDEMForBoundingbox")
             self.logger.error(str(e))
-            return -1
+            return -1111
 
     def get_USGSNLCDForDEMExtent(self, sub_project_folder):
         try:
@@ -680,8 +691,9 @@ class RHESSysWorkflow(object):
             output = subprocess.check_output(my_command, shell=True, stderr=subprocess.STDOUT)
             return output
         except Exception as e:
+            self.logger.info("FAILED->get_USGSNLCDForDEMExtent")
             self.logger.error(str(e))
-            return -1
+            return -1112
 
     def get_SSURGOFeaturesForBoundingbox(self, sub_project_folder):
         try:
@@ -690,8 +702,9 @@ class RHESSysWorkflow(object):
             output = subprocess.check_output(my_command, shell=True, stderr=subprocess.STDOUT)
             return output
         except Exception as e:
+            self.logger.info("FAILED->get_SSURGOFeaturesForBoundingbox")
             self.logger.error(str(e))
-            return -1
+            return -1113
 
     def GenerateSoilPropertyRastersFromSSURGO(self, sub_project_folder):
         try:
@@ -700,8 +713,9 @@ class RHESSysWorkflow(object):
             output = subprocess.check_output(my_command, shell=True, stderr=subprocess.STDOUT)
             return output
         except Exception as e:
+            self.logger.info("FAILED->GenerateSoilPropertyRastersFromSSURGO")
             self.logger.error(str(e))
-            return -1
+            return -1114
 
 
     def Register_LAI_Raster(self, sub_project_folder, lai_fullpathname_with_ext, publisher):
@@ -711,8 +725,9 @@ class RHESSysWorkflow(object):
             output = subprocess.check_output(my_command, shell=True, stderr=subprocess.STDOUT)
             return output
         except Exception as e:
+            self.logger.info("FAILED->Register_LAI_Raster")
             self.logger.error(str(e))
-            return -1
+            return -1115
 
 
     def CreateGRASSLocationFromDEM(self, sub_project_folder, description):
@@ -722,8 +737,9 @@ class RHESSysWorkflow(object):
             output = subprocess.check_output(my_command, shell=True, stderr=subprocess.STDOUT)
             return output
         except Exception as e:
+            self.logger.info("FAILED->CreateGRASSLocationFromDEM")
             self.logger.error(str(e))
-            return -1
+            return -1116
 
 
     def ImportRHESSysSource(self, sub_project_folder, source_code_location=None):
@@ -736,8 +752,9 @@ class RHESSysWorkflow(object):
             output = subprocess.check_output(my_command, shell=True, stderr=subprocess.STDOUT)
             return output
         except Exception as e:
+            self.logger.info("FAILED->ImportRHESSysSource")
             self.logger.error(str(e))
-            return -1
+            return -1117
 
 
     def ImportClimateData(self, sub_project_folder, climate_data_location):
@@ -747,8 +764,9 @@ class RHESSysWorkflow(object):
             output = subprocess.check_output(my_command, shell=True, stderr=subprocess.STDOUT)
             return output
         except Exception as e:
+            self.logger.info("FAILED->ImportClimateData")
             self.logger.error(str(e))
-            return -1
+            return -1118
 
 
     def GenerateBaseStationMap(self, sub_project_folder, station_data_location):
@@ -758,8 +776,9 @@ class RHESSysWorkflow(object):
             output = subprocess.check_output(my_command, shell=True, stderr=subprocess.STDOUT)
             return output
         except Exception as e:
+            self.logger.info("FAILED->GenerateBaseStationMap")
             self.logger.error(str(e))
-            return -1
+            return -1119
 
 
 ##TODO OTHER VARIABLES
@@ -770,8 +789,9 @@ class RHESSysWorkflow(object):
             output = subprocess.check_output(my_command, shell=True, stderr=subprocess.STDOUT)
             return output
         except Exception as e:
+            self.logger.info("FAILED->DelineateWatershed")
             self.logger.error(str(e))
-            return -1
+            return -1120
 
     def GeneratePatchMapOptions(self, options):
         try:
@@ -780,8 +800,9 @@ class RHESSysWorkflow(object):
             output = subprocess.check_output(my_command, shell=True, stderr=subprocess.STDOUT)
             return output
         except Exception,e:
+            self.logger.info("FAILED->GeneratePatchMapOptions")
             self.logger.error(str(e))
-            return -1
+            return -1121
 
 ##TODO OTHER VARIABLES
     def GeneratePatchMap(self, sub_project_folder):
@@ -791,8 +812,9 @@ class RHESSysWorkflow(object):
             output = subprocess.check_output(my_command, shell=True, stderr=subprocess.STDOUT)
             return output
         except Exception as e:
+            self.logger.info("FAILED->GeneratePatchMap")
             self.logger.error(str(e))
-            return -1
+            return -1122
 
     def GenerateSoilTextureMap(self, sub_project_folder, options=''):
         try:
@@ -801,8 +823,9 @@ class RHESSysWorkflow(object):
             output = subprocess.check_output(my_command, shell=True, stderr=subprocess.STDOUT)
             return output
         except Exception as e:
+            self.logger.info("FAILED->GenerateSoilTextureMap")
             self.logger.error(str(e))
-            return -1
+            return -1123
 
     def ImportRasterMapIntoGRASS(self, sub_project_folder, texture, mode):
         try:
@@ -811,8 +834,9 @@ class RHESSysWorkflow(object):
             output = subprocess.check_output(my_command, shell=True, stderr=subprocess.STDOUT)
             return output
         except Exception,e:
+            self.logger.info("FAILED->ImportRasterMapIntoGRASS")
             self.logger.error(str(e))
-            return -1
+            return -1124
 
     def ImportRasterMapIntoGRASS_LAI(self, sub_project_folder):
         try:
@@ -821,8 +845,9 @@ class RHESSysWorkflow(object):
             output = subprocess.check_output(my_command, shell=True, stderr=subprocess.STDOUT)
             return output
         except Exception as e:
+            self.logger.info("FAILED->ImportRasterMapIntoGRASS_LAI")
             self.logger.error(str(e))
-            return -1
+            return -1125
 
     def ImportRasterMapIntoGRASS_LANDCOVER(self, sub_project_folder):
         try:
@@ -831,8 +856,9 @@ class RHESSysWorkflow(object):
             output = subprocess.check_output(my_command, shell=True, stderr=subprocess.STDOUT)
             return output
         except Exception as e:
+            self.logger.info("FAILED->ImportRasterMapIntoGRASS_LANDCOVER")
             self.logger.error(str(e))
-            return -1
+            return -1126
         
     def RegisterLandcoverReclassRulesOptions(self, options):
         try:
@@ -841,8 +867,9 @@ class RHESSysWorkflow(object):
             output = subprocess.check_output(my_command, shell=True, stderr=subprocess.STDOUT)
             return output
         except Exception,e:
+            self.logger.info("FAILED->RegisterLandcoverReclassRulesOptions")
             self.logger.error(str(e))
-            return -1
+            return -1127
 
     def RegisterLandcoverReclassRules(self, sub_project_folder):
         try:
@@ -851,8 +878,9 @@ class RHESSysWorkflow(object):
             output = subprocess.check_output(my_command, shell=True, stderr=subprocess.STDOUT)
             return output
         except Exception as e:
+            self.logger.info("FAILED->RegisterLandcoverReclassRules")
             self.logger.error(str(e))
-            return -1
+            return -1128
         
     def GenerateLandcoverMapsOptions(self, options):
         try:
@@ -861,8 +889,9 @@ class RHESSysWorkflow(object):
             output = subprocess.check_output(my_command, shell=True, stderr=subprocess.STDOUT)
             return output
         except Exception,e:
+            self.logger.info("FAILED->GenerateLandcoverMapsOptions")
             self.logger.error(str(e))
-            return -1
+            return -1129
 
     def GenerateLandcoverMaps(self, sub_project_folder):
         try:
@@ -871,8 +900,9 @@ class RHESSysWorkflow(object):
             output = subprocess.check_output(my_command, shell=True, stderr=subprocess.STDOUT)
             return output
         except Exception as e:
+            self.logger.info("FAILED->GenerateLandcoverMaps")
             self.logger.error(str(e))
-            return -1
+            return -1130
 
     def GenerateWorldTemplateOptions(self, options):
         try:
@@ -881,8 +911,9 @@ class RHESSysWorkflow(object):
             output = subprocess.check_output(my_command, shell=True, stderr=subprocess.STDOUT)
             return output
         except Exception,e:
+            self.logger.info("FAILED->GenerateWorldTemplateOptions")
             self.logger.error(str(e))
-            return -1
+            return -1131
         
 #TODO NAME OF CLIMATE STATION
     def GenerateWorldTemplate(self, sub_project_folder):
@@ -892,8 +923,9 @@ class RHESSysWorkflow(object):
             output = subprocess.check_output(my_command, shell=True, stderr=subprocess.STDOUT)
             return output
         except Exception as e:
+            self.logger.info("FAILED->GenerateWorldTemplate")
             self.logger.error(str(e))
-            return -1
+            return -1132
 
     def CreateWorldfile(self, sub_project_folder):
         try:
@@ -902,8 +934,9 @@ class RHESSysWorkflow(object):
             output = subprocess.check_output(my_command, shell=True, stderr=subprocess.STDOUT)
             return output
         except Exception as e:
+            self.logger.info("FAILED->CreateWorldfile")
             self.logger.error(str(e))
-            return -1
+            return -1133
 
     def CreateFlowtableOptions(self, options):
         try:
@@ -912,8 +945,9 @@ class RHESSysWorkflow(object):
             output = subprocess.check_output(my_command, shell=True, stderr=subprocess.STDOUT)
             return output
         except Exception,e:
+            self.logger.info("FAILED->CreateFlowtableOptions")
             self.logger.error(str(e))
-            return -1
+            return -1134
         
     def CreateFlowtable(self, sub_project_folder):
         try:
@@ -922,8 +956,9 @@ class RHESSysWorkflow(object):
             output = subprocess.check_output(my_command, shell=True, stderr=subprocess.STDOUT)
             return output
         except Exception as e:
+            self.logger.info("FAILED->CreateFlowtable")
             self.logger.error(str(e))
-            return -1
+            return -1135
 
     def RunLAIRead(self, sub_project_folder):
         try:
@@ -932,8 +967,9 @@ class RHESSysWorkflow(object):
             output = subprocess.check_output(my_command, shell=True, stderr=subprocess.STDOUT)
             return output
         except Exception as e:
+            self.logger.info("FAILED->RunLAIRead")
             self.logger.error(str(e))
-            return -1
+            return -1136
 
     def RunCmdOptions(self, options):
         try:
@@ -944,8 +980,9 @@ class RHESSysWorkflow(object):
             output = subprocess.check_output(my_command, shell=True, stderr=subprocess.STDOUT)
             return output
         except Exception,e:
+            self.logger.info("FAILED->RunCmdOptions")
             self.logger.error(str(e))
-            return -1
+            return -1137
         
     ##TODO MORE OPTIONS
     def RunCmd(self, sub_project_folder, addmonths):
@@ -957,8 +994,9 @@ class RHESSysWorkflow(object):
             output = subprocess.check_output(my_command, shell=True, stderr=subprocess.STDOUT)
             return output
         except Exception as e:
+            self.logger.info("FAILED->RunCmd")
             self.logger.error(str(e))
-            return -1
+            return -1138
 
     def RunModelOptions(self, options):
         try:
@@ -969,8 +1007,9 @@ class RHESSysWorkflow(object):
             output = subprocess.check_output(my_command, shell=True, stderr=subprocess.STDOUT)
             return output
         except Exception,e:
+            self.logger.info("FAILED->RunModelOptions")
             self.logger.error(str(e))
-            return -1
+            return -1139
         
     ##TODO MORE OPTIONS
     def RunModel(self, sub_project_folder):
@@ -986,8 +1025,9 @@ class RHESSysWorkflow(object):
             output = subprocess.check_output(my_command, shell=True, stderr=subprocess.STDOUT)
             return output
         except Exception as e:
+            self.logger.info("FAILED->RunModel")
             self.logger.error(str(e))
-            return -1
+            return -1140
 
     def RHESSysPlot(self, sub_project_folder, obs_data):
         try:
@@ -998,8 +1038,9 @@ class RHESSysWorkflow(object):
             output = subprocess.check_output(my_command, shell=True, stderr=subprocess.STDOUT, cwd=sub_project_folder)
             return output
         except Exception as e:
+            self.logger.info("FAILED->RHESSysPlot")
             self.logger.error(str(e))
-            return -1
+            return -1141
 
     ###############################################################################################
     ### Functions to execute HydroTerre Workflows
@@ -1009,8 +1050,9 @@ class RHESSysWorkflow(object):
             self.huc_list = huc_list_as_string.split(';')
             self.huc_list_count = len(self.huc_list)
         except Exception as e:
+            self.logger.info("FAILED->set_huc12_list")
             self.logger.error(str(e))
-            return -1
+            return -1142
 
 
     def get_HUC12_IDs_from_RhyessSys_Domain(self, extent):
@@ -1079,13 +1121,15 @@ class RHESSysWorkflow(object):
                                 if 'messages' in jobJson:                        
                                     self.logger.error(jobJson['messages'])
                                     self.logger.error('HydroTerre job failed get_HUC12_IDs_from_RhyessSys_Domain')
-                                    sys.exit(-100)
+                                    sys.exit(-1143)
                                                        
             else:
+                self.logger.info("FAILED->get_HUC12_IDs_from_RhyessSys_Domain")
                 self.logger.error("no HydroTerre jobId found in the response get_HUC12_IDs_from_RhyessSys_Domain")
-                sys.exit(-101)
+                sys.exit(-1144)
     
         except Exception as e:
+            self.logger.info("FAILED->get_HUC12_IDs_from_RhyessSys_Domain")
             self.logger.error( str(e) )
         
         self.set_huc12_list(huc_list_result)    
@@ -1160,11 +1204,12 @@ class RHESSysWorkflow(object):
                                 if 'messages' in jobJson:                        
                                     print(jobJson['messages'])
                                     print('HydroTerre job failed')
-                                    sys.exit(-100)
+                                    sys.exit(-1145)
                                                        
             else:
+                self.logger.info("FAILED->HydroTerre_RHESSys_ByExtent")
                 print("no HydroTerre jobId found in the response")
-                sys.exit(-101)
+                sys.exit(-1146)
 
             ###############################################################################################
             # Get HydroTerre Service Data Bundle
@@ -1189,6 +1234,7 @@ class RHESSysWorkflow(object):
 
 
         except Exception as e:
+            self.logger.info("FAILED->HydroTerre_RHESSys_ByExtent")
             print(str(e))
 
             
@@ -1204,27 +1250,27 @@ class RHESSysWorkflow(object):
 
             self.logger.info("get_NHDStreamflowGageIdentifiersAndLocation")
             output = self.get_NHDStreamflowGageIdentifiersAndLocation(self.sub_project_folder,self.gageid)
-            if output == -1:
-                sys.exit(-1001)
+            if output < 0:
+                sys.exit(-1147)
             self.logger.info(output)
 
             self.logger.info("get_CatchmentShapefileForNHDStreamflowGage")
             output = self.get_CatchmentShapefileForNHDStreamflowGage(self.sub_project_folder)
-            if output == -1:
-                sys.exit(-1002)
+            if output < 0:
+                sys.exit(-1148)
             self.logger.info(output)
 
             self.logger.info("get_BoundingboxFromStudyareaShapefile")
             output = self.get_BoundingboxFromStudyareaShapefile(self.sub_project_folder)
-            if output == -1:
-                sys.exit(-1003)
+            if output < 0:
+                sys.exit(-1149)
             self.logger.info(output)
 
             ## Now can get extent
             self.logger.info("get_Extent_from_RHESSysWorkflows_Metadata_File")
             self.extent = self.get_Extent_from_RHESSysWorkflows_Metadata_File()
-            if self.extent == -1:
-                sys.exit(-1004)
+            if self.extent < 0:
+                sys.exit(-1150)
 
             ## Now get huc12 list count (threshold too big?)
             ##self.logger.info("get_Extent_from_RHESSysWorkflows_Metadata_File")
@@ -1251,28 +1297,28 @@ class RHESSysWorkflow(object):
   
             self.logger.info("get_USGSDEMForBoundingbox")
             output = self.get_USGSDEMForBoundingbox(self.sub_project_folder)
-            if output == -1:
-                sys.exit(-1005)
+            if output < 0:
+                sys.exit(-1151)
             self.logger.info(output)
 
             self.logger.info("get_USGSNLCDForDEMExtent")
             output = self.get_USGSNLCDForDEMExtent(self.sub_project_folder)
-            if output == -1:
-                sys.exit(-1006)
+            if output < 0:
+                sys.exit(-1152)
             self.logger.info(output)
 
  
             self.logger.info("get_SSURGOFeaturesForBoundingbox")
             output = self.get_SSURGOFeaturesForBoundingbox(self.sub_project_folder)
-            if output == -1:
-                sys.exit(-1007)
+            if output< 0:
+                sys.exit(-1153)
             self.logger.info(output)
 
 
             self.logger.info("GenerateSoilPropertyRastersFromSSURGO")
             output = self.GenerateSoilPropertyRastersFromSSURGO(self.sub_project_folder)
-            if output == -1:
-                sys.exit(-1008)
+            if output < 0:
+                sys.exit(-1154)
             self.logger.info(output)
 
 
@@ -1285,22 +1331,22 @@ class RHESSysWorkflow(object):
             self.lai_fullpathname_with_ext = self.sub_project_folder + '/RHESSys_ETV/RHESSys_LAI/LAI_Month0.tif'
             
             output = self.Register_LAI_Raster(self.sub_project_folder, self.lai_fullpathname_with_ext, self.publisher)
-            if output == -1:
-                sys.exit(-1009)
+            if output < 0:
+                sys.exit(-1155)
             self.logger.info(output)
 
             self.logger.info("CreateGRASSLocationFromDEM")
             #Beware of quotes
             output = self.CreateGRASSLocationFromDEM(self.sub_project_folder, '"RHESSys model for Dead Run 5 watershed near Catonsville, MD"')
-            if output == -1:
-                sys.exit(-1010)
+            if output < 0:
+                sys.exit(-1156)
             self.logger.info(output)
 
 #TODO CHECK SOURCE PATH IS VALID
             self.logger.info("ImportRHESSysSource")
             output = self.ImportRHESSysSource(self.sub_project_folder, self.rhessys_source_location)
-            if output == -1:
-                sys.exit(-1011)
+            if output < 0:
+                sys.exit(-1157)
             self.logger.info(output)
 
 
@@ -1311,8 +1357,8 @@ class RHESSysWorkflow(object):
 #PROBLEM HERE
             self.logger.info("ImportClimateData")
             output = self.ImportClimateData(self.sub_project_folder, self.climate_data_fullpathname)
-            if output == -1:
-                sys.exit(-1012)
+            if output < 0:
+                sys.exit(-1158)
             self.logger.info(output)
 
 
@@ -1335,92 +1381,92 @@ class RHESSysWorkflow(object):
 
             self.logger.info("DelineateWatershed")
             output = self.DelineateWatershed(self.sub_project_folder, self.dem_cell_threshold, self.areaEstimate)
-            if output == -1:
-                sys.exit(-1014)
+            if output < 0:
+                sys.exit(-1159)
             self.logger.info(output)
 
 
 ##TODO Other Options
             self.logger.info("GeneratePatchMap")
             output = self.GeneratePatchMap(self.sub_project_folder)
-            if output == -1:
-                sys.exit(-1015)
+            if output < 0:
+                sys.exit(-1160)
             self.logger.info(output)
 
             self.logger.info("GenerateSoilTextureMap")
             output = self.GenerateSoilTextureMap(self.sub_project_folder)
-            if output == -1:
-                sys.exit(-1016)
+            if output < 0:
+                sys.exit(-1161)
             self.logger.info(output)
 
             self.logger.info("ImportRasterMapIntoGRASS_LAI")
             output = self.ImportRasterMapIntoGRASS_LAI(self.sub_project_folder)
-            if output == -1:
-                sys.exit(-1017)
+            if output < 0:
+                sys.exit(-1162)
             self.logger.info(output)
 
             self.logger.info("ImportRasterMapIntoGRASS_LANDCOVER")
             output = self.ImportRasterMapIntoGRASS_LANDCOVER(self.sub_project_folder)
-            #if output == -1:
-            #    sys.exit(-1018)
+            #if output < 0:
+            #    sys.exit(-1163)
             self.logger.info(output)
 
 #            self.logger.info("ImportRasterMapIntoGRASS_LANDCOVER")
 #            output = #self.ImportRasterMapIntoGRASS_LANDCOVER(self.sub_project_folder)
-#            #if output == -1:
-#            #    sys.exit(-1019)
+#            #if output < 0:
+#            #    sys.exit(-1164)
 #            self.logger.info(output)
 
 
             self.logger.info("RegisterLandcoverReclassRules")
             output = self.RegisterLandcoverReclassRules(self.sub_project_folder)
-            if output == -1:
-                sys.exit(-1020)
+            if output < 0:
+                sys.exit(-1165)
             self.logger.info(output)
 
             self.logger.info("GenerateLandcoverMaps")
             output = self.GenerateLandcoverMaps(self.sub_project_folder)
-            if output == -1:
-                sys.exit(-1021)
+            if output < 0:
+                sys.exit(-1166)
             self.logger.info(output)
 
 #TODO VARIABLE NAMES
             self.logger.info("GenerateWorldTemplate")
             output = self.GenerateWorldTemplate(self.sub_project_folder)
-            if output == -1:
-                sys.exit(-1022)
+            if output < 0:
+                sys.exit(-1167)
             self.logger.info(output)
 
             self.logger.info("CreateWorldfile")
             output = self.CreateWorldfile(self.sub_project_folder)
-            if output == -1:
-                sys.exit(-1023)
+            if output < 0:
+                sys.exit(-1168)
             self.logger.info(output)
 
             self.logger.info("CreateFlowtable")
             output = self.CreateFlowtable(self.sub_project_folder)
-            if output == -1:
-                sys.exit(-1024)
+            if output < 0:
+                sys.exit(-1169)
             self.logger.info(output)
 
             self.logger.info("RunLAIRead")
             output = self.RunLAIRead(self.sub_project_folder)
-            if output == -1:
-                sys.exit(-1025)
+            if output < 0:
+                sys.exit(-1170)
             self.logger.info(output)
 
             self.logger.info("RunCmd")
             addmonths = 9
             output = self.RunCmd(self.sub_project_folder,addmonths)
             #output = self.RunCmd(self.sub_project_folder)
-            if output == -1:
-                sys.exit(-1026)
+            if output < 0:
+                sys.exit(-1171)
             self.logger.info(output)
 
             self.logger.info("RunModel")
             output = self.RunModel(self.sub_project_folder)
-            #if output == -1:
-            #    sys.exit(-1027)
+            #if output < 0:
+            #    sys.exit(-1172)
             self.logger.info(output)
 
             self.logger.info("RHESSysPlot")
@@ -1437,6 +1483,7 @@ class RHESSysWorkflow(object):
             self.logger.info("Workflow took: " + self.timespan)
  
         except Exception as e:
+            self.logger.info("FAILED->execute_workflow")
             return str(e)
 
 
