@@ -17,6 +17,7 @@ sys.path.append(abspath(join(root, '../')))
 # Configuration file for Jupyter Hub
 c = get_config()
 
+c.Authenticator.admin_users = {'root','jupyter'}
 c.JupyterHub.api_tokens = {"6b2ee57055123b95be0df3a3c3609e09886e419b7f032db219dc8235de93ed44":"jupyter"}
 
 try:
