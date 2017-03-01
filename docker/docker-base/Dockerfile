@@ -80,7 +80,7 @@ gdal \
 basemap \
 landlab -c landlab
 
-RUN git clone -b 2_and_3 https://github.com/hydroshare/hs_restclient.git /home/jovyan/libs/hs_restclient
+RUN git clone -b master https://github.com/hydroshare/hs_restclient.git /home/jovyan/libs/hs_restclient
 RUN /bin/bash -c "source /opt/conda/bin/activate root && cd /home/jovyan/libs/hs_restclient && python setup.py install "
 
 # Python 2
