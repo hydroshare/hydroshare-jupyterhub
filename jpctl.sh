@@ -226,6 +226,11 @@ start_services() {
   sudo screen -list 
 }
 
+run_tests(){
+
+   docker run --rm -it -u root -v $(pwd)/notebooks:/home/jovyan/work jupyterhub/singleuser sh test/run-tests.sh
+    
+}
 
 display_usage() {
    echo "*** JupyterHub Control Script ***"
@@ -236,6 +241,7 @@ display_usage() {
    echo "usage: $0 start              # start the jupyterhub in production mode"
    echo "usage: $0 start --debug      # start the jupyterhub in debug mode, necessary for development"
    echo "usage: $0 clean              # clean all jupyterhub screen instances and removes docker containers"
+   echo "usage: $0 test               # run unittests"
    echo "***"
 }
 
@@ -256,6 +262,8 @@ case "$1" in
         ;;
     update) update_docker_images $1
         ;;
+    test) run_tests $1
+	;;
     *) display_usage
         ;;
 esac
