@@ -13,12 +13,36 @@ JUPYTER_PATH="$(pwd)/jupyterhub"
 LOG_PATH="$(pwd)/log"
 DOCKERSPAWNER_PATH="$(pwd)/dockerspawner"
 OAUTHENTICATOR_PATH="$(pwd)/oauthenticator"
+JUPYTERHUBRESTSERVER="$(pwd)/jupyterhub_rest_server"
 
 clean() {
+  
+  # remove containers
   echo -n "--> removing containers..."
   sudo docker rm -fv $(docker ps -a -q) 2> /dev/null || true
   echo "done"
        
+  # remove dangling images
+  echo -n "--> removing dangling images..."
+  docker rmi $(docker images -q -f dangling=true) 2> /dev/null || true
+  echo "done" 
+
+  # parse args if they are provided
+  if [[ $# -ne 0 ]] ;  then
+    if [[ $1 == "--systemd" ]]; then
+       clean_systemd
+    elif [[ $1 == "--screen" ]]; then
+       clean_screen
+    else
+       echo -e "invalid argument: $1\nSee help for vaild start arguments\n"
+    fi
+  else
+     echo -e "missing argument. JupyterHub system files will not be cleaned. \nSee help for vaild start arguments\n"
+  fi
+
+}
+
+clean_screen(){
   # remove error files
   echo -n "--> removing error logs..."
   sudo rm $LOG_PATH/*.err 2> /dev/null || true
@@ -33,45 +57,74 @@ clean() {
   echo -n "--> removing cookies..."
   sudo rm $JUPYTER_PATH/jupyterhub_cookie_secret 2> /dev/null || true
   echo "done"
-  
-  # remove dangling images
-  echo -n "--> removing dangling images..."
-  docker rmi $(docker images -q -f dangling=true) 2> /dev/null || true
-  echo "done" 
+ 
+}
 
+clean_systemd(){
+
+  # remove error files
+  echo -n "--> removing error logs..."
+  sudo rm /etc/jupyterhub/*.err 2> /dev/null || true
+  sudo rm /etc/jupyterhub/*.log 2> /dev/null || true
+  echo "done"
+
+  # remove jupyterhub files
+  echo -n "--> removing database..."
+  sudo rm /etc/jupyterhub/*.sqlite 2> /dev/null || true
+  echo "done"
+
+  echo -n "--> removing cookies..."
+  sudo rm /etc/jupyterhub/*cookie_secret 2> /dev/null || true
+  echo "done"
 }
 
 install() {
     # install jupyterhub dependencies
-    printf "Installing system requirements\n"
+    echo -e "--> installing system requirements"
     sudo apt-get clean  
     sudo apt-get update --fix-missing  
     sudo apt-get install -y openssh-server wget screen docker python3-dateutil
 
     # install pip, ipgetter, and jupyterhub
-    printf "Installing Pip3, Ipgetter, JupyterHub\n"
+    echo -e "--> installing pip3, ipgetter, jupyterHub"
     wget https://bootstrap.pypa.io/get-pip.py
     sudo python3 get-pip.py
     sudo pip3 install ipgetter
     sudo pip3 install "ipython[notebook]" jupyterhub
+    rm get-pip.py
 
     # install node and configurable proxy
-    printf "Installing NodeJS and configurable-http-proxy\n"
+    echo -e "--> installing nodejs and configurable-http-proxy"
     curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
     sudo apt-get install -y nodejs 
     sudo npm install -g configurable-http-proxy
 
     # build the jupyterhub docker image  
-    printf "Building the JupyterHub Docker image\n"
+    echo "--> building the jupyterhub docker image"
     cd ./docker && docker build -t jupyterhub/singleuser .
 
-    # install dockerspawner dependencies
-    sudo pip3 install -r $DOCKERSPAWNER_PATH/requirements.txt
+    # install dockerspawner 
+    echo "--> installing dockerspawner"
+    sudo pip3 install -e $DOCKERSPAWNER_PATH
 
-    # install oauthenticator dependencies
-    sudo pip3 install -r $OAUTHENTICATOR_PATH/requirements.txt
+    # install oauthenticator 
+    echo "--> installing oauthenticator"
+    sudo pip3 install -e $OAUTHENTICATOR_PATH
+
+    # install JupyterHub rest server
+    echo "--> installing jupyterhub rest server"
+    sudo -H pip3 install -e $JUPYTERHUBRESTSERVER
 }
 
+uninstall() {
+
+   printf "Uninstalling DockerSpawner\n"
+   cat dockerspawner_install_files.txt | sudo xargs rm -rf
+   
+   printf "Uninstalling  OAuthenticator\n"
+   cat oauthenticator_install_files.txt | sudo xargs rm -rf
+
+}
 
 build_docker() {
 
@@ -126,18 +179,21 @@ update_docker_images() {
   clean
 
 }
-start_services() {
+stop_services() {
 
-  JUPYTER_CMD="start"
-  RUN_CULL=true
   # parse args if they are provided
   if [[ $# -ne 0 ]] ;  then
-    if [[ $1 == "--debug" ]]; then
-       JUPYTER_CMD="start-debug"
-       RUN_CULL=false
+    if [[ $1 == "--systemd" ]]; then
+       stop_systemctl
+    else
+       stop_screen
     fi
   fi
- 
+
+}
+
+stop_screen() {
+
   echo "Shutting screen instances"
 
   echo -n "--> killing rest..."
@@ -164,7 +220,35 @@ start_services() {
   fi
   echo "done"
 
+}
 
+start_services() {
+
+  # parse args if they are provided
+  if [[ $# -ne 0 ]] ;  then
+    if [[ $1 == "--debug" ]]; then
+        restart_screen $1
+    elif [[ $1 == "--systemd" ]]; then
+       start_systemctl
+    else
+       echo -e "invalid argument: $1\nSee help for vaild start arguments\n"
+    fi
+  fi
+}
+
+restart_screen() {
+
+  JUPYTER_CMD="start"
+  RUN_CULL=true
+  if [[ $# -ne 0 ]] ;  then
+    if [[ $1 == "--debug" ]]; then
+       JUPYTER_CMD="start-debug"
+       RUN_CULL=false
+    fi
+  fi
+
+  stop_services 
+  
   # remove the error logs before attempting restart 
   if ls | grep -q "rest.err"; then
       sudo rm rest.err > /dev/null
@@ -226,6 +310,43 @@ start_services() {
   sudo screen -list 
 }
 
+start_systemctl(){
+   echo -e "--> starting jupyterhub..."
+   sudo systemctl start jupyterhub
+   sleep 3
+   isactive jupyterhub
+   
+   echo -e "--> starting jupyterhub rest server..."
+   sudo systemctl start jupyterhubrestserver
+   sleep 3
+   isactive jupyterhubrestserver
+
+   echo -e "To view systemd logs:\n  journalctl -f -u jupyterhub\n"
+
+}
+
+stop_systemctl(){
+   echo -e "--> stopping jupyterhub..."
+   sudo systemctl stop jupyterhub
+   isactive jupyterhub
+   
+   echo -e "--> stopping jupyterhub rest server..."
+   sudo systemctl stop jupyterhubrestserver
+   isactive jupyterhubrestserver
+}
+
+isactive() {
+  RED='\033[0;31m'
+  GRN='\033[0;32m'
+  NC='\033[0m' # No Color
+
+  if [ "`sudo systemctl is-active ${1}`" != "active" ]; then
+    echo -e "${RED} [-] ${1} is not running${NC}\n"
+  else  
+    echo -e "${GRN} [+] ${1} is running${NC}\n" 
+  fi
+}
+
 run_tests(){
 
    docker run --rm -it -u root -v $(pwd)/notebooks:/home/jovyan/work jupyterhub/singleuser sh test/run-tests.sh
@@ -238,9 +359,13 @@ display_usage() {
    echo "usage: $0 build              # build the jupyter docker images"
    echo "usage: $0 build --clean      # force a clean build the jupyter docker images"
    echo "usage: $0 update             # update the base docker image on a production server (designed to minimize server downtime)"
-   echo "usage: $0 start              # start the jupyterhub in production mode"
-   echo "usage: $0 start --debug      # start the jupyterhub in debug mode, necessary for development"
-   echo "usage: $0 clean              # clean all jupyterhub screen instances and removes docker containers"
+   echo "usage: $0 start              # start the jupyterhub in production mode (using screen)"
+   echo "usage: $0 start --systemd    # start the jupyterhub services (using systemd)"
+   echo "usage: $0 start --debug      # start the jupyterhub in debug mode, necessary for development (using screen)"
+   echo "usage: $0 stop               # stop all jupyterhub services (using screen)"
+   echo "usage: $0 stop --systemd     # stop all jupyterhub services (using systemd)"
+   echo "usage: $0 clean --systemd    # clean all jupyterhub images, containers, and system files (using systemd)"
+   echo "usage: $0 clean --screen     # clean all jupyterhub images, containers, and system files (using screen)"
    echo "usage: $0 test               # run unittests"
    echo "***"
 }
@@ -256,7 +381,9 @@ case "$1" in
         ;;
     start) start_services ${2:-}
         ;;
-    clean) clean $1
+    stop) stop_services ${2:-}
+        ;;
+    clean) clean ${2:-}
         ;;
     build) build_docker ${2:-}
         ;;

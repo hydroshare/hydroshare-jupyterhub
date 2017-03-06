@@ -168,7 +168,7 @@ class ResourceMetadata (object):
         
         
 class hydroshare():
-    def __init__(self, username=None):
+    def __init__(self, username=None, password=None, cache=True):
         self.hs = None
         self.content = {}
         
@@ -178,10 +178,14 @@ class hydroshare():
         uname = username
         if uname is None:
             uname = os.environ['HS_USR_NAME']
-            
-        # get a secure connection to hydroshare
-        auth = self.getSecureConnection(uname)
-        
+
+        if password is None:
+            # get a secure connection to hydroshare
+           auth = self.getSecureConnection(uname)
+        else:
+            print('WARNING:  THIS IS NOT A SECURE METHOD OF CONNECTING TO HYDROSHARE...AVOID TYPING CREDENTIALS AS PLAIN TEXT')
+            auth = HydroShareAuthBasic(username=uname, password=password)
+
         try:
             self.hs = HydroShare(auth=auth)
             self.hs.getUserInfo()
@@ -192,7 +196,9 @@ class hydroshare():
 
             # remove the cached authentication
             auth_path = os.path.join(os.path.dirname(__file__), '../../../.auth')
-            os.remove(auth_path)
+            if os.path.exists(auth_path):
+                os.remove(auth_path)
+
             return None
         
     def _getResourceFromHydroShare(self, resourceid, destination='.', unzip=True):

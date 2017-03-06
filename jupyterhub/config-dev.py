@@ -38,6 +38,13 @@ try:
     c.JupyterHub.confirm_no_ssl = True
     c.JupyterHub.port = int(os.environ['JUPYTER_PORT'])
     c.DockerSpawner.hub_ip_connect = os.environ['DOCKER_SPAWNER_IP']
+
+#    # Have the Spawner override the Docker run command
+#    c.DockerSpawner.extra_create_kwargs.update({
+#        'command': '/usr/local/bin/start-singleuser.sh',
+#	'GRANT_SUDO': 'yes'
+#    })
+
     c.JupyterHub.hub_ip = os.environ['DOCKER_SPAWNER_IP']
     c.JupyterHub.extra_log_file = os.environ['JUPYTER_LOG']
     userspace = os.path.join(os.environ['JUPYTER_USERSPACE_DIR'], '{username}')
