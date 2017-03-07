@@ -33,7 +33,7 @@ class hydroshare():
         
         # load the HS environment variables
         # todo: this should be set as a path variable somehow.  Possibly add JPY_TMP to Dockerfile
-        utilities.load_environment('/home/jovyan/env')
+        utilities.load_environment(os.path.join(os.environ['HOME'],'.env'))
         self.auth_path = '/home/jovyan/.auth'
 
         # todo: either use JPY_USR or ask them to enter their hydroshare username
