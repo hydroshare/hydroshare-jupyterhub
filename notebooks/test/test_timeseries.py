@@ -3,16 +3,17 @@ import unittest
 
 # todo: remove this sys.path call.  The docker container should have the utilities dir in the system path
 
-sys.path.append(os.path.abspath('../'))
-os.environ['DATA'] = '.'
+#sys.path.append(os.path.abspath('../'))
+#os.environ['DATA'] = '.'
 
 # todo:-------------------------------------------
 
 import numpy as np
 import itertools as it
 from datetime import datetime
-from utilities import hydroshare
+from utilities.hydroshare import hydroshare
 import shutil
+import tempfile
 
 """
 ----------
@@ -33,16 +34,18 @@ else:
     from unittest.mock import patch
 
 
-class TaudemNotebook(unittest.TestCase):
+class timeseriesNotebook(unittest.TestCase):
 
     def setUp(self):
+
+        self.tdir = tempfile.mkdtemp(dir='/tmp')
 
         # with patch('__builtin__.raw_input', return_value='hydro') as _raw_input:
         self.hs = hydroshare.hydroshare(username='tonytest2', password='hydro')
         self.resid = '927094481da54af38ffb6f0c39ad8787'
 
     def tearDown(self):
-        outfile = 'beaver_divide_temp_daily_agg.csv'
+        outfile = os.path.join(self.tdir, 'beaver_divide_temp_daily_agg.csv')
         if os.path.exists(outfile):
             os.remove(outfile)
         if os.path.exists(self.resid):
@@ -54,8 +57,8 @@ class TaudemNotebook(unittest.TestCase):
         # operations for timeseries.ipynb
 
         with patch.object(hydroshare, 'input', return_value='y'):
-            content = self.hs.getResourceFromHydroShare('927094481da54af38ffb6f0c39ad8787')
-        self.assertTrue(os.path.exists('./927094481da54af38ffb6f0c39ad8787'))
+            content = self.hs.getResourceFromHydroShare('927094481da54af38ffb6f0c39ad8787', destination=self.tdir)
+        self.assertTrue(os.path.exists(os.path.join(self.tdir, '927094481da54af38ffb6f0c39ad8787')))
 
         self.assertTrue('BeaverDivideTemp.csv' in self.hs.content)
         air_temp_csv = self.hs.content['BeaverDivideTemp.csv']
@@ -72,7 +75,7 @@ class TaudemNotebook(unittest.TestCase):
         grouped_data = []
         grouped_dates = []
         ind = 0
-        for k, g in it.groupby(data,lambda data: (data[0]-start).days // lenperiod):
+        for k, g in it.groupby(data, lambda data: (data[0]-start).days // lenperiod):
             group = list(g)
             grouped_dates.append(group[0][0])
             d = [g[1] for g in group if g[1] != -9999]
@@ -98,7 +101,7 @@ class TaudemNotebook(unittest.TestCase):
         # ----------------------------------------------
 
         # set the save path for the aggregated values
-        temp_agg = os.path.join(os.environ['DATA'], 'beaver_divide_temp_daily_agg.csv')
+        temp_agg = os.path.join(self.tdir, 'beaver_divide_temp_daily_agg.csv')
 
         # write the derived temperatures to a csv file
         with open(temp_agg, 'w') as f:
@@ -107,5 +110,5 @@ class TaudemNotebook(unittest.TestCase):
                 f.write('%s,%3.2f,%3.2f,%3.2f\n' %
                        (grouped_dates[i].strftime('%m-%d-%Y'), t_ave[i], t_min[i], t_max[i]))
 
-        # ---------------------------------------------- 
+        # ----------------------------------------------
 
