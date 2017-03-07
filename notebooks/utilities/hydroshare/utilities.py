@@ -23,16 +23,6 @@ def sizeof_fmt(num, suffix='B'):
         num /= 1024.0
     return "%.1f%s%s" % (num, 'Yi', suffix)
 
-# def get_tree_size(path):
-#     """Return total size of files in given path and subdirs."""
-#     total = 0
-#     for entry in os.scandir(path):
-#         if entry.is_dir(follow_symlinks=False):
-#             total += get_tree_size(entry.path)
-#         else:
-#             total += entry.stat(follow_symlinks=False).st_size
-#     return total
-
 def get_hs_content(resid):
 
     resdir = find_resource_directory(resid)
@@ -43,8 +33,6 @@ def get_hs_content(resid):
         content[fname] = f
 
     return content
-
-
 
 def find_resource_directory(resid):
    
@@ -125,3 +113,34 @@ def runThreadedFunction(t, msg, success):
       
     t.join()
     return res
+
+def load_environment(env_path=None):
+
+    # load the environment path (if it exists)
+    if env_path is None:
+        if 'JUPYTER_TMP' in os.environ.keys():
+            env_path = os.path.join(os.environ['JUPYTER_TMP'], 'env')
+
+    if not os.path.exists(env_path):
+        print('\nEnvironment file could not be found.  Make sure that the JUPYTER_ENV variable is set properly')
+        return
+
+    # env_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'env')
+    with open(env_path, 'r') as f:
+        lines = f.readlines()
+        print('Adding the following system variables:')
+        for line in lines:
+            k, v = line.strip().split('=')
+            os.environ[k] = v
+            print('   %s = %s' % (k, v))
+        print('\nThese can be accessed using the following command: ')
+        print('   os.environ[key]')
+        print('\n   (e.g.)\n   os.environ["HS_USR_NAME"]  => %s' % os.environ['HS_USR_NAME'])
+
+def get_env_var(varname):
+    if varname in os.environ.keys():
+        return os.environ[varname]
+    else:
+        return input('Could not find %s, please specify a value: ' % varname).strip()
+
+
