@@ -1,0 +1,7 @@
+[Unit]
+Description=JupyterHub 
+
+[Service]
+EnvironmentFile=/etc/jupyterhub/env
+WorkingDirectory=/etc/jupyterhub
+ExecStart=/usr/local/bin/jupyterhub -f /etc/jupyterhub/config-dev.py

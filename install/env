@@ -1,0 +1,22 @@
+# HydroShare OAuth Settings
+#export HYDROSHARE_CLIENT_ID=PeF5dckum0uMcTGjEar2MRdLOIcYNmR0Xj02z8P0
+#export HYDROSHARE_CLIENT_SECRET=cxeLpZuvQBdrxzUioo1aciMmGQgbCXRwVVlGqBeN0fc8DuE0dRsJkuep7GYmM2bejWlUWiiZZzwYK0lldhXfY7tnVOblzt89mCkEHtRYQ0Tx4JJFc86Qlm5IeYYrqvlH
+#export OAUTH_CALLBACK_URL=127.0.0.1/hub/oauth_callback
+
+# HydroShare specific settings
+HYDROSHARE_USE_WHITELIST=0
+HYDROSHARE_REDIRECT_COOKIE_PATH=/etc/jupyterhub_restserver/redirect
+
+# Jupyter Notebook Settings.  These env vars are used to prepare the JupyterHub server during initialization (all required)
+JUPYTER_NOTEBOOK_DIR=/home/hydro/hydroshare-jupyterhub/notebooks
+JUPYTER_USERSPACE_DIR=/home/hydro/userspace
+JUPYTER_HUB_IP=192.168.56.101
+DOCKER_SPAWNER_IP=192.168.56.101
+JUPYTER_PORT=8000
+JUPYTER_LOG=./jupyterhub.log
+JUPYTER_USER=hydro
+
+# Jupyterhub REST Settings
+JUPYTER_REST_PORT=8080
+JUPYTER_REST_IP=192.168.56.101
+

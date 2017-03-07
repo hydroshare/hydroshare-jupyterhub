@@ -1,0 +1,9 @@
+JupyterhubRestServer.egg-info/PKG-INFO
+JupyterhubRestServer.egg-info/SOURCES.txt
+JupyterhubRestServer.egg-info/dependency_links.txt
+JupyterhubRestServer.egg-info/requires.txt
+JupyterhubRestServer.egg-info/top_level.txt
+jupyterhub_rest_server/__init__.py
+jupyterhub_rest_server/handlers.py
+jupyterhub_rest_server/server.py
+jupyterhub_rest_server/utilities.py
