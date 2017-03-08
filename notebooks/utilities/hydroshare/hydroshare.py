@@ -3,27 +3,16 @@ import os, sys
 import getpass
 import glob
 import requests
-import threading
 from IPython.core.display import display, HTML
 from hs_restclient import HydroShare, HydroShareAuthBasic, HydroShareHTTPException
 from datetime import datetime as dt
 import pickle
 import shutil
-import urllib
 
+from . import threads
 from . import resource
 from . import utilities
-
-is_py2 = sys.version[0] == '2'
-if is_py2:
-    import Queue as queue
-    input = raw_input
-    urlencode = urllib.pathname2url
-else:
-    import queue as queue
-    urlencode = urllib.parse.quote
-
-threadResults = queue.Queue()
+from .compat import *
 
 
 class hydroshare():
@@ -33,7 +22,9 @@ class hydroshare():
         
         # load the HS environment variables
         # todo: this should be set as a path variable somehow.  Possibly add JPY_TMP to Dockerfile
-        utilities.load_environment(os.path.join(os.environ['HOME'],'.env'))
+        self.cache = cache
+        if cache:
+            utilities.load_environment(os.path.join(os.environ['HOME'], '.env'))
         self.auth_path = '/home/jovyan/.auth'
 
         # todo: either use JPY_USR or ask them to enter their hydroshare username
@@ -52,10 +43,14 @@ class hydroshare():
         try:
             self.hs = HydroShare(auth=auth)
             self.hs.getUserInfo()
-            display(HTML('<b style="color:green;">Successfully established a connection with HydroShare</b>'))
-     
+            # display(HTML('<b style="color:green;">Successfully established a connection with HydroShare</b>'))
+            print('Successfully established a connection with HydroShare')
+
         except HydroShareHTTPException as e:
-            display(HTML('<p style="color:red;"><b>Failed to establish a connection with HydroShare.  Please check that you provided the correct credentials</b><br>%s </p>' % e))
+            # display(HTML('<p style="color:red;"><b>Failed to establish a connection with HydroShare.  Please check that you provided the correct credentials</b><br>%s </p>' % e))
+            print('Failed to establish a connection with HydroShare.\n  '
+                  'Please check that you provided the correct credentials.\n  '
+                  '%s' % e)
 
             # remove the cached authentication
             if os.path.exists(self.auth_path):
@@ -63,17 +58,17 @@ class hydroshare():
 
             return None
        
-    def _getResourceFromHydroShare(self, resourceid, destination='.', unzip=True):
-        # download the resource
-        pid = self.hs.getResource(resourceid, destination=destination, unzip=unzip)
-        threadResults.put(pid)
+    # def _getResourceFromHydroShare(self, resourceid, destination='.', unzip=True):
+    #     # download the resource
+    #     pid = self.hs.getResource(resourceid, destination=destination, unzip=unzip)
+    #     utilities.threadResults.put(pid)
     
-    def _createHydroShareResource(self, res_type, title, abstract, content_file,              
-                                  keywords=[]):
-        
-        resid = self.hs.createResource(res_type, title, resource_file=content_file, 
-                                       keywords=keywords, abstract=abstract)
-        threadResults.put(resid)
+    # def _createHydroShareResource(self, res_type, title, abstract, content_file,
+    #                               keywords=[]):
+    #
+    #     resid = self.hs.createResource(res_type, title, resource_file=content_file,
+    #                                    keywords=keywords, abstract=abstract)
+    #     threadResults.put(resid)
     
     def _addContentToExistingResource(self, resid, content_files):
 
@@ -95,9 +90,10 @@ class hydroshare():
                 username = input('Please enter your HydroShare username: ').strip()
             p = getpass.getpass('Enter the HydroShare password for user \'%s\': ' % username)
             auth = HydroShareAuthBasic(username=username, password=p)
-            
-            with open(self.auth_path, 'wb') as f:
-                pickle.dump(auth, f, protocol=2)
+
+            if self.cache:
+                with open(self.auth_path, 'wb') as f:
+                    pickle.dump(auth, f, protocol=2)
                 
         else:
             
@@ -143,8 +139,10 @@ class hydroshare():
         f = None if len(content_files) == 0 else content_files[0]
 
         # create the hs resource (1 content file allowed)
-        t = threading.Thread(target=self._createHydroShareResource, args=(res_type, title, abstract, f), kwargs={'keywords':keywords})
-        resid = utilities.runThreadedFunction(t, msg='Creating HydroShare Resource', success='Resource Creation Successful')
+        resid = threads.runThreadedFunction('Creating HydroShare Resource', 'Resource Created Successfully',
+                                            self.hs.createResource, res_type, title, abstract, f,
+                                            keywords=keywords)
+        # resid = utilities.runThreadedFunction(t, msg='Creating HydroShare Resource', success='Resource Creation Successful')
 
         # add the remaining content files to the hs resource
         self.addContentToExistingResource(resid, content_files[1:])
@@ -185,10 +183,10 @@ class hydroshare():
                 header = requests.head(res_meta['bag_url'])
 
                 # download the resource (threaded)
-                t = threading.Thread(target=self._getResourceFromHydroShare, 
-                                     args=(resourceid,), kwargs={'destination':dst, 'unzip':True})
-                utilities.runThreadedFunction(t, msg='Downloading', success='Download Completed Successfully')
+                threads.runThreadedFunction('Downloading Resource', 'Download Finished', self.hs.getResource,
+                                            resourceid, destination=dst, unzip=True)
 
+                print('Successfully downloaded resource %s' % resourceid)
 
             except Exception as e:
                 display(HTML('<b style="color:red">Failed to retrieve resource content from HydroShare: %s</b>' % e))
@@ -211,8 +209,9 @@ class hydroshare():
         self.content.update(content)
         
     def addContentToExistingResource(self, resid, content):
-        t = threading.Thread(target=self._addContentToExistingResource, args=(resid, content))
-        utilities.runThreadedFunction(t, msg='Adding Content to Resource', success='Successfully Added Content Files')
+        # t = threads.Thread(target=self._addContentToExistingResource, args=(resid, content))
+        threads.runThreadedFunction('Adding Content to Resource', 'Successfully Added Content Files',
+                                    self._addContentToExistingResource, resid, content)
     
     def loadResource(self, resourceid):
         

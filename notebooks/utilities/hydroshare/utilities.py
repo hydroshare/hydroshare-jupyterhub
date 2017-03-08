@@ -1,20 +1,10 @@
 from __future__ import print_function
 import os, sys
-import time
 from IPython.core.display import display, HTML
-import urllib
 import glob
 
-is_py2 = sys.version[0] == '2'
-if is_py2:
-    import Queue as queue
-    input = raw_input
-    urlencode = urllib.pathname2url
-else:
-    import queue as queue
-    urlencode = urllib.parse.quote
+from .compat import *
 
-threadResults = queue.Queue()
 
 def sizeof_fmt(num, suffix='B'):
     for unit in ['', 'Ki', 'Mi', 'Gi', 'Ti', 'Pi', 'Ei', 'Zi']:
@@ -57,8 +47,13 @@ def check_for_ipynb(content_files):
                                                    urlencode(rel_path))
             links[fname] = url
     return links
-            
-def display_resource_content_files(content_file_dictionary, text='Found the following content when parsing the HydroShare resource:'):
+
+def display_tree(resid):
+
+    pass
+
+def display_resource_content_files(content_file_dictionary,
+                                   text='Found the following content when parsing the HydroShare resource:'):
     
     # get ipynb files
     nbs = check_for_ipynb(content_file_dictionary)
@@ -81,38 +76,7 @@ def display_resource_content_files(content_file_dictionary, text='Found the foll
     
     if (len(content_file_dictionary.keys()) + len(nbs.keys())) > 0:
         display(HTML('These files are stored in a dictionary called <b>hs.content</b> for your convenience.  To access a file, simply issue the following command where MY_FILE is one of the files listed above: <pre>hs.content["MY_FILE"] </pre> '))
-    
-def runThreadedFunction(t, msg, success):
 
-    # start the thread
-    t.start()
-
-    # add some padding to the message
-    message = msg+' ' if msg[-1] != ' ' else msg
- 
-    # print message while 
-    max_msg_len = 25
-    msg_len = max_msg_len
-    while(t.isAlive()):
-        time.sleep(.25)    
-        if msg_len == max_msg_len:
-            msg_len = 0
-            sys.stdout.write('\r' + ' '*(len(message) + 11))
-            sys.stdout.write('\r')
-            print(message, end='')     
-        print('.',end='')
-        msg_len += 1
-    
-    # join the thread
-    print('\r' + (len(message) + 10)*' ')
-    display(HTML('<b style="color:green;">%s</b>' % success))
-    
-    res = None
-    if not threadResults.empty():
-        res = threadResults.get()
-      
-    t.join()
-    return res
 
 def load_environment(env_path=None):
 

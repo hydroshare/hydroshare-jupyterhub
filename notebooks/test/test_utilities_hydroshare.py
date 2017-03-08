@@ -1,11 +1,12 @@
 from __future__ import print_function
 import unittest
 import hs_restclient
-from utilities.hydroshare import utilities, resource
 import tempfile
 import os
 import shutil
 import glob
+
+from utilities.hydroshare import utilities, resource, threads
 
 class hydroshareUtilities(unittest.TestCase):
 
@@ -102,7 +103,17 @@ class hydroshareUtilities(unittest.TestCase):
         pass
 
     def test_runthreaded(self):
-        pass
+
+        def myfunc(i, j, n):
+            res = 0
+            for c in range(n):
+                res += i*j
+            return res
+
+        args = (2, 6, 5)
+        res = threads.runThreadedFunction('', '', myfunc, *args)
+        self.assertTrue(res == myfunc(*args))
+
 
 
 class hydroshareResource(unittest.TestCase):
