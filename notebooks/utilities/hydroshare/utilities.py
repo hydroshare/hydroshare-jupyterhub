@@ -50,6 +50,7 @@ def check_for_ipynb(content_files):
 
 def display_tree(resid):
 
+    # todo: display a tree view of the resource bagit, based on id
     pass
 
 def display_resource_content_files(content_file_dictionary,

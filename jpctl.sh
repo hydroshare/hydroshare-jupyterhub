@@ -100,24 +100,32 @@ install() {
     sudo npm install -g configurable-http-proxy
 
     # build the jupyterhub docker image  
-    echo "--> building the jupyterhub docker image"
+    echo -e "--> building the jupyterhub docker image"
     cd ./docker && docker build -t jupyterhub/singleuser .
 
     # install dockerspawner 
-    echo "--> installing dockerspawner"
+    echo -e "--> installing dockerspawner"
     sudo pip3 install -e $DOCKERSPAWNER_PATH
 
     # install oauthenticator 
-    echo "--> installing oauthenticator"
+    echo -e "--> installing oauthenticator"
     sudo pip3 install -e $OAUTHENTICATOR_PATH
 
     # install JupyterHub rest server
-    echo "--> installing jupyterhub rest server"
+    echo -e "--> installing jupyterhub rest server"
     sudo -H pip3 install -e $JUPYTERHUBRESTSERVER
+
+    # install jupyterhub services
+    echo -e "--> installing jupyterhub services"
+    echo -e "----> copying config-prod to install directory"
+    cp jupyterhub/config-prod.py install/config.py
+    echo -e "----> copying env to install directory"
+    cp jupyterhub/env install/env
+    sudo ./install/install_services    
 }
 
 uninstall() {
-
+# todo: finish this function
    printf "Uninstalling DockerSpawner\n"
    cat dockerspawner_install_files.txt | sudo xargs rm -rf
    

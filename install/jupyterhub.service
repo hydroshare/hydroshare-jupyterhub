@@ -3,5 +3,5 @@ Description=JupyterHub
 
 [Service]
 EnvironmentFile=/etc/jupyterhub/env
-WorkingDirectory=/etc/jupyterhub
-ExecStart=/usr/local/bin/jupyterhub -f /etc/jupyterhub/config-dev.py
+WorkingDirectory=/etc/jupyterhub/server
+ExecStart=/usr/local/bin/jupyterhub -f /etc/jupyterhub/server/config.py

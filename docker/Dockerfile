@@ -7,10 +7,17 @@ MAINTAINER Tony Castronova <acastronova@cuahsi.org>
 ######################################################
 
 USER jovyan
-RUN pip install mock
-RUN pip3 install mock
+#RUN pip install mock
+#RUN pip3 install mock
 RUN conda update -n root --all -y
 RUN conda update -n python2 --all -y
+
+USER root
+RUN conda clean --all -y
+RUN apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+USER jovyan
+
 
 ###################################################
 ## End - JupyterHub Development Image Additions ###
