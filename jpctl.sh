@@ -423,7 +423,8 @@ run_tests(){
 
 display_usage() {
    echo "*** JupyterHub Control Script ***"
-   echo "usage: $0 install            # install required software and build jupyterhub docker containers"
+   echo "usage: $0 install --ubuntu            # install required software and build jupyterhub docker containers (ubuntu)"
+   echo "usage: $0 install --rhel            # install required software and build jupyterhub docker containers (RHEL)"
    echo "usage: $0 build              # build the jupyter docker images"
    echo "usage: $0 build --clean      # force a clean build the jupyter docker images"
    echo "usage: $0 update             # update the base docker image on a production server (designed to minimize server downtime)"
