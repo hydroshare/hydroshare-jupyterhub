@@ -14,6 +14,7 @@ LOG_PATH="$(pwd)/log"
 DOCKERSPAWNER_PATH="$(pwd)/dockerspawner"
 OAUTHENTICATOR_PATH="$(pwd)/oauthenticator"
 JUPYTERHUBRESTSERVER="$(pwd)/jupyterhub_rest_server"
+INSTALL_TMP_DIR="$(pwd)/install"
 
 clean() {
   
@@ -34,10 +35,12 @@ clean() {
     elif [[ $1 == "--screen" ]]; then
        clean_screen
     else
-       echo -e "invalid argument: $1\nSee help for vaild start arguments\n"
+       echo -e "--> [Error] invalid argument: $1\nSee help for vaild start arguments\n"
     fi
   else
-     echo -e "missing argument. JupyterHub system files will not be cleaned. \nSee help for vaild start arguments\n"
+     echo -e "--> no 'clean' argument was provided, so I will attempt to clean both screen and systemd processes."
+     clean_screen
+     clean_systemd
   fi
 
 }
@@ -64,17 +67,17 @@ clean_systemd(){
 
   # remove error files
   echo -n "--> removing error logs..."
-  sudo rm /etc/jupyterhub/*.err 2> /dev/null || true
-  sudo rm /etc/jupyterhub/*.log 2> /dev/null || true
+  sudo rm /etc/jupyterhub/server/*.err 2> /dev/null || true
+  sudo rm /etc/jupyterhub/server/*.log 2> /dev/null || true
   echo "done"
 
   # remove jupyterhub files
   echo -n "--> removing database..."
-  sudo rm /etc/jupyterhub/*.sqlite 2> /dev/null || true
+  sudo rm /etc/jupyterhub/server/*.sqlite 2> /dev/null || true
   echo "done"
 
   echo -n "--> removing cookies..."
-  sudo rm /etc/jupyterhub/*cookie_secret 2> /dev/null || true
+  sudo rm /etc/jupyterhub/server/*cookie_secret 2> /dev/null || true
   echo "done"
 }
 
@@ -85,6 +88,10 @@ install() {
     sudo apt-get update --fix-missing  
     sudo apt-get install -y openssh-server wget screen docker python3-dateutil
 
+    # activate and enable docker
+    sudo systemctl start docker
+    sudo systemctl enable docker
+    
     # install pip, ipgetter, and jupyterhub
     echo -e "--> installing pip3, ipgetter, jupyterHub"
     wget https://bootstrap.pypa.io/get-pip.py
@@ -118,20 +125,25 @@ install() {
     # install jupyterhub services
     echo -e "--> installing jupyterhub services"
     echo -e "----> copying config-prod to install directory"
-    cp jupyterhub/config-prod.py install/config.py
+    cp $JUPYTER_PATH/config.py $INSTALL_TMP_DIR/config.py
     echo -e "----> copying env to install directory"
-    cp jupyterhub/env install/env
-    sudo ./install/install_services    
+    cp $JUPYTER_PATH/env $INSTALL_TMP_DIR/env
+    sudo $INSTALL_TMP_DIR/install-services.sh
+
 }
 
 uninstall() {
-# todo: finish this function
+   # todo: finish this function
    printf "Uninstalling DockerSpawner\n"
    cat dockerspawner_install_files.txt | sudo xargs rm -rf
    
    printf "Uninstalling  OAuthenticator\n"
    cat oauthenticator_install_files.txt | sudo xargs rm -rf
 
+   echo -3 "--> removing jupyterhub systemd services"
+   sudo rm -rf /etc/jupyterhub
+   sudo rm /lib/systemd/system/jupyterhub.service
+   sudo rm /lib/systemd/system/jupyterhubrestserver.service
 }
 
 build_docker() {

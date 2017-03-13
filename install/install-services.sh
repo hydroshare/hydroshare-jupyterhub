@@ -1,10 +1,13 @@
 #!/usr/bin/env bash
 
+
 if [[ $UID != 0 ]]; then
     echo "Please run this script with sudo:"
     echo "sudo $0 $*"
     exit 1
 fi
+
+PWD=$( dirname $( readlink -f ${BASH_SOURCE[0]} ) )
 
 ####################################### 
 # Install Environment File (Base Dir) #
@@ -17,8 +20,8 @@ mkdir -p $JH
 # jupyterhub server dir
 JH=/etc/jupyterhub
 mkdir -p $JH
-cp env $JH
-cp -r static $JH
+cp $PWD/env $JH
+cp -r $PWD/static $JH
 
 # server dir
 JHS=/etc/jupyterhub/server
@@ -37,23 +40,23 @@ mkdir -p $JHC
 ####################################### 
 
 echo "installing jupyterhub service"
-cp config.py $JHS
-cp jupyterhub.service /lib/systemd/system
+cp $PWD/config.py $JHS
+cp $PWD/jupyterhub.service /lib/systemd/system
 
 ####################################### 
 # Install JupyterHub Rest Server      #
 ####################################### 
 
 echo "installing jupyterhub rest server service"
-cp jupyterhub_rest_server_start.py $JHR
-cp jupyterhubrestserver.service /lib/systemd/system
+cp $PWD/jupyterhub_rest_server_start.py $JHR
+cp $PWD/jupyterhubrestserver.service /lib/systemd/system
 
 ####################################### 
 # Install JupyterHub Culling          #
 ####################################### 
 
 echo "installing jupyterhub culling service"
-cp cull_idle_servers.py $JHC
+cp $PWD/cull_idle_servers.py $JHC
 
 
 ####################################### 
@@ -61,6 +64,16 @@ cp cull_idle_servers.py $JHC
 #######################################
  
 systemctl daemon-reload
-#systemctl enable jupyterhub
-#systemctl enable jupyterhubrestserver
-#systemctl enable jupyterhubculling
+systemctl enable jupyterhub
+systemctl enable jupyterhubrestserver
+systemctl enable jupyterhubculling
+
+
+
+####################################### 
+# Print Success                       #
+#######################################
+
+echo "JupyterHub and JupyterHubRest services installed successfully" 
+echo "JupyterHub working directory: /etc/jupyterhub"
+sudo tree /etc/jupyterhub
