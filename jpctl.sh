@@ -86,7 +86,7 @@ install_base_ubuntu() {
     echo -e "--> installing system requirements"
     sudo apt-get clean  
     sudo apt-get update --fix-missing  
-    sudo apt-get install -y openssh-server wget screen docker python3-dateutil
+    sudo apt-get install -y openssh-server wget screen docker python3-dateutil, tree
 
     # install node and configurable proxy
     echo -e "--> installing nodejs and configurable-http-proxy"
@@ -100,7 +100,7 @@ install_base_rhel() {
     echo -e "--> installing system requirements"
     sudo yum clean all
     sudo yum update update
-    sudo yum install -y openssh-server wget screen docker python3-dateutil
+    sudo yum install -y openssh-server wget screen docker python3-dateutil, tree
 
     # install node and configurable proxy
     echo -e "--> installing nodejs and configurable-http-proxy"
