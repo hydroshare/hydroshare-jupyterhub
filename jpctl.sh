@@ -81,12 +81,60 @@ clean_systemd(){
   echo "done"
 }
 
-install() {
+install_base_ubuntu() {
     # install jupyterhub dependencies
     echo -e "--> installing system requirements"
     sudo apt-get clean  
     sudo apt-get update --fix-missing  
     sudo apt-get install -y openssh-server wget screen docker python3-dateutil
+
+    # install node and configurable proxy
+    echo -e "--> installing nodejs and configurable-http-proxy"
+    curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
+    sudo apt-get install -y nodejs 
+    sudo npm install -g configurable-http-proxy
+
+
+
+}
+
+install_base_rhel() {
+    # install jupyterhub dependencies
+    echo -e "--> installing system requirements"
+    sudo yum clean all
+    sudo update update
+    sudo yum install -y openssh-server wget screen docker python3-dateutil
+
+    # install node and configurable proxy
+    echo -e "--> installing nodejs and configurable-http-proxy"
+    curl --silent --location https://rpm.nodesource.com/setup_6.x | bash -
+    sudo yum -y install nodejs
+    sudo npm install -g configurable-http-proxy
+}
+
+install() {
+
+    # parse args
+    if [[ $# -ne 0 ]] ;  then
+	if [[ $1 == "--ubuntu" ]]; then
+	    install_base_ubuntu
+	elif [[ $1 == "--rhel" ]]; then
+	    install_base_rhel
+        else
+	    echo -e "--> [Error] invalid installation platform argument: $1\nSee help for valid arguments\n"
+	    return -1
+	fi
+    else
+	echo -e "--> [Error] missing installation platform argument: $1\nSee help for valid arguments\n"
+	return -1
+    fi
+
+
+#    # install jupyterhub dependencies
+#    echo -e "--> installing system requirements"
+#    sudo apt-get clean  
+#    sudo apt-get update --fix-missing  
+#    sudo apt-get install -y openssh-server wget screen docker python3-dateutil
 
     # activate and enable docker
     sudo systemctl start docker
@@ -100,11 +148,11 @@ install() {
     sudo pip3 install "ipython[notebook]" jupyterhub
     rm get-pip.py
 
-    # install node and configurable proxy
-    echo -e "--> installing nodejs and configurable-http-proxy"
-    curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
-    sudo apt-get install -y nodejs 
-    sudo npm install -g configurable-http-proxy
+#    # install node and configurable proxy
+#    echo -e "--> installing nodejs and configurable-http-proxy"
+#    curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
+#    sudo apt-get install -y nodejs 
+#    sudo npm install -g configurable-http-proxy
 
     # build the jupyterhub docker image  
     echo -e "--> building the jupyterhub docker image"
