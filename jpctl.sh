@@ -47,17 +47,17 @@ clean() {
 
 clean_screen(){
   # remove error files
-  echo -n "--> removing error logs..."
+  echo -n "--> removing screen error logs..."
   sudo rm $LOG_PATH/*.err 2> /dev/null || true
   sudo rm $JUPYTER_PATH/jupyter.log 2> /dev/null || true
   echo "done"
 
   # remove jupyterhub files
-  echo -n "--> removing database..."
+  echo -n "--> removing screen database..."
   sudo rm $JUPYTER_PATH/jupyter.sqlite 2> /dev/null || true
   echo "done"
 
-  echo -n "--> removing cookies..."
+  echo -n "--> removing screen cookies..."
   sudo rm $JUPYTER_PATH/jupyterhub_cookie_secret 2> /dev/null || true
   echo "done"
  
@@ -66,17 +66,17 @@ clean_screen(){
 clean_systemd(){
 
   # remove error files
-  echo -n "--> removing error logs..."
+  echo -n "--> removing systemd error logs..."
   sudo rm /etc/jupyterhub/server/*.err 2> /dev/null || true
   sudo rm /etc/jupyterhub/server/*.log 2> /dev/null || true
   echo "done"
 
   # remove jupyterhub files
-  echo -n "--> removing database..."
+  echo -n "--> removing systemd database..."
   sudo rm /etc/jupyterhub/server/*.sqlite 2> /dev/null || true
   echo "done"
 
-  echo -n "--> removing cookies..."
+  echo -n "--> removing systemd cookies..."
   sudo rm /etc/jupyterhub/server/*cookie_secret 2> /dev/null || true
   echo "done"
 }
@@ -93,9 +93,6 @@ install_base_ubuntu() {
     curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
     sudo apt-get install -y nodejs 
     sudo npm install -g configurable-http-proxy
-
-
-
 }
 
 install_base_rhel() {
@@ -107,9 +104,9 @@ install_base_rhel() {
 
     # install node and configurable proxy
     echo -e "--> installing nodejs and configurable-http-proxy"
-    curl --silent --location https://rpm.nodesource.com/setup_6.x | bash -
     sudo yum -y install nodejs
     sudo npm install -g configurable-http-proxy
+    sudo yum install -y gcc-c++ make
 }
 
 install() {
@@ -129,13 +126,6 @@ install() {
 	return -1
     fi
 
-
-#    # install jupyterhub dependencies
-#    echo -e "--> installing system requirements"
-#    sudo apt-get clean  
-#    sudo apt-get update --fix-missing  
-#    sudo apt-get install -y openssh-server wget screen docker python3-dateutil
-
     # activate and enable docker
     sudo systemctl start docker
     sudo systemctl enable docker
@@ -147,12 +137,6 @@ install() {
     sudo pip3 install ipgetter
     sudo pip3 install "ipython[notebook]" jupyterhub
     rm get-pip.py
-
-#    # install node and configurable proxy
-#    echo -e "--> installing nodejs and configurable-http-proxy"
-#    curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
-#    sudo apt-get install -y nodejs 
-#    sudo npm install -g configurable-http-proxy
 
     # build the jupyterhub docker image  
     echo -e "--> building the jupyterhub docker image"
