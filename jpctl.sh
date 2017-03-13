@@ -446,7 +446,7 @@ if [ $# -eq 0 ] ; then
 fi
 
 case "$1" in
-    install) install $1
+    install) install ${2:-}
         ;;
     start) start_services ${2:-}
         ;;
