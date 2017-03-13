@@ -66,9 +66,6 @@ cp $PWD/cull_idle_servers.py $JHC
 systemctl daemon-reload
 systemctl enable jupyterhub
 systemctl enable jupyterhubrestserver
-systemctl enable jupyterhubculling
-
-
 
 ####################################### 
 # Print Success                       #
