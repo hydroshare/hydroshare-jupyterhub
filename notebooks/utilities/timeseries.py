@@ -190,88 +190,27 @@ class timeseries():
             destination: path relative to /user/[username]/notebooks/data
 
         """
-        
-        # get the resource to download. default is the id that launched jupyter
-        while 1:
-            if resourceid is None:
-            
-                res = input('It looks like you have launched JupyterHub from a resource with the id: %s.\n'
-                       'Would you like to download content for this resource? [Y/n/e] ' % (os.environ['HS_RES_ID'] ))
-                res_lower = res.strip().lower()
-                if res_lower == 'y' or res_lower == '':
-                    resourceid = os.environ['HS_RES_ID'] 
-                elif res_lower == 'n':
-                    resourceid = input('Enter the resource id to download: ')
-                elif res_lower == 'e':
-                    return None
-            resourceid = str(resourceid)
-            if resourceid.strip() == '':
-                resourceid = os.environ['HS_RES_ID'] 
-
-            # make sure this is a TimeSeries resource.
-            try:
-                res_meta = self.hydroshare.hs.getSystemMetadata(resourceid)
+        try:
+            res_meta = self.hydroshare.hs.getSystemMetadata(resourceid)
                 
-                if res_meta['resource_type'].lower() != 'timeseriesresource':
-                    display(HTML('<b style="color:red;">Attempting to download resource of type %s.<br> The'
+            if res_meta['resource_type'].lower() != 'timeseriesresource':
+                display(HTML('<b style="color:red;">Attempting to download resource of type %s.<br> The'
                                  '`getTimeSeriesResource` function can only be used to download resources'
                                  'of type TimeSeriesResource.<br>Please specify a TimeSeries resource to download</b>'
                                  % res_meta['resource_type']))
-                    resourceid=None
-                else: 
-                    break
+                return  None
+        except Exception as e:
+            display(HTML('<b style="color:red">Failed to retrieve resource content from HydroShare: %s</b>' % e))
+            return None
                     
-            except Exception as e:
-                display(HTML('<b style="color:red">Failed to retrieve resource content from HydroShare: %s</b>' % e))
-                return None
-                    
-               
-                
-               
-        
-        print('\nDownloading resource: %s' % resourceid)
-        
+
         # set the download path
         default_dl_path = os.environ['DATA']
         dst = os.path.abspath(os.path.join(default_dl_path, destination))
         download = True
         
-        # check if the data should be overwritten
-        dst_res_folder = os.path.join(dst, resourceid)
-        if os.path.exists(dst_res_folder):    
-            res = input('This resource already exists in your userspace.\nWould you like to overwrite this data [y/N]? ')
-            res_lower = res.strip().lower()
-            if res == 'y':
-                shutil.rmtree(dst_res_folder)
-            else:
-                download = False
-                
-        # re-download the content if desired
-        if download:
-            try:
-                # download the resource (threaded)
-                header = requests.head(res_meta['bag_url'])
-                t = threading.Thread(target=self.hydroshare._getResourceFromHydroShare, 
-                                     args=(resourceid,), kwargs={'destination':dst, 'unzip':True})
-                hydroshare.runThreadedFunction(t, msg='Downloading', success='Download Completed Successfully')
-            except Exception as e:
-                display(HTML('<b style="color:red">Failed to retrieve resource content from HydroShare: %s</b>' % e))
-                return None
-
-        # load the resource content
-        outdir = os.path.join(dst, '%s/%s' % (resourceid, resourceid))
-        content_files = glob.glob(os.path.join(outdir,'data/contents/*'))
-        
-        content = {}
-        for f in content_files:
-            fname = os.path.basename(f)
-            content[fname] = f
-        
-        # update the content dictionary
-        self.hydroshare.content.update(content)
-        
-        # display the content files
-        hydroshare.display_resource_content_files(self.content())
+        # get the hydroshare resource.  This puts the result into hs.content
+        self.hydroshare.getResourceFromHydroShare(resourceid, destination)
         
         # load the odm2db into memory
         try:
