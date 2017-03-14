@@ -125,8 +125,8 @@ class hydroshare():
                 meta = self.getResourceMetadata(derivedFromId)
                 abstract = meta.abstract + '\n\n[Modified in JupyterHub on %s]\n%s' % (dt.now(), abstract)
                 keywords = set(keywords + meta.keywords)
-                
-            except:
+            except Exception, e:
+                print(e)
                 display(HTML('<b style="color:red;">[%s] is not a valid HydroShare resource id for setting the "derivedFrom" attribute.</p>' % derivedFromId))
                 return None
         
@@ -140,12 +140,16 @@ class hydroshare():
 
         # create the hs resource (1 content file allowed)
         resid = threads.runThreadedFunction('Creating HydroShare Resource', 'Resource Created Successfully',
-                                            self.hs.createResource, res_type, title, abstract, f,
+                                            self.hs.createResource, resource_type=res_type, title=title, 
+                                            abstract=abstract, resource_file=f,
                                             keywords=keywords)
-        # resid = utilities.runThreadedFunction(t, msg='Creating HydroShare Resource', success='Resource Creation Successful')
 
         # add the remaining content files to the hs resource
-        self.addContentToExistingResource(resid, content_files[1:])
+        try:
+            if len(content_files) > 1 :
+                self.addContentToExistingResource(resid, content_files[1:])
+        except Exception, e:
+            print(e)
                                                                            
         
         display(HTML('Resource id: %s' % resid))
