@@ -3,5 +3,5 @@ Description=JupyterHubRestServer
 
 [Service]
 EnvironmentFile=/etc/jupyterhub/env
-WorkingDirectory=/etc/jupyterhub/server
-ExecStart=/usr/bin/python3 /etc/jupyterhub_restserver/jupyterhub_rest_server_start.py 
+WorkingDirectory=/etc/jupyterhub/rest
+ExecStart=/usr/bin/python3 /etc/jupyterhub/rest/jupyterhub_rest_server_start.py 
