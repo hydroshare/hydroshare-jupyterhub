@@ -35,7 +35,9 @@ class progressBar(object):
             parray = ['-', '\\', '|', '/', '-', '\\', '|', '/']
 
         elif ptype == 'dots':
-            parray = ['.'*i for i in range(20)]
+            parray = [' ']*19
+            parray = ['.'*i + ''.join(parray[i:]) for i in range(len(parray))]
+#            parray = ['.'*i for i in range(20)]
 
         return parray
 
@@ -50,9 +52,10 @@ class progressBar(object):
 
     def writeprogress(self):
         # self._clearLine()
-        msg = '\r' + ' '.join([self.msg, next(self.barArray)]) + ' '*self.messagelen
+        msg = '\r' + ' '.join([self.msg, next(self.barArray)])
+        #msg += 'x'*(len(self.msg) - len(msg))
         sys.stdout.write(msg)
-        self.messagelen = len(msg)
+
         sys.stdout.flush()
     
     def success(self):
