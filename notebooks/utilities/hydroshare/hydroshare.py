@@ -57,19 +57,7 @@ class hydroshare():
                 os.remove(self.auth_path)
 
             return None
-       
-    # def _getResourceFromHydroShare(self, resourceid, destination='.', unzip=True):
-    #     # download the resource
-    #     pid = self.hs.getResource(resourceid, destination=destination, unzip=unzip)
-    #     utilities.threadResults.put(pid)
-    
-    # def _createHydroShareResource(self, res_type, title, abstract, content_file,
-    #                               keywords=[]):
-    #
-    #     resid = self.hs.createResource(res_type, title, resource_file=content_file,
-    #                                    keywords=keywords, abstract=abstract)
-    #     threadResults.put(resid)
-    
+   
     def _addContentToExistingResource(self, resid, content_files):
 
         for f in content_files:
