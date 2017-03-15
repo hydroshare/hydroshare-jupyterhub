@@ -125,8 +125,7 @@ class hydroshare():
                 meta = self.getResourceMetadata(derivedFromId)
                 abstract = meta.abstract + '\n\n[Modified in JupyterHub on %s]\n%s' % (dt.now(), abstract)
                 keywords = set(keywords + meta.keywords)
-            except Exception, e:
-                print(e)
+            except:
                 display(HTML('<b style="color:red;">[%s] is not a valid HydroShare resource id for setting the "derivedFrom" attribute.</p>' % derivedFromId))
                 return None
         
@@ -148,7 +147,7 @@ class hydroshare():
         try:
             if len(content_files) > 1 :
                 self.addContentToExistingResource(resid, content_files[1:])
-        except Exception, e:
+        except Exceptions as e:
             print(e)
                                                                            
         
@@ -204,10 +203,15 @@ class hydroshare():
         content = {}
         for f in content_files:
             fname = os.path.basename(f)
+            
+            # trim the base name relative to the data directory
+            dest_folder_name = os.path.dirname(destination).split('/')[-1]
+            f = os.path.join(dest_folder_name ,os.path.relpath(f, dest_folder_name))
+            
             content[fname] = f
 
+        # show the resource content files
         utilities.display_resource_content_files(content)
-        #check_for_ipynb(content_files)
         
         # update the content dictionary
         self.content.update(content)

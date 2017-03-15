@@ -42,9 +42,7 @@ def check_for_ipynb(content_files):
         if f[-5:] == 'ipynb':
             fname = os.path.basename(p)
             rel_path = os.path.relpath(p, os.environ['HOME'])
-            url = '%s%s/notebooks/notebooks/%s' % (os.environ['JUPYTER_HUB_IP'],
-                                                   os.environ['JPY_BASE_URL'],
-                                                   urlencode(rel_path))
+            url = urlencode(rel_path)
             links[fname] = url
     return links
 
@@ -62,10 +60,6 @@ def display_resource_content_files(content_file_dictionary,
         display(HTML('<b>Found the following notebook(s) associated with this HydroShare resource.</b><br>Click the link(s) below to launch the notebook.'))
         
         for name, url in nbs.items():
-
-            # remove notebook from content_file_dictionary
-            content_file_dictionary.pop(name)
-
             display(HTML('<a href=%s target="_blank">%s<a>' % (url, name)))
 
     # print the remaining files    
