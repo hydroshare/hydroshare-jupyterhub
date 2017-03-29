@@ -201,7 +201,7 @@ build_docker() {
   fi
 
 
-  if [[ "$(docker images -q docker.io/castrona/hydroshare-jupyterhub 2> /dev/null)" != "" ]]; then
+  if [[ "$(docker images -q castrona/hydroshare-jupyterhub 2> /dev/null)" != "" ]]; then
     echo -e "--> reusing existing base image.  Use --clean option to force rebuild of base image"
   else
     # pull the latest base image
