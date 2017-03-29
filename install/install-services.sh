@@ -41,7 +41,16 @@ mkdir -p $JHC
 
 echo "installing jupyterhub service"
 cp $PWD/config.py $JHS
-cp $PWD/jupyterhub.service /lib/systemd/system
+
+# write the unit file since the ExecStart path will change based on the system (i.e. LUbuntu vs CentOS) 
+JSERVICE=$PWD/jupyterhub.service
+echo "[Unit]" > $JSERVICE
+echo "Description=JupterHub" >> $JSERVICE
+echo -e "\n[Service]" >> $JSERVICE
+echo "EnvironmentFile=/etc/jupyterhub/env" >> $JSERVICE
+echo "WorkingDirectory=/etc/jupyterhub/server" >> $JSERVICE
+echo "ExecStart=$(which jupyterhub) -f $JHS/config.py" >> $JSERVICE
+cp $JSERVICE /lib/systemd/system
 
 ####################################### 
 # Install JupyterHub Rest Server      #
@@ -49,7 +58,15 @@ cp $PWD/jupyterhub.service /lib/systemd/system
 
 echo "installing jupyterhub rest server service"
 cp $PWD/jupyterhub_rest_server_start.py $JHR
-cp $PWD/jupyterhubrestserver.service /lib/systemd/system
+# write the unit file since the ExecStart path will change based on the system (i.e. LUbuntu vs CentOS) 
+RSERVICE=$PWD/jupyterhubrestserver.service
+echo "[Unit]" > $RSERVICE
+echo "Description=JupterHubRestServer" >> $RSERVICE
+echo -e "\n[Service]" >> $RSERVICE
+echo "EnvironmentFile=/etc/jupyterhub/env" >> $RSERVICE
+echo "WorkingDirectory=/etc/jupyterhub/rest" >> $RSERVICE
+echo "ExecStart=$(which python3) $JHR/jupyterhub_rest_server_start.py" >> $RSERVICE
+cp $JSERVICE /lib/systemd/system
 
 ####################################### 
 # Install JupyterHub Culling          #
