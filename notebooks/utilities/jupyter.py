@@ -28,8 +28,11 @@ def get_server_url_for_path(p):
            environ['JPY_BASE_URL'], rel_path)
     return url
 
-def load_environment(silent=True):
-    env_path = join(dirname(abspath(__file__)), 'env')
+def load_environment(env_path=None, silent=True):
+
+    if env_path is None:
+        env_path = join(dirname(abspath(__file__)), 'env')
+
     with open(env_path, 'r') as f:
         lines = f.readlines()
         for line in lines:

@@ -15,6 +15,10 @@ USER root
 # libproj-dev  TAUDEM dependency
 RUN apt-get clean && apt-get update --fix-missing
 
+RUN echo "after apt-get ...." >> /tmp/disk_usage
+RUN date >> /tmp/disk_usage
+RUN df -h >> /tmp/disk_usage
+
 RUN apt-get update && apt-get install --fix-missing -y \ 
     libgeos-dev \
     mpic++ \
