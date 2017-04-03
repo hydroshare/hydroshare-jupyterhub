@@ -23,10 +23,10 @@ MAINTAINER Tony Castronova <acastronova@cuahsi.org>
 ###################################################
 ## End - JupyterHub Development Image Additions ###
 ###################################################
-USER root
-RUN conda clean --all -y
-RUN apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+#USER root
+#RUN conda clean --all -y
+#RUN apt-get clean && \
+#    rm -rf /var/lib/apt/lists/*
 USER jovyan
 CMD ["sh", "/srv/singleuser/singleuser.sh"]
 

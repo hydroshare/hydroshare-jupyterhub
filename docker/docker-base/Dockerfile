@@ -15,10 +15,6 @@ USER root
 # libproj-dev  TAUDEM dependency
 RUN apt-get clean && apt-get update --fix-missing
 
-RUN echo "after apt-get ...." >> /tmp/disk_usage \
-&& date >> /tmp/disk_usage \
-&& df -h >> /tmp/disk_usage
-
 RUN apt-get update && apt-get install --fix-missing -y \ 
     libgeos-dev \
     mpic++ \
@@ -147,5 +143,21 @@ RUN conda update -n python2 --all -y
 
 ENV PATH=/opt/conda/envs/python2/bin:/home/jovyan/libs/TauDEM:$PATH PYTHONPATH=/home/jovyan/work/notebooks:$PYTHONPATH DOCUMENTS=/home/jovyan/work/notebooks/documents DATA=/home/jovyan/work/notebooks/data HOME=/home/jovyan/work/notebooks ECOHYDROLIB_CFG=/home/jovyan/.ecohydro.cfg LD_LIBRARY_PATH=/usr/lib/grass64/lib
 ENV PYTHONPATH=/home/jovyan/work/notebooks:$PYTHONPATH
+
+######################
+# CLEANUP            #
+######################
+USER root
+RUN conda clean --all -y
+RUN apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+########################################
+# SWITCH BACK TO JOVYAN BEFORE LEAVING #
+########################################
+USER jovyan
+
+
+
 
 
