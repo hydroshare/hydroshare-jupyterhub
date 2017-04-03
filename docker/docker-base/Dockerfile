@@ -15,9 +15,9 @@ USER root
 # libproj-dev  TAUDEM dependency
 RUN apt-get clean && apt-get update --fix-missing
 
-RUN echo "after apt-get ...." >> /tmp/disk_usage
-RUN date >> /tmp/disk_usage
-RUN df -h >> /tmp/disk_usage
+RUN echo "after apt-get ...." >> /tmp/disk_usage \
+&& date >> /tmp/disk_usage \
+&& df -h >> /tmp/disk_usage
 
 RUN apt-get update && apt-get install --fix-missing -y \ 
     libgeos-dev \
@@ -61,6 +61,14 @@ RUN ln -s /opt/conda/envs/python2/bin/python2 /usr/bin/python22
 ADD https://raw.github.com/selimnairb/RHESSysWorkflows/master/docs/config/ecohydro-Linux.cfg /home/jovyan/.ecohydro.cfg
 RUN chown jovyan:users /home/jovyan/.ecohydro.cfg
 
+# NBExtensions
+RUN git clone https://github.com/Castronova/jupyter_contrib_nbextensions.git /home/jovyan/libs/jupyter_contrib_nbextensions
+RUN pip3 install -e /home/jovyan/libs/jupyter_contrib_nbextensions
+RUN jupyter contrib nbextension install --system
+RUN jupyter nbextensions_configurator disable --user
+RUN jupyter nbextension enable recursivedelete/main
+RUN chown -R jovyan:users /home/jovyan/work/notebooks
+
 #########################
 # SWITCH TO JOVYAN USER #
 #########################
@@ -70,6 +78,8 @@ USER jovyan
 RUN git clone https://github.com/dtarb/TauDEM.git /home/jovyan/libs/TauDEM
 RUN cd /home/jovyan/libs/TauDEM && git checkout tags/v5.3.7
 RUN cd /home/jovyan/libs/TauDEM/src && make
+
+U
 
 # prepare python environments
 RUN pip install --upgrade pip
@@ -84,6 +94,8 @@ gdal \
 basemap \
 landlab -c landlab
 
+RUN pip3 install -y ulmo
+
 RUN git clone -b master https://github.com/hydroshare/hs_restclient.git /home/jovyan/libs/hs_restclient
 RUN /bin/bash -c "source /opt/conda/bin/activate root && cd /home/jovyan/libs/hs_restclient && python setup.py install "
 
@@ -94,6 +106,8 @@ RUN conda install -y -n python2 \
 gdal \
 basemap \
 landlab -c landlab 
+
+RUN pip install -y ulmo
 
 # install ecohydrolib
 RUN git clone https://github.com/leonard-psu/EcohydroLib.git /home/jovyan/libs/EcohydroLib
@@ -118,6 +132,14 @@ sed -i -e 's|^MODULE_ETC.*|MODULE_ETC = /home/jovyan/libs/RHESSysWorkflows/etc/r
 # prepare grass environment
 ADD ./rhessys_wf.py /home/jovyan/libs/rhessys_wf.py
 ADD ./run.py /home/jovyan/libs/run.py
+
+
+######################
+# Update Conda libs  #
+######################
+RUN conda update -n root --all -y
+RUN conda update -n python2 --all -y
+
 
 ######################
 # SET PATH VARIABLES #
