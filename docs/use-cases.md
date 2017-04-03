@@ -1,4 +1,20 @@
- HydroShare JupyterHub Use-Cases
+<!--
+When writing use cases keep the following in mind:
+
+* Why should CUAHSI be doing this? 
+* What is CUAHSI’s role?  
+* Why is it our “job”?
+
+* Make the Benefit of accomplishing this use case clear
+   - How would a scientist accomplish this task right now (without this tech)?
+   - What is the relative benefit of this tech to the user and to CUAHSI?  
+
+* Convey the cost of accomplishing this use case
+  - Minimal development tasks as a checklist.  
+-->
+
+
+HydroShare JupyterHub Use-Cases
 
 Anthony Castronova  
 Hydrologic Scientist  
@@ -38,15 +54,6 @@ A list of the items could be implemented to extend the initial use case.
 ### Motivation  
 Scientists typically develop algorithms and software routines for hydrologic analysis that are limited to small or moderate computational scales due to the compute limitations. These scales are often acceptable for development and testing purposes, however many studies require analysis at computational scales that exceed the capabilities of personal computers.  Executing full-scale analysis on a personal computer can consume all hardware resources thereby stagnating all other research until analysis has completed and effectively stalling research progress.  For example, executing a distributed hydrologic model at a regional scale or running data intensive algorithms across a collection of datasets would completely consume a typical personal computer. To satisfy these computational limitations, researchers must invest in compute resources such as workstations, cloud servers, or HPC cycles which must be maintained over time.  Instead, scientists should have access to tools and libraries to facilitate the execution of these prototype routines using community hosted and FOSS software. One approach for providing such functionality is the HydroShare JupyterHub initiative which provides compute cycles capable of supporting most small to medium scale hydrologic routines and is ideal for prototyping.  The development of the JupyterHub software and infrastructure supports CUAHSI's mission to foster hydrologic research by providing a community-based portal for scientists to prototype, collaborate, and validate published results.  Moreover, linking this environment with the HydroShare search and discovery interface enables scientists to host their published results and workflows in a manner that supports reproducible science and generally satisfies NSF's requirement for funded work to disseminate and sharing research results.
 
-<!--
-Why should CUAHSI be doing this?  What is CUAHSI’s role?  Why is it our “job”?
-Benefit of accomplishing this use case:
-Make it clear how a scientist would have to accomplish this task right now (without this tech).  What is the relative benefit of this tech? 
-	Benefits to the user  
-	Benefits to CUAHSI  
-
-Convey the cost of accomplishing this use case:
--->
 
 ### Preconditions
 * The scientist has developed their routine as a Python notebook
@@ -59,12 +66,6 @@ Convey the cost of accomplishing this use case:
 4. Results are saved to the local userspace on the JupyterHub cloud.  
 5. Using built-in libraries, a new HydroShare resource is created from within the Python notebook.  
 6. Results are downloaded by the user from the JupyterHub interface or via HydroShare.
-
-<!--
-Minimal Development Tasks (Should translated into Trello milestones)
-Checklist?  
-Complete  - EXPAND THIS BULLET
--->
 
 ### Minimal Tasks to Satisfy the Use Case
 
@@ -87,12 +88,11 @@ Complete  - EXPAND THIS BULLET
 
 ---
 
-# Execute Data Intensive Python Notebooks
+## 2. Execute Data Intensive Python Notebooks
 
-## Motivation
+### Motivation
 Routines for hydrologic analysis are often developed and tested at partial scales before they are deployed at full scale (e.g. national or continental spatial scales). Typically the full scale execution of these scripts requires considerable data to be downloaded for processing which can be automated using web services. However, many consecutive data queries and downloads can consume a significant portion of CPU as well as considerable disk space.  This is problematic for researchers that rely on a single computer for their research for which data download and analysis will consume significant CPU, and HDD resources. Moreover, much of these "raw" data are not used after analysis is complete but they consume a considerable amount of hard drive storage.  The overall download and processing requirements of these data intensive analysis deter community validation of results.  Scientists should have access to community designed/developed cloud services to overcome these limitations.  One solution is to allow scientist to uploaded and/or download hydrologic data to the HydroShare JupyterHub server and  execute their routines remotely on cloud infrastructure. The development of the JupyterHub software to support data intensive research activities using JupyterHub supports CUAHSI's mission to facilitate water science research by providing FOSS platform for scientists to analyze datasets that exceed the resources of their personal computers.  Furthermore, this activity enables researchers to collaborate and validate the findings and analysis of large datasets without the time and CPU intensive data collection process occurring on their computer.  Moreover, linking this environment with the HydroShare search and discovery interface enables scientists to host their published results and workflows in a manner that supports reproducible science and generally satisfies NSF's requirement for funded work to disseminate and sharing research results.
 
-<!-- Why should CUAHSI be doing this?  What is CUAHSI’s role?  Why is it our “job”? -->
 
 ### Preconditions  
 * The scientist has prototyped and tested their algorithm as a Python notebook  
