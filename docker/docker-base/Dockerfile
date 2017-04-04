@@ -88,7 +88,7 @@ gdal \
 basemap \
 landlab -c landlab
 
-RUN pip3 install -y ulmo
+RUN pip3 install ulmo
 
 RUN git clone -b master https://github.com/hydroshare/hs_restclient.git /home/jovyan/libs/hs_restclient
 RUN /bin/bash -c "source /opt/conda/bin/activate root && cd /home/jovyan/libs/hs_restclient && python setup.py install "
@@ -101,7 +101,7 @@ gdal \
 basemap \
 landlab -c landlab 
 
-RUN pip install -y ulmo
+RUN pip install ulmo
 
 # install ecohydrolib
 RUN git clone https://github.com/leonard-psu/EcohydroLib.git /home/jovyan/libs/EcohydroLib
