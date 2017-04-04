@@ -75,8 +75,6 @@ RUN git clone https://github.com/dtarb/TauDEM.git /home/jovyan/libs/TauDEM
 RUN cd /home/jovyan/libs/TauDEM && git checkout tags/v5.3.7
 RUN cd /home/jovyan/libs/TauDEM/src && make
 
-U
-
 # prepare python environments
 RUN pip install --upgrade pip
 
