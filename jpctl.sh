@@ -38,11 +38,8 @@ clean() {
        echo -e "--> [Error] invalid argument: $1\nSee help for vaild start arguments\n"
     fi
   else
-     echo -e "--> no 'clean' argument was provided, so I will attempt to clean both screen and systemd processes."
-     clean_screen
-     clean_systemd
+     echo -e "--> No clean argument provided, just cleaning docker containers and images"
   fi
-
 }
 
 clean_screen(){
@@ -64,6 +61,8 @@ clean_screen(){
 }
 
 clean_systemd(){
+
+  echo -e '\nCLEANING SYSTEMD FILES\n'
 
   # remove error files
   echo -n "--> removing systemd error logs..."
@@ -235,11 +234,11 @@ stop_services() {
 
   # parse args if they are provided
   if [[ $# -ne 0 ]] ;  then
-    if [[ $1 == "--systemd" ]]; then
-       stop_systemctl
-    else
+    if [[ $1 == "--screen" ]]; then
        stop_screen
     fi
+  else 
+     stop_systemctl
   fi
 
 }
@@ -278,13 +277,15 @@ start_services() {
 
   # parse args if they are provided
   if [[ $# -ne 0 ]] ;  then
-    if [[ $1 == "--debug" ]]; then
-        restart_screen $1
-    elif [[ $1 == "--systemd" ]]; then
-       start_systemctl
+#    if [[ $1 == "--debug" ]]; then
+#        restart_screen $1
+    if [[ $1 == "--screen" ]]; then
+        restart_screen
     else
        echo -e "invalid argument: $1\nSee help for vaild start arguments\n"
     fi
+  else
+     start_systemctl
   fi
 }
 
@@ -363,6 +364,9 @@ restart_screen() {
 }
 
 start_systemctl(){
+
+   echo -e "\nSTARTING SYSTEMD SERVICES\n"
+  
    echo -e "--> starting jupyterhub..."
    sudo systemctl start jupyterhub
    sleep 3
@@ -378,6 +382,9 @@ start_systemctl(){
 }
 
 stop_systemctl(){
+
+   echo -e "\nSTOPPING SYSTEMD SERVICES\n"
+
    echo -e "--> stopping jupyterhub..."
    sudo systemctl stop jupyterhub
    isactive jupyterhub
@@ -412,11 +419,9 @@ display_usage() {
    echo "usage: $0 build              # build the jupyter docker images"
    echo "usage: $0 build --clean      # force a clean build the jupyter docker images"
    echo "usage: $0 update             # update the base docker image on a production server (designed to minimize server downtime)"
-   echo "usage: $0 start              # start the jupyterhub in production mode (using screen)"
-   echo "usage: $0 start --systemd    # start the jupyterhub services (using systemd)"
+   echo "usage: $0 start              # start the jupyterhub services (using systemd)"
    echo "usage: $0 start --debug      # start the jupyterhub in debug mode, necessary for development (using screen)"
-   echo "usage: $0 stop               # stop all jupyterhub services (using screen)"
-   echo "usage: $0 stop --systemd     # stop all jupyterhub services (using systemd)"
+   echo "usage: $0 stop               # stop all jupyterhub services (using systemd)"
    echo "usage: $0 clean --systemd    # clean all jupyterhub images, containers, and system files (using systemd)"
    echo "usage: $0 clean --screen     # clean all jupyterhub images, containers, and system files (using screen)"
    echo "usage: $0 test               # run unittests"
