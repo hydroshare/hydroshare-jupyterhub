@@ -34,8 +34,8 @@ except Exception as e:
     sys.exit(1)
 
 # OAuth with HydroShare
-#c.JupyterHub.authenticator_class = 'oauthenticator.HydroShareOAuthenticator'
-#c.HydroShareOAuthenticator.oauth_callback_url = os.environ['OAUTH_CALLBACK_URL']
+c.JupyterHub.authenticator_class = 'oauthenticator.HydroShareOAuthenticator'
+c.HydroShareOAuthenticator.oauth_callback_url = os.environ['OAUTH_CALLBACK_URL']
 
 # mount the userspace directory
 c.DockerSpawner.volumes = {

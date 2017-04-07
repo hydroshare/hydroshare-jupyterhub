@@ -121,7 +121,7 @@ install() {
 	    return -1
 	fi
     else
-	echo -e "--> [Error] missing installation platform argument: $1\nSee help for valid arguments\n"
+	echo -e "--> [Error] missing installation platform argument: \nSee help for valid arguments\n"
 	return -1
     fi
 
@@ -137,9 +137,9 @@ install() {
     sudo pip3 install "ipython[notebook]" jupyterhub
     rm get-pip.py
 
-    # build the jupyterhub docker image  
-    echo -e "--> building the jupyterhub docker image"
-    cd ./docker && docker build -t jupyterhub/singleuser .
+   # # build the jupyterhub docker image  
+   # echo -e "--> building the jupyterhub docker image"
+   # cd ./docker && docker build -t jupyterhub/singleuser .
 
     # install dockerspawner 
     echo -e "--> installing dockerspawner"
