@@ -6,16 +6,12 @@ EXPOSE 8888
 USER root
 
 ############################
-# INSTALL SYSTEM LIBRARIES #
+# ROOT - INSTALL LIBRARIES #
 ############################
 
-# libgeos-dev  RHESYSS dependency
-# mpic++       TAUDEM dependency
-# libgdal-dev  TAUDEM dependency
-# libproj-dev  TAUDEM dependency
 RUN apt-get clean && apt-get update --fix-missing
 
-RUN apt-get update && apt-get install --fix-missing -y \ 
+RUN apt-get install --fix-missing -y \ 
     libgeos-dev \
     mpic++ \
     libproj-dev \   
@@ -65,43 +61,21 @@ RUN jupyter nbextensions_configurator disable --user
 RUN jupyter nbextension enable recursivedelete/main
 RUN chown -R jovyan:users /home/jovyan/work/notebooks
 
-#########################
-# SWITCH TO JOVYAN USER #
-#########################
-USER jovyan 
+
+####################################
+# USER JOVYAN - INSTALL MODELS     #
+####################################
+# doing this before python gdal    #
+# operations b/c anaconda  has a   #
+# tendency to mess up gdal paths   #
+####################################
+
+#ENV LD_LIBRARY_PATH=/lib:/usr/lib:/usr/local/lib:$LD_LIBRARY_PATH
 
 # TAUDEM v5.3.7 - build and install taudem (must happen before rhesyss b/c of gdal conflicts)
 RUN git clone https://github.com/dtarb/TauDEM.git /home/jovyan/libs/TauDEM
 RUN cd /home/jovyan/libs/TauDEM && git checkout tags/v5.3.7
 RUN cd /home/jovyan/libs/TauDEM/src && make
-
-# prepare python environments
-RUN pip install --upgrade pip
-
-###############################
-# PREPARE PYTHON ENVIRONMENTS #
-###############################
-
-# Python 3
-RUN conda install -y -n root \
-gdal \
-basemap \
-landlab -c landlab
-
-RUN pip3 install ulmo
-
-RUN git clone -b master https://github.com/hydroshare/hs_restclient.git /home/jovyan/libs/hs_restclient
-RUN /bin/bash -c "source /opt/conda/bin/activate root && cd /home/jovyan/libs/hs_restclient && python setup.py install "
-
-# Python 2
-RUN /bin/bash -c "source /opt/conda/bin/activate python2 && pip install --upgrade pip && pip install wget "
-
-RUN conda install -y -n python2 \
-gdal \
-basemap \
-landlab -c landlab 
-
-RUN pip install ulmo
 
 # install ecohydrolib
 RUN git clone https://github.com/leonard-psu/EcohydroLib.git /home/jovyan/libs/EcohydroLib
@@ -115,9 +89,6 @@ RUN /bin/bash -c "source /opt/conda/bin/activate python2 \
 && cd ../libs/RHESSysWorkflows \
 && python setup.py install"
 
-# install odm2api
-RUN conda install -y -n python2 -c odm2 odm2api
-
 # load the rhessys configuration file and modify for the current user
 RUN sed -i -e 's|^ETC.*|ETC = /home/jovyan/libs/RHESSysWorkflows/etc|g' /home/jovyan/.ecohydro.cfg &&\
 sed -i -e 's|^MODULE_PATH.*|MODULE_PATH = /home/jovyan/work/notebooks/.grass6/addons|g' /home/jovyan/.ecohydro.cfg &&\
@@ -127,24 +98,59 @@ sed -i -e 's|^MODULE_ETC.*|MODULE_ETC = /home/jovyan/libs/RHESSysWorkflows/etc/r
 ADD ./rhessys_wf.py /home/jovyan/libs/rhessys_wf.py
 ADD ./run.py /home/jovyan/libs/run.py
 
+###################################
+# USER JOVYAN - INSTALL LIBRARIES #
+###################################
+USER jovyan 
 
-######################
-# Update Conda libs  #
-######################
+# update python 2 and 3 environments
+RUN pip install --upgrade pip
+RUN pip3 install --upgrade pip
 RUN conda update -n root --all -y
 RUN conda update -n python2 --all -y
 
+# Install Python 3 Modules
+RUN conda install -y -n root \
+gdal \
+basemap \
+landlab -c landlab
 
-######################
-# SET PATH VARIABLES #
-######################
+RUN pip3 install ulmo
 
-ENV PATH=/opt/conda/envs/python2/bin:/home/jovyan/libs/TauDEM:$PATH PYTHONPATH=/home/jovyan/work/notebooks:$PYTHONPATH DOCUMENTS=/home/jovyan/work/notebooks/documents DATA=/home/jovyan/work/notebooks/data HOME=/home/jovyan/work/notebooks ECOHYDROLIB_CFG=/home/jovyan/.ecohydro.cfg LD_LIBRARY_PATH=/usr/lib/grass64/lib
-ENV PYTHONPATH=/home/jovyan/work/notebooks:$PYTHONPATH
+RUN git clone -b master https://github.com/hydroshare/hs_restclient.git /home/jovyan/libs/hs_restclient
+RUN pip3 install -e /home/jovyan/libs/hs_restclient --user
+RUN pip install -e /home/jovyan/libs/hs_restclient --user
 
-######################
-# CLEANUP            #
-######################
+#RUN /bin/bash -c "source /opt/conda/bin/activate root && cd /home/jovyan/libs/hs_restclient && python setup.py install "
+
+# Install Python 2 Modules
+RUN pip install wget
+#RUN /bin/bash -c "source /opt/conda/bin/activate python2 && pip install --upgrade pip && pip install wget "
+
+RUN conda install -y -n python2 \
+gdal \
+basemap \
+landlab -c landlab 
+
+#RUN pip install ulmo
+RUN conda install -y -n python2 -c odm2 odm2api
+
+####################################
+# USER JOVYAN - SET PATH VARIABLES #
+####################################
+
+ENV \
+PATH=/opt/conda/envs/python2/bin:/home/jovyan/libs/TauDEM:$PATH \
+PYTHONPATH=/home/jovyan/work/notebooks:$PYTHONPATH \
+DOCUMENTS=/home/jovyan/work/notebooks/documents \
+DATA=/home/jovyan/work/notebooks/data \
+HOME=/home/jovyan/work/notebooks \
+ECOHYDROLIB_CFG=/home/jovyan/.ecohydro.cfg \
+LD_LIBRARY_PATH=/usr/lib/grass64/lib:$LD_LIBRARY_PATH
+
+#############################
+# ROOT - CLEANUP            #
+#############################
 USER root
 RUN conda clean --all -y
 RUN apt-get clean && \
@@ -154,8 +160,3 @@ RUN apt-get clean && \
 # SWITCH BACK TO JOVYAN BEFORE LEAVING #
 ########################################
 USER jovyan
-
-
-
-
-
