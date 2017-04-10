@@ -77,14 +77,13 @@ def load_environment(env_path=None):
 
     # load the environment path (if it exists)
     if env_path is None:
-        if 'JUPYTER_TMP' in os.environ.keys():
-            env_path = os.path.join(os.environ['JUPYTER_TMP'], 'env')
+        if 'NOTEBOOK_HOME' in os.environ.keys():
+            env_path = os.path.join(os.environ['NOTEBOOK_HOME'], '.env')
 
     if not os.path.exists(env_path):
         print('\nEnvironment file could not be found.  Make sure that the JUPYTER_ENV variable is set properly')
         return
 
-    # env_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'env')
     with open(env_path, 'r') as f:
         lines = f.readlines()
         print('Adding the following system variables:')
