@@ -26,7 +26,7 @@ def get_hs_content(resid):
 
 def find_resource_directory(resid):
    
-    basedir = os.environ['HOME']
+    basedir = os.environ['NOTEBOOK_HOME']
    
     # loop over all the files in userspace
     for dirpath, dirnames, filenames in os.walk(basedir):
@@ -41,7 +41,7 @@ def check_for_ipynb(content_files):
     for f, p in content_files.items():
         if f[-5:] == 'ipynb':
             fname = os.path.basename(p)
-            rel_path = os.path.relpath(p, os.environ['HOME'])
+            rel_path = os.path.relpath(p, os.environ['NOTEBOOK_HOME'])
             url = urlencode(rel_path)
             links[fname] = url
     return links
