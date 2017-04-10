@@ -53,13 +53,13 @@ RUN ln -s /opt/conda/envs/python2/bin/python2 /usr/bin/python22
 ADD https://raw.github.com/selimnairb/RHESSysWorkflows/master/docs/config/ecohydro-Linux.cfg /home/jovyan/.ecohydro.cfg
 RUN chown jovyan:users /home/jovyan/.ecohydro.cfg
 
-# NBExtensions
-RUN git clone https://github.com/Castronova/jupyter_contrib_nbextensions.git /home/jovyan/libs/jupyter_contrib_nbextensions
-RUN pip3 install -e /home/jovyan/libs/jupyter_contrib_nbextensions
-RUN jupyter contrib nbextension install --system
-RUN jupyter nbextensions_configurator disable --user
-RUN jupyter nbextension enable recursivedelete/main
-RUN chown -R jovyan:users /home/jovyan/work/notebooks
+## NBExtensions
+#RUN git clone https://github.com/Castronova/jupyter_contrib_nbextensions.git /home/jovyan/libs/jupyter_contrib_nbextensions
+#RUN pip3 install -e /home/jovyan/libs/jupyter_contrib_nbextensions
+#RUN jupyter contrib nbextension install --system
+#RUN jupyter nbextensions_configurator disable --user
+#RUN jupyter nbextension enable recursivedelete/main
+#RUN chown -R jovyan:users /home/jovyan/work/notebooks
 
 
 ####################################
@@ -144,10 +144,11 @@ PATH=/opt/conda/envs/python2/bin:/home/jovyan/libs/TauDEM:$PATH \
 PYTHONPATH=/home/jovyan/work/notebooks:$PYTHONPATH \
 DOCUMENTS=/home/jovyan/work/notebooks/documents \
 DATA=/home/jovyan/work/notebooks/data \
-HOME=/home/jovyan/work/notebooks \
+HOME=/home/jovyan \
 ECOHYDROLIB_CFG=/home/jovyan/.ecohydro.cfg \
 LD_LIBRARY_PATH=/usr/lib/grass64/lib:$LD_LIBRARY_PATH
 
+#HOME=/home/jovyan/work/notebooks \
 #############################
 # ROOT - CLEANUP            #
 #############################

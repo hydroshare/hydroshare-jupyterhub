@@ -1,4 +1,5 @@
-FROM castrona/hydroshare-jupyterhub:latest
+#FROM castrona/hydroshare-jupyterhub:latest
+FROM hydroshare-jupyterhub
 MAINTAINER Tony Castronova <acastronova@cuahsi.org>
 
 ######################################################
@@ -13,12 +14,23 @@ MAINTAINER Tony Castronova <acastronova@cuahsi.org>
 #
 ## install nbextensions
 #RUN git clone https://github.com/Castronova/jupyter_contrib_nbextensions.git /home/jovyan/libs/jupyter_contrib_nbextensions
-#USER root
+USER root
 #RUN pip3 install -e /home/jovyan/libs/jupyter_contrib_nbextensions
 #RUN jupyter contrib nbextension install --system
 #RUN jupyter nbextensions_configurator disable --user
 #RUN jupyter nbextension enable recursivedelete/main
 #RUN chown -R jovyan:users /home/jovyan/work/notebooks
+
+# NBExtensions
+RUN git clone https://github.com/Castronova/jupyter_contrib_nbextensions.git /home/jovyan/libs/jupyter_contrib_nbextensions
+RUN pip3 install -e /home/jovyan/libs/jupyter_contrib_nbextensions
+RUN jupyter contrib nbextension install --system
+RUN jupyter nbextension enable recursivedelete/main --user --section=tree
+RUN jupyter nbextensions_configurator disable --user
+RUN chown -R jovyan:users /home/jovyan/.jupyter
+
+ENV NOTEBOOK_HOME=/home/jovyan/work/notebooks
+
 
 ###################################################
 ## End - JupyterHub Development Image Additions ###
