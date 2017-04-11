@@ -40,7 +40,7 @@ c.HydroShareOAuthenticator.oauth_callback_url = os.environ['OAUTH_CALLBACK_URL']
 # mount the userspace directory
 c.DockerSpawner.volumes = {
    userspace: '/home/jovyan/work',
-   os.environ['JUPYTER_STATIC_DIR']: '/home/jovyan/work/notebooks/.jupyter/custom',
+   os.environ['JUPYTER_STATIC_DIR']: '/home/jovyan/.jupyter/custom',
 }
 
 # IRODS settings 
