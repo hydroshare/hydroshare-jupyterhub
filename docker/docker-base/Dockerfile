@@ -107,6 +107,7 @@ landlab -c landlab
 RUN pip3 install ulmo
 
 RUN git clone -b master https://github.com/hydroshare/hs_restclient.git /home/jovyan/libs/hs_restclient
+RUN cd /home/jovyan/libs/hs_restclient && git checkout tags/1.2.6
 RUN pip3 install -e /home/jovyan/libs/hs_restclient --user
 RUN pip install -e /home/jovyan/libs/hs_restclient --user
 
