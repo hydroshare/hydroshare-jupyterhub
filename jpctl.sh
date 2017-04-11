@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-
-
 set -eu
 set -o pipefail
 sudo ls > /dev/null # get sudo rights before user walks away
@@ -43,6 +41,11 @@ clean() {
 }
 
 clean_screen(){
+  
+  echo -e "--------------------------------\n"
+  echo -e "--     DEPRECATED FUNCTION    --\n"
+  echo -e "--------------------------------\n"
+  
   # remove error files
   echo -n "--> removing screen error logs..."
   sudo rm $LOG_PATH/*.err 2> /dev/null || true
@@ -136,10 +139,6 @@ install() {
     sudo pip3 install ipgetter
     sudo pip3 install "ipython[notebook]" jupyterhub
     rm get-pip.py
-
-   # # build the jupyterhub docker image  
-   # echo -e "--> building the jupyterhub docker image"
-   # cd ./docker && docker build -t jupyterhub/singleuser .
 
     # install dockerspawner 
     echo -e "--> installing dockerspawner"
@@ -245,6 +244,10 @@ stop_services() {
 
 stop_screen() {
 
+  echo -e "--------------------------------\n"
+  echo -e "--     DEPRECATED FUNCTION    --\n"
+  echo -e "--------------------------------\n"
+
   echo "Shutting screen instances"
 
   echo -n "--> killing rest..."
@@ -277,8 +280,6 @@ start_services() {
 
   # parse args if they are provided
   if [[ $# -ne 0 ]] ;  then
-#    if [[ $1 == "--debug" ]]; then
-#        restart_screen $1
     if [[ $1 == "--screen" ]]; then
         restart_screen
     else
@@ -291,6 +292,10 @@ start_services() {
 
 restart_screen() {
 
+  echo -e "--------------------------------\n"
+  echo -e "--     DEPRECATED FUNCTION    --\n"
+  echo -e "--------------------------------\n"
+  
   JUPYTER_CMD="start"
   RUN_CULL=true
   if [[ $# -ne 0 ]] ;  then
@@ -414,16 +419,16 @@ run_tests(){
 
 display_usage() {
    echo "*** JupyterHub Control Script ***"
-   echo "usage: $0 install --ubuntu            # install required software and build jupyterhub docker containers (ubuntu)"
-   echo "usage: $0 install --rhel            # install required software and build jupyterhub docker containers (RHEL)"
+   echo "usage: $0 install --ubuntu   # install required software and build jupyterhub docker containers (ubuntu)"
+   echo "usage: $0 install --rhel     # install required software and build jupyterhub docker containers (RHEL)"
    echo "usage: $0 build              # build the jupyter docker images"
    echo "usage: $0 build --clean      # force a clean build the jupyter docker images"
    echo "usage: $0 update             # update the base docker image on a production server (designed to minimize server downtime)"
    echo "usage: $0 start              # start the jupyterhub services (using systemd)"
-   echo "usage: $0 start --debug      # start the jupyterhub in debug mode, necessary for development (using screen)"
+   echo "usage: $0 start --debug      # [DEPRECATED] start the jupyterhub in debug mode, necessary for development (using screen)"
    echo "usage: $0 stop               # stop all jupyterhub services (using systemd)"
    echo "usage: $0 clean --systemd    # clean all jupyterhub images, containers, and system files (using systemd)"
-   echo "usage: $0 clean --screen     # clean all jupyterhub images, containers, and system files (using screen)"
+   echo "usage: $0 clean --screen     # [DEPRECATED] clean all jupyterhub images, containers, and system files (using screen)"
    echo "usage: $0 test               # run unittests"
    echo "***"
 }
