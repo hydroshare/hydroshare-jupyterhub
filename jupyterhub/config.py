@@ -20,6 +20,7 @@ try:
     c.JupyterHub.confirm_no_ssl = True
     c.JupyterHub.port = int(os.environ['JUPYTER_PORT'])
     c.DockerSpawner.hub_ip_connect = os.environ['DOCKER_SPAWNER_IP']
+    c.DockerSpawner.remove_containers = True
     c.JupyterHub.hub_ip = os.environ['DOCKER_SPAWNER_IP']
     c.JupyterHub.extra_log_file = os.environ['JUPYTER_LOG']
     userspace = os.path.join(os.environ['JUPYTER_USERSPACE_DIR'], '{username}')
