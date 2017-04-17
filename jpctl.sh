@@ -101,7 +101,7 @@ install_base_rhel() {
     # install jupyterhub dependencies
     echo -e "--> installing system requirements"
     sudo yum clean all
-    sudo yum update update
+    sudo yum update 
     sudo yum install -y openssh-server wget screen docker python3-dateutil, tree
 
     # install node and configurable proxy
