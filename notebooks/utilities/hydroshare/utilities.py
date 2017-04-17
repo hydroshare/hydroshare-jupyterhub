@@ -101,4 +101,26 @@ def get_env_var(varname):
     else:
         return input('Could not find %s, please specify a value: ' % varname).strip()
 
+def get_server_url_for_path(p):
+    """
+    gets the url corresponding to a given file or directory path
+    p : path to convert into a url
 
+    returns the url path for the filepath p
+    """
+
+    load_environment()
+    fname = os.path.basename(p)
+    rel_path = os.path.relpath(p, os.environ['NOTEBOOK_HOME'])
+    url = urlencode(rel_path)
+    return url
+
+def get_relative_path(p):
+    """
+    gets the path relative to the jupyter home directory
+    p: path to convert into relative path
+
+    returns the path relative to the default jupyter home directory
+    """
+
+    return os.path.relpath(p, os.environ['NOTEBOOK_HOME'])
