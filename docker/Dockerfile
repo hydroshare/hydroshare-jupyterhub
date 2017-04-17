@@ -17,6 +17,7 @@ RUN chown -R jovyan:users /home/jovyan/.jupyter
 
 ENV NOTEBOOK_HOME=/home/jovyan/work/notebooks
 
+RUN pip install wget
 
 ###################################################
 ## End - JupyterHub Development Image Additions ###
