@@ -15,9 +15,9 @@ PWD=$( dirname $( readlink -f ${BASH_SOURCE[0]} ) )
 # Install Environment File (Base Dir) #
 ####################################### 
 
-echo "--> installing jupyterhub common files"
-JH=/etc/jupyterhub
-mkdir -p $JH
+#echo "--> installing jupyterhub common files"
+#JH=/etc/jupyterhub
+#mkdir -p $JH
 
 # jupyterhub server dir
 echo "----> moving jupyterhub env and static files"
@@ -40,6 +40,11 @@ mkdir -p $JHR
 echo "----> preparing jupyterhub culling"
 JHC=/etc/jupyterhub/cull
 mkdir -p $JHC
+
+# log dir
+echo "----> preparing jupyterhub logging"
+JHL=/etc/jupyterhub/log
+mkdir -p $JHL
 
 ####################################### 
 # Install Jupyterhub Server           #

@@ -101,14 +101,23 @@ install_base_rhel() {
     # install jupyterhub dependencies
     echo -e "--> installing system requirements"
     sudo yum clean all
-    sudo yum update 
-    sudo yum install -y openssh-server wget screen docker python3-dateutil, tree
+    sudo yum install -y openssh-server wget screen docker tree gcc-c++ make
+
+    if ( ! which python3 ); then
+        sudo rpm -Uvh https://centos7.iuscommunity.org/ius-release.rpm || true
+        sudo yum install -y python35u python35u-libs python35u-devel python35u-pip
+        sudo ln -sf /usr/bin/python3.5 /usr/bin/python3
+        sudo ln -sf /usr/bin/pip3.5 /usr/bin/pip3
+    fi
+    sudo pip3 install python-dateutil
+
+    # install epel
+    sudo yum install -y epel-release
 
     # install node and configurable proxy
     echo -e "--> installing nodejs and configurable-http-proxy"
-    sudo yum -y install nodejs
+    sudo yum install -y nodejs
     sudo npm install -g configurable-http-proxy
-    sudo yum install -y gcc-c++ make
 }
 
 install() {
@@ -129,8 +138,8 @@ install() {
     fi
 
     # activate and enable docker
-    sudo systemctl start docker
     sudo systemctl enable docker
+    sudo systemctl start docker
     
     # install pip, ipgetter, and jupyterhub
     echo -e "--> installing pip3, ipgetter, jupyterHub"
