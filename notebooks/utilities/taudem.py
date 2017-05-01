@@ -13,12 +13,17 @@ if is_py2:
 else:
     import queue as queue
 
+
+def get_input(text):
+    return input(text)
+
 def create_workspace(folder_name):
 
     # get the data directory (this is an environment variable that is provided to you)
     data_directory = os.path.join(os.environ['DATA'], folder_name)
     create_dir = True
     if os.path.exists(data_directory):
+        # res = get_input('This directory already exists.\nWould you like to remove it [Y/n]? ')
         res = input('This directory already exists.\nWould you like to remove it [Y/n]? ')
         if res != 'n':
             shutil.rmtree(data_directory)

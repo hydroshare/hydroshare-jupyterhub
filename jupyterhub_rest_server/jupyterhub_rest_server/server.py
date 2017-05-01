@@ -4,8 +4,8 @@ from tornado import gen
 from tornado.ioloop import IOLoop
 import tornado.web
 from tornado.log import enable_pretty_logging
-import handlers as resthandlers
 import socket
+from . import handlers as resthandlers
 
 enable_pretty_logging()
 
@@ -22,17 +22,17 @@ class Application(tornado.web.Application):
         }
         tornado.web.Application.__init__(self, handlers, **settings)
 
-def set_env():
-    for line in open('../jupyterhub/env'):
-        li = line.strip()
-        if not li.startswith('#') and li != '':
-            li = li.replace('export', '').strip()  # remove the export tag
-            var,val = li.split('=', 1)  # split at first occurence of '='
-            os.environ[var] = val
+#def set_env():
+#    for line in open('../jupyterhub/env'):
+#        li = line.strip()
+#        if not li.startswith('#') and li != '':
+#            li = li.replace('export', '').strip()  # remove the export tag
+#            var,val = li.split('=', 1)  # split at first occurence of '='
+#            os.environ[var] = val
 
 def main():
     # set environment variables
-    set_env()
+#    set_env()
 
     app = Application()
     app.listen(os.environ['JUPYTER_REST_PORT'])

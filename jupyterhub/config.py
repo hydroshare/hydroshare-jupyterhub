@@ -2,22 +2,17 @@ import os
 from os.path import *
 import sys
 
-# get the project root
-root = abspath(dirname(__file__))
-
-# append the dockerspawner submodule to the path
-sys.path.append(abspath(join(root, '../dockerspawner/dockerspawner')))
-
-# append the oauthenticator submodule to the path
-sys.path.append(abspath(join(root, '../oauthenticator/oauthenticator')))
-
-# append the parent dir
-sys.path.append(abspath(join(root, '../')))
-
 # Configuration file for Jupyter Hub
 c = get_config()
 
-c.JupyterHub.api_tokens = {"6b2ee57055123b95be0df3a3c3609e09886e419b7f032db219dc8235de93ed44":"jupyter"}
+# set container culling properties
+c.JupyterHub.services = [
+    {
+        'name': 'cull-idle',
+        'admin': True,
+        'command': 'python3 /etc/jupyterhub/cull/cull_idle_servers.py --timeout=3600'.split(),
+    }
+]
 
 try:
     # spawn with Docker
@@ -25,6 +20,7 @@ try:
     c.JupyterHub.confirm_no_ssl = True
     c.JupyterHub.port = int(os.environ['JUPYTER_PORT'])
     c.DockerSpawner.hub_ip_connect = os.environ['DOCKER_SPAWNER_IP']
+    c.DockerSpawner.remove_containers = True
     c.JupyterHub.hub_ip = os.environ['DOCKER_SPAWNER_IP']
     c.JupyterHub.extra_log_file = os.environ['JUPYTER_LOG']
     userspace = os.path.join(os.environ['JUPYTER_USERSPACE_DIR'], '{username}')
@@ -42,22 +38,20 @@ except Exception as e:
 c.JupyterHub.authenticator_class = 'oauthenticator.HydroShareOAuthenticator'
 c.HydroShareOAuthenticator.oauth_callback_url = os.environ['OAUTH_CALLBACK_URL']
 
-static = abspath(join(dirname(__file__), '../static/custom'))
-
 # mount the userspace directory
 c.DockerSpawner.volumes = {
    userspace: '/home/jovyan/work',
-   static: '/home/jovyan/work/notebooks/.jupyter/custom',
+   os.environ['JUPYTER_STATIC_DIR']: '/home/jovyan/.jupyter/custom',
 }
 
+# IRODS settings 
 # http://stackoverflow.com/questions/37144357/link-containers-with-the-docker-python-api
-c.DockerSpawner.extra_host_config = {
-    'privileged':True,
-    'cap_add':['SYS_ADMIN','MKNOD'],
-    'devices':['/dev/fuse'],
-    'security_opt':['apparmor:unconfined']
-}
+#c.DockerSpawner.extra_host_config = {
+#    'privileged':True,
+#    'cap_add':['SYS_ADMIN','MKNOD'],
+#    'devices':['/dev/fuse'],
+#    'security_opt':['apparmor:unconfined']
+#}
 
 #c.NotebookApp.extra_static_paths = ['/home/jovyan/work/notebooks/.ipython/profile_default/static']
-
 

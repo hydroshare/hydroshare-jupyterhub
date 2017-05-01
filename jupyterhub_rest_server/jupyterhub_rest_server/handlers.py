@@ -1,11 +1,11 @@
 import tornado.web
 import os
-import utilities
 import socket
 import logging
 import tornado.auth
 import shutil
 import ipgetter
+from . import utilities
 
 from tornado.log import enable_pretty_logging
 enable_pretty_logging()
@@ -43,9 +43,10 @@ class JupyterHandler(RequestHandler, tornado.auth.OAuth2Mixin):
  
         # generate the redirect url
         baseurl = os.environ['JUPYTER_HUB_IP']
+        port = os.environ['JUPYTER_PORT']
         
         # build the redirect url 
-        url = "http://%s/user/%s/tree/notebooks/Welcome.ipynb" % (baseurl,username)
+        url = "http://%s:%s/user/%s/tree/notebooks/Welcome.ipynb" % (baseurl,port, username)
 
         # save the next url to ensure that the redirect will work
         p = os.path.join(os.environ['HYDROSHARE_REDIRECT_COOKIE_PATH'], '.redirect_%s' % username)        

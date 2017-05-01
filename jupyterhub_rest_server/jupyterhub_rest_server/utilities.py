@@ -11,18 +11,18 @@ log = logging.getLogger()
 
 
 
-def load_envs():
-    with open('../jupyterhub/env','r') as f:
-        lines = f.readlines()
-        for line in lines:
-            vals = line.strip().split(' ')[-1].split('=')
-            if len(vals) == 2:
-                os.environ[vals[0]] = vals[1]
+#def load_envs():
+#    with open('../jupyterhub/env','r') as f:
+#        lines = f.readlines()
+#        for line in lines:
+#            vals = line.strip().split(' ')[-1].split('=')
+#            if len(vals) == 2:
+#                os.environ[vals[0]] = vals[1]
 
 def set_hydroshare_args(username, resourceid, resourcetype):
     
     userspace_dir = os.environ['JUPYTER_USERSPACE_DIR']
-    hs_env = os.path.abspath(os.path.join(userspace_dir, '%s/notebooks/utilities/env' % username.lower()))
+    hs_env = os.path.abspath(os.path.join(userspace_dir, '%s/notebooks/.env' % username.lower()))
     print('ENV_PATH ',hs_env)
 
     with open(hs_env, 'w') as f:
@@ -97,7 +97,7 @@ def build_userspace(username):
 
 
 # load environment vars 
-load_envs()
+#load_envs()
 
 
 
