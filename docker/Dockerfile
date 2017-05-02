@@ -17,16 +17,19 @@ RUN chown -R jovyan:users /home/jovyan/.jupyter
 
 ENV NOTEBOOK_HOME=/home/jovyan/work/notebooks
 
+USER jovyan
+
 RUN pip install wget
+RUN pip3 install wget 
 RUN pip install ulmo
+
+# patch hs_restclient v1.2.6 
+ADD docker/hs_restclient.patch /home/jovyan/libs/hs_restclient/hs_restclient/hs_restclient.patch
+RUN cd /home/jovyan/libs/hs_restclient/hs_restclient && patch < hs_restclient.patch
 
 ###################################################
 ## End - JupyterHub Development Image Additions ###
 ###################################################
-#USER root
-#RUN conda clean --all -y
-#RUN apt-get clean && \
-#    rm -rf /var/lib/apt/lists/*
 USER jovyan
 CMD ["sh", "/srv/singleuser/singleuser.sh"]
 
