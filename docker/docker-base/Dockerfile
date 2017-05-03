@@ -60,6 +60,7 @@ RUN chown jovyan:users /home/jovyan/.ecohydro.cfg
 # operations b/c anaconda  has a   #
 # tendency to mess up gdal paths   #
 ####################################
+USER jovyan 
 
 # TAUDEM v5.3.7 - build and install taudem (must happen before rhesyss b/c of gdal conflicts)
 RUN git clone https://github.com/dtarb/TauDEM.git /home/jovyan/libs/TauDEM
