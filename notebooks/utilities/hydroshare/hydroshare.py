@@ -300,3 +300,31 @@ class hydroshare():
             content[fname] = f
         utilities.display_resource_content_files(content)
         self.content = content
+
+    def getContentFiles(self, resourceid):
+        """Gets the content files for a resource that exists on the
+           Jupyter Server
+
+        args:
+        -- resourceid: the id of the hydroshare resource
+
+        returns:
+        -- {content file name: path}
+        """
+
+        content = utilities.get_hs_content(resourceid)
+        return content
+
+    def getContentPath(self, resourceid):
+        """Gets the server path of a resources content files.
+
+        args:
+        -- resourceid: the id of the hydroshare resource
+
+        returns:
+        -- server path the the resource content files
+        """
+
+        path = utilities.find_resource_directory(resourceid)
+        if path is not None:
+            return os.path.join(path, resourceid, 'data/contents')
