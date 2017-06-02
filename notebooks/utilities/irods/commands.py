@@ -11,39 +11,38 @@ class iCommands(object):
         self.irods_dir = os.environ['DATA']
         self.hs = hydroshare
 
+        icmd = os.path.join(self.irods_dir, 'icommands.sh')
+        iplug = os.path.join(self.irods_dir, 'icommands/plugins/')
+        iauth = os.path.join(self.irods_dir, '.irods/.irodsA')
+        ienv = os.path.join(self.irods_dir, '.irods/irods_environment.json')
         # force an update of the system environment variables
         # export the irods environment vars if they don't already exist
         if 'IRODS_PLUGINS_HOME' not in os.environ.keys():
             os.environ['PATH'] += ':%s/icommands' % self.irods_dir
-            os.environ['IRODS_PLUGINS_HOME'] = '%s/icommands/plugins/' \
-                % self.irods_dir
-            os.environ['IRODS_ENVIRONMENT_FILE'] = '%s/.irods/' \
-                'irods_environment.json' % self.irods_dir
-            os.environ['IRODS_AUTHENTICATION_FILE'] = '%s/.irods/.irodsA' \
-                % self.irods_dir
+            os.environ['IRODS_PLUGINS_HOME'] = iplug
+            os.environ['IRODS_ENVIRONMENT_FILE'] = ienv
+            os.environ['IRODS_AUTHENTICATION_FILE'] = iauth
 
-        chk = Popen(['ienv'], stdout=PIPE, stderr=STDOUT, shell=True)
-        chk.communicate()
-        chk_returncode = chk.returncode
-        if chk_returncode != 0:
+        if not os.path.exists(iplug):
             print('iCommands not found on the system, preparing to install.')
 
             # need to install icommands
             print('Downloading iCommands...', end='', flush=True)
-            if not os.path.exists('/home/jovyan/libs/icommands.sh'):
-                get_cmd = 'wget --no-http-keep-alive -O'
-                '/home/jovyan/libs/icommands.sh https://pods.'
-                'iplantcollaborative.org/wiki/download/attachments/'
-                '28117338/irods-icommands-4.1.9-ubuntu-12.installer?'
-                'version=1&modificationDate=1473720729000&api=v2'
+            if not os.path.exists(icmd):
+                get_cmd = 'wget --no-http-keep-alive -O ' \
+                    '%s/icommands.sh https://pods.' \
+                    'iplantcollaborative.org/wiki/download/attachments/' \
+                    '28117338/irods-icommands-4.1.9-ubuntu-12.installer?'\
+                    'version=1&modificationDate=1473720729000&api=v2' \
+                    % self.irods_dir
                 download_icommands = Popen([get_cmd], stdout=PIPE,
                                            stderr=STDOUT, shell=True)
                 download_icommands.communicate()
             print('done', flush=True)
 
             print('Installing iCommands...', end='', flush=True)
-            install_cmd = 'chmod +x /home/jovyan/libs/icommands.sh;'
-            'echo "%s" | /home/jovyan/libs/icommands.sh ' % self.irods_dir
+            install_cmd = 'chmod +x {0};echo "{1}" | {0} ' \
+                          .format(icmd, self.irods_dir)
             installicommands = Popen(install_cmd, stdout=PIPE,
                                      stderr=STDOUT, shell=True)
             installicommands.communicate()
@@ -52,18 +51,18 @@ class iCommands(object):
                 print('ERROR.\nCould not install icommands :(', flush=True)
             else:
                 print('done', flush=True)
-
+        
+        if not os.path.exists(iauth):
             print('Configuring iCommands', flush=True)
             self._init_icommands()
 
     def _init_icommands(self):
         irods_config = os.path.join(self.irods_dir, '.irods')
-        print(irods_config)
 
         if not os.path.exists(irods_config):
             os.makedirs(irods_config)
 
-        username = input('Please enter your HydroShare username: ')
+        username = input('Please enter your iRODs username: ')
         json = os.path.join(irods_config, 'irods_environment.json')
         print('Writing irods environment file', flush=True)
         with open(json, 'w') as f:
@@ -72,14 +71,18 @@ class iCommands(object):
                      "irods_port": 1247,\n \
                      "irods_user_name": "%s"\n \
                      }' % username)
-        os.putenv("IRODS_ENVIRONMENT_FILE", json)
         os.environ["IRODS_ENVIRONMENT_FILE"] = json
         with open('/home/jovyan/.bashrc', 'a') as f:
             f.write('export IRODS_ENVIRONMENT_FILE=%s' % json)
 
         print('Initializing environment', flush=True)
         p = getpass.getpass('Please enter your iRODS password: ')
-        os.system('iinit %s' % (p))
+        r = os.system('iinit %s' % (p))
+        if r != 0:
+            print('Failed to authenticate iRODs account', flush=True)
+            shutil.rmtree(irods_config)
+        else:
+            print('Authentication Successful', flush=True)
 
     def ils(self):
         """lists contents of hydroshare irods userspace
