@@ -289,15 +289,26 @@ class hydroshare():
                          '<br><br><code>hs.getResourceFromHydroShare(%s)'
                          '</code>.' % (resourceid, resourceid)))
             return
-        content_files = glob.glob(os.path.join(resdir, '%s/data/contents/*'
-                                               % resourceid))
-        display(HTML('<p>Downloaded content is located at: %s</p>' % resdir))
-        display(HTML('<p>Found %d content file(s). \n</p>'
-                     % len(content_files)))
+        
+        # create search paths.  Need to check 2 paths due to hs_restclient bug #63.
+        search_paths = [os.path.join(resdir, '%s/data/contents/*' % resourceid), 
+                        os.path.join(resdir, 'data/contents/*')]
+                        
         content = {}
-        for f in content_files:
-            fname = os.path.basename(f)
-            content[fname] = f
+        found_content = False
+        for p in search_paths:
+            content_files = glob.glob(p)
+            if len(content_files) > 0:
+                found_content = True
+                display(HTML('<p>Downloaded content is located at: %s</p>' % resdir))
+                display(HTML('<p>Found %d content file(s). \n</p>'
+                             % len(content_files)))
+            for f in content_files:
+                fname = os.path.basename(f)
+                content[fname] = f
+        if len(content.keys()) == 0:
+            display(HTML('<p>Did not find any content files for resource id: %s</p>' % resourceid))
+
         utilities.display_resource_content_files(content)
         self.content = content
 
