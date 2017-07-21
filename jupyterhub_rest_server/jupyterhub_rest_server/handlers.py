@@ -36,17 +36,35 @@ class JupyterHandler(RequestHandler, tornado.auth.OAuth2Mixin):
         # make all usernames lowercase
         username = husername.lower()
         resourcetype = resourcetype.lower()
-	
+
         # build userspace
-        utilities.build_userspace(username)
-        utilities.set_hydroshare_args(husername, resourceid, resourcetype)
- 
+        try:
+            msg = '%s -> building userspace' % husername
+            print(msg)
+            utilities.build_userspace(username)
+        except Exception as e:
+            print('ERROR %s: %s' % (msg, e))
+
+        try:
+            msg = '%s -> writing .env' % husername
+            print(msg)
+            utilities.set_hydroshare_args(husername, resourceid, resourcetype)
+        except Exception as e:
+            print('ERROR %s: %s' % (msg, e), flush=True)
+
         # generate the redirect url
         baseurl = os.environ['JUPYTER_HUB_IP']
         port = os.environ['JUPYTER_PORT']
         
         # build the redirect url 
-        url = "http://%s:%s/user/%s/tree/notebooks/Welcome.ipynb" % (baseurl,port, username)
+        if port == '443':
+            proto = 'https'
+            port = ''
+        else:
+            proto = 'http'
+            port = ':'+port
+        
+        url = "%s://%s%s/user/%s/tree/notebooks/Welcome.ipynb" % (proto, baseurl, port, username)
 
         # save the next url to ensure that the redirect will work
         p = os.path.join(os.environ['HYDROSHARE_REDIRECT_COOKIE_PATH'], '.redirect_%s' % username)        

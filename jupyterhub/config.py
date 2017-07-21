@@ -44,6 +44,9 @@ c.DockerSpawner.volumes = {
    os.environ['JUPYTER_STATIC_DIR']: '/home/jovyan/.jupyter/custom',
 }
 
+# SSL
+c.NotebookApp.certfile = u'/volume/hydro-develop/cert.pem'
+c.NotebookApp.keyfile = u'/volume/hydro-develop/key.pem'
 # IRODS settings 
 # http://stackoverflow.com/questions/37144357/link-containers-with-the-docker-python-api
 #c.DockerSpawner.extra_host_config = {
