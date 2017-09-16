@@ -91,21 +91,11 @@ IRODS_AUTHENTICATION_FILE=/home/jovyan/work/notebooks/data/.irods/.irodsA
 
 #RUN jupyter nbextensions_configurator enable --user
 
-ADD docker/icommands.sh /home/jovyan/libs/icommands.sh
-USER root
-RUN chmod +x /home/jovyan/libs/icommands.sh
-RUN echo "/home/jovyan/libs" | /home/jovyan/libs/icommands.sh
-USER jovyan
-
-ENV \
-PATH=/home/jovyan/libs/icommands:$PATH \
-IRODS_PLUGINS_HOME=/home/jovyan/libs/icommands/plugins/ \
-IRODS_ENVIRONMENT_FILE=/home/jovyan/work/notebooks/data/.irods/irods_environment.json \
-IRODS_AUTHENTICATION_FILE=/home/jovyan/work/notebooks/data/.irods/.irodsA
-
 RUN pip install git+https://github.com/cybergis/jupyterlib.git
 RUN pip3 install git+https://github.com/cybergis/jupyterlib.git
 
+RUN pip install geopandas
+RUN pip3 install geopandas
 
 ###################################################
 ## End - JupyterHub Development Image Additions ###
