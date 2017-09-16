@@ -97,6 +97,9 @@ RUN pip3 install git+https://github.com/cybergis/jupyterlib.git
 RUN pip install geopandas
 RUN pip3 install geopandas
 
+RUN pip install graphviz
+RUN pip3 install graphviz
+
 ###################################################
 ## End - JupyterHub Development Image Additions ###
 ###################################################
