@@ -114,10 +114,16 @@ RUN pip3 install git+https://github.com/cybergis/jupyterlib.git
   RUN apt-get install --allow-unauthenticated --no-install-recommends -y r-base=3.3*
   RUN Rscript -e "install.packages('devtools', repos='http://archive.linux.duke.edu/cran')"
   RUN Rscript -e "devtools::install_github('IRkernel/IRkernel')"
-#  RUN Rscript -e "IRkernel::installspec()"
-    USER jovyan
+  USER jovyan
   ####### END ROOT ########
-  RUN Rscript -e "IRkernel::installspec(name = 'ir33', displayname = 'R 3.3')"
+
+RUN Rscript -e "IRkernel::installspec(name = 'ir33', displayname = 'R 3.3')"
+
+RUN pip install geopandas
+RUN pip3 install geopandas
+
+RUN pip install graphviz
+RUN pip3 install graphviz
 
 ###################################################
 ## End - JupyterHub Development Image Additions ###
