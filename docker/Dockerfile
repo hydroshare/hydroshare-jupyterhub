@@ -89,10 +89,35 @@ IRODS_PLUGINS_HOME=/home/jovyan/libs/icommands/plugins/ \
 IRODS_ENVIRONMENT_FILE=/home/jovyan/work/notebooks/data/.irods/irods_environment.json \ 
 IRODS_AUTHENTICATION_FILE=/home/jovyan/work/notebooks/data/.irods/.irodsA
 
-#RUN jupyter nbextensions_configurator enable --user
-
 RUN pip install git+https://github.com/cybergis/jupyterlib.git
 RUN pip3 install git+https://github.com/cybergis/jupyterlib.git
+
+  ###### BEGIN ROOT #######
+  USER root
+
+  # register the kernel in the current R installation
+  RUN sh -c 'echo "deb http://cran.rstudio.com/bin/linux/debian jessie-cran3/" >> /etc/apt/sources.list'
+  RUN gpg --keyserver keyserver.ubuntu.com --recv-key E084DAB9
+  RUN gpg -a --export E084DAB9 | apt-key add -
+  RUN apt-key update
+  RUN apt-get update
+  
+  # required libs for installing R packages
+  RUN apt-get -y install \
+      libcurl4-openssl-dev \
+      libssl-dev \
+      make \
+      gcc \
+      g++
+  
+  # install R-base packages (including IRKernel)
+  RUN apt-get install --allow-unauthenticated --no-install-recommends -y r-base=3.3*
+  RUN Rscript -e "install.packages('devtools', repos='http://archive.linux.duke.edu/cran')"
+  RUN Rscript -e "devtools::install_github('IRkernel/IRkernel')"
+  USER jovyan
+  ####### END ROOT ########
+
+RUN Rscript -e "IRkernel::installspec(name = 'ir33', displayname = 'R 3.3')"
 
 RUN pip install geopandas
 RUN pip3 install geopandas
