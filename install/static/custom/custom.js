@@ -59,6 +59,8 @@ $(document).ready(function(){
     foot.appendChild(center);
     foot.appendChild(right);
     
-    $("#notebook")[0].appendChild(foot);
+    // insert the footer at the bottom of the page 
+    var insertAfterElement = document.getElementById('pager')
+    insertAfterElement.parentNode.insertBefore(foot, insertAfterElement.nextSibling)
 
 });
