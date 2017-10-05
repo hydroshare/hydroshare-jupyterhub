@@ -22,20 +22,15 @@ class Application(tornado.web.Application):
         }
         tornado.web.Application.__init__(self, handlers, **settings)
 
-#def set_env():
-#    for line in open('../jupyterhub/env'):
-#        li = line.strip()
-#        if not li.startswith('#') and li != '':
-#            li = li.replace('export', '').strip()  # remove the export tag
-#            var,val = li.split('=', 1)  # split at first occurence of '='
-#            os.environ[var] = val
-
 def main():
-    # set environment variables
-#    set_env()
 
     app = Application()
-    app.listen(os.environ['JUPYTER_REST_PORT'])
+    http_server = tornado.httpserver.HTTPServer(app, ssl_options={
+        "certfile": "/etc/ssl/certs/cuahsi.org/cuahsi.cer",
+        "keyfile": "/etc/ssl/certs/cuahsi.org/cuahsi.key"
+    })
+    http_server.listen(8080)
+    #app.listen(os.environ['JUPYTER_REST_PORT'])
     print('\n'+'-'*60)
     print('JupyterHub REST server listening on %s:%s' % (os.environ['JUPYTER_REST_IP'],os.environ['JUPYTER_REST_PORT']))
     print('-'*60+'\n')

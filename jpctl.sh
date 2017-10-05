@@ -238,6 +238,7 @@ update_docker_images() {
   clean
 
 }
+
 stop_services() {
 
   # parse args if they are provided
@@ -426,6 +427,15 @@ run_tests(){
     
 }
 
+restart_services(){
+
+  stop_services
+
+  clean --systemd
+
+  start_services
+}
+
 display_usage() {
    echo "*** JupyterHub Control Script ***"
    echo "usage: $0 install --ubuntu   # install required software and build jupyterhub docker containers (ubuntu)"
@@ -463,6 +473,8 @@ case "$1" in
         ;;
     test) run_tests $1
 	;;
+    restart) restart_services 
+        ;;
     *) display_usage
         ;;
 esac
