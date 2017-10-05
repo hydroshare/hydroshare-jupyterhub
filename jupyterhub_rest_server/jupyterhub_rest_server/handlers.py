@@ -10,6 +10,7 @@ from . import utilities
 from tornado.log import enable_pretty_logging
 enable_pretty_logging()
 
+
 class RequestHandler(tornado.web.RequestHandler):
     def __init_(self):
         super(RequestHandler, self)
@@ -26,6 +27,25 @@ class RequestHandler(tornado.web.RequestHandler):
             self.write('<b>Encountered Error: </b> Could not find parameter "%s". <br> ' % argname)
             return 0
         return arg
+
+class IndexHandler(RequestHandler, tornado.auth.OAuth2Mixin):
+    def get(self):
+        args = [
+		 ['husername', 
+                  'HydroShare username.  This is used to build an isolated userspace on the JupyterHub server', 
+                  'Yes',
+ 		  'Example: TonyCastronova'],
+                 ['resourcetype', 
+                  'the type of hydroshare resource that will be sent to JupyterHub. Typically used when launching JupyterHub instances from HydroShare', 
+                  'No',
+ 		  'Example: GenericResource'],
+                 ['resourceid', 
+                  'the unique id of the a HydroShare resource.  Typically used when launching JupyterHub instances from HydroShare', 
+                  'No',
+ 		  'Example: 97add6638f7841278c73519e7192b252'],
+        ]
+        header = ['Function', 'Description', 'Required']
+        self.render("index.html", header=header, args=args)
 
 class JupyterHandler(RequestHandler, tornado.auth.OAuth2Mixin):
     def get(self):

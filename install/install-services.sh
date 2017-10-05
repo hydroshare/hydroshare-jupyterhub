@@ -61,6 +61,8 @@ echo "\n[Service]" >> $JSERVICE
 echo "EnvironmentFile=/etc/jupyterhub/env" >> $JSERVICE
 echo "WorkingDirectory=/etc/jupyterhub/server" >> $JSERVICE
 echo "ExecStart=$(which jupyterhub) -f $JHS/config.py" >> $JSERVICE
+echo "Restart=always" >> $JSERVICE
+echo "RestartSec=10" >> $JSERVICE
 echo "\n[Install]" >> $JSERVICE
 echo "WantedBy=multi-user.target" >> $JSERVICE
 cp $JSERVICE /lib/systemd/system
@@ -80,6 +82,8 @@ echo "\n[Service]" >> $RSERVICE
 echo "EnvironmentFile=/etc/jupyterhub/env" >> $RSERVICE
 echo "WorkingDirectory=/etc/jupyterhub/rest" >> $RSERVICE
 echo "ExecStart=$(which python3) $JHR/jupyterhub_rest_server_start.py" >> $RSERVICE
+echo "Restart=always" >> $RSERVICE
+echo "RestartSec=10" >> $RSERVICE
 echo "\n[Install]" >> $RSERVICE
 echo "WantedBy=multi-user.target" >> $RSERVICE
 cp $RSERVICE /lib/systemd/system

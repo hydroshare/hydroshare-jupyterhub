@@ -1,0 +1,76 @@
+
+<html>
+<head>
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+<!-- jQuery library -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+<!-- Latest compiled JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+</head>
+
+{% block css %}
+<style type="text/css">
+  #restfunctions {
+      font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+      border-collapse: collapse;
+      width: 100%;
+  }
+  
+  #restfunctions td, #restfunctions th {
+      border: 1px solid #ddd;
+      padding: 8px;
+  }
+  
+  #restfunctions tr:nth-child(even){background-color: #f2f2f2;}
+  
+  #restfunctions tr:hover {background-color: #ddd;}
+  
+  #restfunctions th {
+      padding-top: 12px;
+      padding-bottom: 12px;
+      text-align: left;
+      background-color: #4CAF50;
+      color: white;
+  }
+  .hiddenRow {
+     padding: 0 !important;
+  }
+  body {
+    margin:20px;
+  }
+</style>
+{% end %}
+
+<h3>Welcome to the JupyterHub-HydroShare REST API</h3>
+
+<p>The following arguments can be used to interact with the JupyterHub server: </p>
+
+<table class="table table-condensed" id="restfunctions">
+
+  {% for item in header %}
+     <th> {{ item }} </th>
+  {% end %}
+  {% for r in range(len(args)) %}
+    <tr data-toggle="collapse" data-target="#row{{ r }}" class="function accordion-toggle">
+    {% for item in args[r][:-1] %}
+       <td> {{ item }} </td>
+     {% end %}
+    </tr>
+    <tr>
+      <td colspan='3' class="hiddenRow">
+        <div class="accordian-body collapse" id="row{{ r }}">
+           <i>{{ args[r][-1] }}</i>
+        </div>
+      </td>
+    </tr>
+  {% end %}
+</table>
+
+</html>
+
+
+
