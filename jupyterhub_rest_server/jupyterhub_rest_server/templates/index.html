@@ -42,10 +42,33 @@
   body {
     margin:20px;
   }
+
+.error {
+  background-color:#FFCCCC;
+  margin:10px 0px 30px 0px;
+  padding:10px;
+}
+
 </style>
 {% end %}
 
 <h3>Welcome to the JupyterHub-HydroShare REST API</h3>
+
+
+{% try %}
+  {% if error %}
+    <div class='error'>
+    <h4>An error was encountered while attempting to process your request</h4>
+    {% for e in error %}
+      <ul>
+        <li>{{ e }} </li>
+      </ul>
+    {% end %}
+    </div>
+    <hr>
+  {% end %}
+{% except %}
+{% end %}
 
 <p>The following arguments can be used to interact with the JupyterHub server: </p>
 

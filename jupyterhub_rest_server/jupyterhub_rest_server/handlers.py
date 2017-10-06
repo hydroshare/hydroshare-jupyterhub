@@ -11,9 +11,31 @@ from tornado.log import enable_pretty_logging
 enable_pretty_logging()
 
 
+args = [
+	 ['husername', 
+          'HydroShare username.  This is used to build an isolated userspace on the JupyterHub server', 
+          'Yes',
+	  'Example: TonyCastronova'],
+         ['resourcetype', 
+          'The type of HydroShare resource being sent to JupyterHub. Typically used when launching JupyterHub instances from HydroShare', 
+          'No',
+	  'Example: GenericResource'],
+         ['resourceid', 
+          'The unique id of the a HydroShare resource.  Typically used when launching JupyterHub instances from HydroShare', 
+          'No',
+	  'Example: 97add6638f7841278c73519e7192b252'],
+         ['target', 
+          'Target notebook to launch relative to http://[jupyteraddress]/user/[husername]/tree/.  This argument is designed to support applications that wish to provide a more customized user experience.', 
+          'No',
+	  'Example: notebooks/Welcome.ipynb'],
+]
+header = ['Function', 'Description', 'Required']
+
+
 class RequestHandler(tornado.web.RequestHandler):
-    def __init_(self):
-        super(RequestHandler, self)
+#    def __init_(self):
+    errors = []
+#        super(RequestHandler, self)
 
     def get_or_error(self, argname, strip=True):
         """
@@ -24,38 +46,46 @@ class RequestHandler(tornado.web.RequestHandler):
         """
         arg = self.get_argument(argname, default=None, strip=strip)
         if arg is None:
-            self.write('<b>Encountered Error: </b> Could not find parameter "%s". <br> ' % argname)
-            return 0
+            error = 'Could not find required parameter "%s"' % argname
+            self.render("index.html", header=header, args=args, error=error)
         return arg
+
+    def get_arg_value(self, argname, isrequired, strip=True):
+        arg = self.get_argument(argname, default=None, strip=strip)
+        if arg is None and isrequired:
+            error = 'Could not find required parameter "%s"' % argname
+            self.errors.append(error)
+        return arg
+   
+    def check_for_errors(self):
+        if len(self.errors) > 0:
+            self.render("index.html", header=header, args=args, error=self.errors)
+            return 1
+        else:
+            return 0
+
 
 class IndexHandler(RequestHandler, tornado.auth.OAuth2Mixin):
     def get(self):
-        args = [
-		 ['husername', 
-                  'HydroShare username.  This is used to build an isolated userspace on the JupyterHub server', 
-                  'Yes',
- 		  'Example: TonyCastronova'],
-                 ['resourcetype', 
-                  'the type of hydroshare resource that will be sent to JupyterHub. Typically used when launching JupyterHub instances from HydroShare', 
-                  'No',
- 		  'Example: GenericResource'],
-                 ['resourceid', 
-                  'the unique id of the a HydroShare resource.  Typically used when launching JupyterHub instances from HydroShare', 
-                  'No',
- 		  'Example: 97add6638f7841278c73519e7192b252'],
-        ]
-        header = ['Function', 'Description', 'Required']
         self.render("index.html", header=header, args=args)
 
 class JupyterHandler(RequestHandler, tornado.auth.OAuth2Mixin):
     def get(self):
-        resourcetype = self.get_or_error('resourcetype')
-        resourceid = self.get_or_error('resourceid')
-        husername = self.get_or_error('husername')
+
+        # get arguments from the query string.
+        # display an error if req args are missing.
+        self.errors = []
+        husername = self.get_arg_value('husername', 1)
+        resourcetype = self.get_arg_value('resourcetype', 0) or ""
+        resourceid = self.get_arg_value('resourceid', 0) or ""
+        target = self.get_arg_value('target', 0)
+        if self.check_for_errors():
+            return
 
         # make all usernames lowercase
         username = husername.lower()
-        resourcetype = resourcetype.lower()
+        if resourcetype != "":
+            resourcetype = resourcetype.lower()
 
         # build userspace
         try:
@@ -65,6 +95,7 @@ class JupyterHandler(RequestHandler, tornado.auth.OAuth2Mixin):
         except Exception as e:
             print('ERROR %s: %s' % (msg, e))
 
+        print('HERE')
         try:
             msg = '%s -> writing .env' % husername
             print(msg)
@@ -84,7 +115,12 @@ class JupyterHandler(RequestHandler, tornado.auth.OAuth2Mixin):
             proto = 'http'
             port = ':'+port
         
-        url = "%s://%s%s/user/%s/tree/notebooks/Welcome.ipynb" % (proto, baseurl, port, username)
+        if target is not None:
+            url = "%s://%s%s/user/%s/tree/%s" % (proto, baseurl, port, username, target)
+        else:
+            url = "%s://%s%s/user/%s/tree/notebooks/Welcome.ipynb" % (proto, baseurl, port, username)
+
+        print("URL:" + url)
 
         # save the next url to ensure that the redirect will work
         p = os.path.join(os.environ['HYDROSHARE_REDIRECT_COOKIE_PATH'], '.redirect_%s' % username)        
