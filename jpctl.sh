@@ -26,41 +26,7 @@ clean() {
   docker rmi $(docker images -q -f dangling=true) 2> /dev/null || true
   echo "done" 
 
-  # parse args if they are provided
-  if [[ $# -ne 0 ]] ;  then
-    if [[ $1 == "--systemd" ]]; then
-       clean_systemd
-    elif [[ $1 == "--screen" ]]; then
-       clean_screen
-    else
-       echo -e "--> [Error] invalid argument: $1\nSee help for vaild start arguments\n"
-    fi
-  else
-     echo -e "--> No clean argument provided, just cleaning docker containers and images"
-  fi
-}
-
-clean_screen(){
-  
-  echo -e "--------------------------------\n"
-  echo -e "--     DEPRECATED FUNCTION    --\n"
-  echo -e "--------------------------------\n"
-  
-  # remove error files
-  echo -n "--> removing screen error logs..."
-  sudo rm $LOG_PATH/*.err 2> /dev/null || true
-  sudo rm $JUPYTER_PATH/jupyter.log 2> /dev/null || true
-  echo "done"
-
-  # remove jupyterhub files
-  echo -n "--> removing screen database..."
-  sudo rm $JUPYTER_PATH/jupyter.sqlite 2> /dev/null || true
-  echo "done"
-
-  echo -n "--> removing screen cookies..."
-  sudo rm $JUPYTER_PATH/jupyterhub_cookie_secret 2> /dev/null || true
-  echo "done"
- 
+  clean_systemd
 }
 
 clean_systemd(){
@@ -241,142 +207,15 @@ update_docker_images() {
 
 stop_services() {
 
-  # parse args if they are provided
-  if [[ $# -ne 0 ]] ;  then
-    if [[ $1 == "--screen" ]]; then
-       stop_screen
-    fi
-  else 
      stop_systemctl
-  fi
-
-}
-
-stop_screen() {
-
-  echo -e "--------------------------------\n"
-  echo -e "--     DEPRECATED FUNCTION    --\n"
-  echo -e "--------------------------------\n"
-
-  echo "Shutting screen instances"
-
-  echo -n "--> killing rest..."
-  if sudo screen -list | grep -q "rest"; then
-    sudo screen -S rest -X at "#" stuff $'\003'
-    sudo screen -X -S rest quit > /dev/null
-    sleep 1
-  fi
-  echo "done"
-
-  echo -n "--> killing jupyter..."
-  if sudo screen -list | grep -q "jupyter"; then
-    sudo screen -S jupyter -X at "#" stuff $'\003'
-    sudo screen -X -S jupyter quit > /dev/null
-    sleep 1
-  fi
-  echo "done"
-
-  echo -n "--> killing collector..."
-  if sudo screen -list | grep -q "collector"; then
-    sudo screen -S collector -X at "#" stuff $'\003'
-    sudo screen -X -S collector quit > /dev/null
-    sleep 1
-  fi
-  echo "done"
 
 }
 
 start_services() {
 
-  # parse args if they are provided
-  if [[ $# -ne 0 ]] ;  then
-    if [[ $1 == "--screen" ]]; then
-        restart_screen
-    else
-       echo -e "invalid argument: $1\nSee help for vaild start arguments\n"
-    fi
-  else
      start_systemctl
-  fi
 }
 
-restart_screen() {
-
-  echo -e "--------------------------------\n"
-  echo -e "--     DEPRECATED FUNCTION    --\n"
-  echo -e "--------------------------------\n"
-  
-  JUPYTER_CMD="start"
-  RUN_CULL=true
-  if [[ $# -ne 0 ]] ;  then
-    if [[ $1 == "--debug" ]]; then
-       JUPYTER_CMD="start-debug"
-       RUN_CULL=false
-    fi
-  fi
-
-  stop_services 
-  
-  # remove the error logs before attempting restart 
-  if ls | grep -q "rest.err"; then
-      sudo rm rest.err > /dev/null
-  fi
-
-  if ls | grep -q "jupyter.err"; then
-      sudo rm jupyter.err > /dev/null
-  fi
-
-  if ls | grep -q "cull.err"; then
-      sudo rm cull.err > /dev/null
-  fi
-
-  # make output dir
-  mkdir -p ./log
-
-  echo -e "\nRestarting screen instances"
-  echo -n "--> starting rest..."
-  sudo screen -dmS rest sh -c "cd $REST_PATH &&  ./run.sh >$LOG_PATH/rest.out 2> $LOG_PATH/rest.err"
-  sleep 1 # give the session time to spin up
-  if ! sudo screen -list | grep -q "rest"; then
-    echo -e "\n\n**********************"
-    echo -e "Failed to start rest"
-    echo "**********************"
-    cat $LOG_PATH/rest.err
-    return -1
-  fi
-  echo "done"
-
-  echo -n "--> starting jupyter..."
-  sudo screen -dmS jupyter sh -c "cd $JUPYTER_PATH && ./run.sh $JUPYTER_CMD > $LOG_PATH/jupyter.out 2> $LOG_PATH/jupyter.err"
-  sleep 1 # give the session time to spin up
-  if ! sudo screen -list | grep -q "jupyter"; then
-    echo -e "\n\n**********************"
-    echo -e "Failed to start jupyter"
-    echo "**********************"
-    cat $LOG_PATH/jupyter.err
-    return -1
-  fi
-  echo "done"
-  
-  if "$RUN_CULL" = true; then
-    echo -n "--> starting collector..."
-    sudo screen -dmS collector sh -c "cd $JUPYTER_PATH && ./run_cull.sh > $LOG_PATH/cull.out 2> $LOG_PATH/cull.err"
-    sleep 1 # give the session time to spin up
-    if ! sudo screen -list | grep -q "collector"; then
-      echo -e "\n\n**********************"
-      echo -e "Failed to start collector"
-      echo "**********************"
-      cat $LOG_PATH/cull.err
-      return -1
-    fi
-    echo "done"
-  else 
-    echo "--> skipping collector startup because you are running in debug mode" 
-  fi
-
-  echo -e "\nRunning Screens"
-  sudo screen -list 
-}
 
 start_systemctl(){
 
@@ -444,10 +283,8 @@ display_usage() {
    echo "usage: $0 build --clean      # force a clean build the jupyter docker images"
    echo "usage: $0 update             # update the base docker image on a production server (designed to minimize server downtime)"
    echo "usage: $0 start              # start the jupyterhub services (using systemd)"
-   echo "usage: $0 start --debug      # [DEPRECATED] start the jupyterhub in debug mode, necessary for development (using screen)"
    echo "usage: $0 stop               # stop all jupyterhub services (using systemd)"
-   echo "usage: $0 clean --systemd    # clean all jupyterhub images, containers, and system files (using systemd)"
-   echo "usage: $0 clean --screen     # [DEPRECATED] clean all jupyterhub images, containers, and system files (using screen)"
+   echo "usage: $0 clean              # clean all jupyterhub images, containers, and system files (using systemd)"
    echo "usage: $0 test               # run unittests"
    echo "***"
 }
