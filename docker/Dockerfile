@@ -102,7 +102,7 @@ RUN conda create -y -n R
 RUN conda update conda -y  #(conda update --all)
 
 RUN conda install -n R -c r \
- r-essentials
+ r-essentials \
  r-xml \
  r-rjsonio
 
