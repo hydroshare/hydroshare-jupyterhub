@@ -17,7 +17,6 @@ def sanity_check(string):
 
 @app.task
 def run_container(image_name, vol_mount, mount_target, invoker_id, env_vars={}):
-    print('long time task begins')
     print("Name: %s" % image_name)
     print("Local Relative Path: %s" % vol_mount)
     print("Mount target: %s" % mount_target)
