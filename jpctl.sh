@@ -185,6 +185,12 @@ build_docker() {
   # remove the jupyterhub/singleuser image
   echo -e "--> building the \"jupyterhub/singleuser\" image"
   docker build -f ./docker/Dockerfile -t jupyterhub/singleuser .
+
+  # build celery workers
+  echo -e "--> building celery workers"
+  docker-compose -f docker/celery/docker-compose.yml build
+  docker-compose -f docker/celery/docker-compose.yml scale worker=5
+ 
 }
 
 update_docker_images() {
@@ -231,6 +237,9 @@ start_systemctl(){
    sleep 3
    isactive jupyterhubrestserver
 
+   echo -e "--> starting celery workers..."
+   docker-compose -f docker/celery/docker-compose.yml up -d
+
    echo -e "To view systemd logs:\n  journalctl -f -u jupyterhub\n"
 
 }
@@ -246,6 +255,10 @@ stop_systemctl(){
    echo -e "--> stopping jupyterhub rest server..."
    sudo systemctl stop jupyterhubrestserver
    isactive jupyterhubrestserver
+
+   echo -e "--> stopping celery workers..."
+   docker-compose -f docker/celery/docker-compose.yml stop
+
 }
 
 isactive() {
