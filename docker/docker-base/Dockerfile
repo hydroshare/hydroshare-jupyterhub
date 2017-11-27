@@ -9,90 +9,108 @@ USER root
 # ROOT - INSTALL LIBRARIES #
 ############################
 
-RUN apt-get clean && apt-get update --fix-missing
-
-RUN apt-get install --fix-missing -y \ 
-    libgeos-dev \
-    mpic++ \
-    libproj-dev \   
-    libfuse2 \
-    libfuse-dev \
-    build-essential \ 
-    git \ 
-    subversion \
-    p7zip-full \
-    python \
-    python-dev \
-    python-pip \
-    python-scipy \
-    libxml2-dev \
-    libxslt-dev \
-    libgdal-dev \  
-    libgdal-doc \
-    gdal-bin \
-    python-gdal \
-    grass \
-    grass-dev \
-    libbsd-dev \
-    vlc  \
-    libx11-dev \
-&& rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install --fix-missing -y --no-install-recommends \ 
+  libgeos-dev \
+  mpic++ \
+  libproj-dev \   
+  libfuse2 \
+  libfuse-dev \
+  build-essential \ 
+  git \ 
+  subversion \
+  p7zip-full \
+  python \
+  python-dev \
+  python-pip \
+  python-scipy \
+  libxml2-dev \
+  libxslt-dev \
+  libgdal-dev \  
+  libgdal-doc \
+  gdal-bin \
+  python-gdal \
+  grass \
+  grass-dev \
+  libbsd-dev \
+  vlc  \
+  libx11-dev \
+  && apt-get clean \
+  && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/
 
 ###################################
 #          SYSTEM PREP            #
 ###################################
 
-# upgrade andaconda
-RUN conda update conda -y
-
 # create directories
-RUN mkdir /home/jovyan/libs && chown -R jovyan:users /home/jovyan/libs
-RUN mkdir /home/jovyan/work/notebooks && chown -R jovyan:users /home/jovyan/work/notebooks
+RUN mkdir /home/jovyan/libs \
+  && chown -R jovyan:users /home/jovyan/libs \
+  && mkdir /home/jovyan/work/notebooks \
+  && chown -R jovyan:users /home/jovyan/work/notebooks
 
 # fetch juptyerhub-singleuser entrypoint
-RUN wget -q https://raw.githubusercontent.com/jupyterhub/jupyterhub/master/scripts/jupyterhub-singleuser -O /usr/local/bin/jupyterhub-singleuser && \
-    chmod 755 /usr/local/bin/jupyterhub-singleuser
+RUN wget -q https://raw.githubusercontent.com/jupyterhub/jupyterhub/master/scripts/jupyterhub-singleuser -O /usr/local/bin/jupyterhub-singleuser \
+  && chmod 755 /usr/local/bin/jupyterhub-singleuser
 ADD singleuser.sh /srv/singleuser/singleuser.sh
 
-# link conda python2 (used by jupyterhub) to python22
-RUN ln -s /opt/conda/envs/python2/bin/python2 /usr/bin/python22
+# Prepare celery and add celery tasks
+RUN mkdir /home/jovyan/libs/celeryworker
+ADD celery/celeryworker  /home/jovyan/libs/celeryworker/
 
 # fetch the ecohydro config file
 ADD https://raw.github.com/selimnairb/RHESSysWorkflows/master/docs/config/ecohydro-Linux.cfg /home/jovyan/.ecohydro.cfg
 RUN chown jovyan:users /home/jovyan/.ecohydro.cfg
 
-# Prepare celery and add celery tasks
-RUN mkdir /home/jovyan/libs/celeryworker
-ADD docker/celery/celeryworker  /home/jovyan/libs/celeryworker/
-
 USER jovyan
+
+####################################
+#      SETUP CONDA ENVIRONMENTS    #
+####################################
+
+# upgrade andaconda
+# create python2 and R envs
+RUN conda update conda -y \
+  && conda create -y -n python2 python=2 \
+  && conda create -y -n R \
+  && conda clean --all -y
+
+# link environments to bin
+USER root
+ RUN ln -sf /opt/conda/envs/python2/bin/python2 /usr/bin/python22 \
+   && ln -sf /opt/conda/bin/python /usr/bin/python3 \
+   && ln -sf /opt/conda/envs/python2/bin/pip /usr/bin/pip2 \
+   && ln -sf /opt/conda/bin/pip /usr/bin/pip3 \
+   && ln -s /opt/conda/envs/R/bin/R /usr/bin/R \
+   && ln -s /opt/conda/envs/R/bin/Rscript /usr/bin/Rscript
+USER jovyan
+
+# update pip environments
+RUN pip3 install --no-cache-dir --upgrade pip \
+  && pip2 install --no-cache-dir --upgrade pip
 
 ###################################
 #          INSTALL TAUDEM         #
 ###################################
 
 # TAUDEM v5.3.7 - build and install taudem (must happen before rhesyss b/c of gdal conflicts)
-RUN git clone https://github.com/dtarb/TauDEM.git /home/jovyan/libs/TauDEM
-RUN cd /home/jovyan/libs/TauDEM && git checkout tags/v5.3.7
-RUN cd /home/jovyan/libs/TauDEM/src && make
+USER root
+RUN git clone --branch v5.3.7 https://github.com/dtarb/TauDEM.git /home/jovyan/libs/TauDEM \
+  && cd /home/jovyan/libs/TauDEM/src \
+  && sed -i 's#\.\.#/usr/local/bin#g' makefile \
+  && make \
+  && rm -rf /home/jovyan/libs/TauDEM
+USER jovyan
 
 ###################################
 #       INSTALL ECOHYDROLIB       #
 ###################################
 
-RUN git clone https://github.com/leonard-psu/EcohydroLib.git /home/jovyan/libs/EcohydroLib
-RUN /bin/bash -c "source /opt/conda/bin/activate python2  \
-&& cd ../libs/EcohydroLib \
-&& python setup.py install "
+RUN pip2 install git+https://github.com/leonard-psu/EcohydroLib.git
 
 ###################################
 #     INSTALL RHESSysWorkflows    #
 ###################################
 
-RUN git clone https://github.com/leonard-psu/RHESSysWorkflows.git /home/jovyan/libs/RHESSysWorkflows
-RUN /bin/bash -c "source /opt/conda/bin/activate python2 \
-&& cd ../libs/RHESSysWorkflows \
-&& python setup.py install"
+RUN pip2 install git+https://github.com/leonard-psu/RHESSysWorkflows.git
 
 # load the rhessys configuration file and modify for the current user
 RUN sed -i -e 's|^ETC.*|ETC = /home/jovyan/libs/RHESSysWorkflows/etc|g' /home/jovyan/.ecohydro.cfg &&\
@@ -110,32 +128,34 @@ ADD ./run.py /home/jovyan/libs/run.py
 RUN wget -O /home/jovyan/libs/boost.tar.gz https://sourceforge.net/projects/boost/files/boost/1.53.0/boost_1_53_0.tar.gz/download \
  && mkdir /home/jovyan/libs/boost \
  && tar xzfv /home/jovyan/libs/boost.tar.gz -C /home/jovyan/libs/boost --strip-components 1
-
-  ###### BEGIN ROOT #######
-  USER root
-  RUN apt-get install -y libblas-dev liblapack-dev cmake \
-   && cd /home/jovyan/libs/boost && ./bootstrap.sh --prefix=/usr/local \
-   && echo "using mpi ;" >> /home/jovyan/libs/boost/tools/build/v2/user-config.jam \
-   && cd /home/jovyan/libs/boost && ./b2 --with=all -j 4 install; exit 0 \
-   && sh -c 'echo "/usr/local/lib" >> /etc/ld.so.conf.d/local.conf' \
-   && ldconfig
-  USER jovyan
-  ####### END ROOT ########
-
 RUN wget https://dakota.sandia.gov/sites/default/files/distributions/public/dakota-6.5-public.src.tar.gz -P /home/jovyan/libs \
  && tar xzf /home/jovyan/libs/dakota-6.5-public.src.tar.gz -C /home/jovyan/libs \
  && mkdir /home/jovyan/libs/dakota-6.5.0.src/build 
-ADD docker/dakota_template.cmake /home/jovyan/libs/dakota-6.5.0.src/build/BuildDakota.cmake
-RUN cd /home/jovyan/libs/dakota*.src/build \
- && cmake -C BuildDakota.cmake /home/jovyan/libs/dakota*.src
+ADD dakota_template.cmake /home/jovyan/libs/dakota-6.5.0.src/build/BuildDakota.cmake
+ENV LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
 
   ###### BEGIN ROOT #######
   USER root
-  ENV LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
-  RUN cd /home/jovyan/libs/dakota*.src/build \
+  RUN buildDeps='liblapack-dev python3-dev cmake' \
+   && apt-get update && apt-get install -y libopenblas-dev $buildDeps --no-install-recommends \
+   && rm -rf /var/lib/apt/lists/* \
+   # build and install boost
+   && cd /home/jovyan/libs/boost && ./bootstrap.sh --prefix=/usr/local \
+   && echo "using mpi ;" >> /home/jovyan/libs/boost/tools/build/v2/user-config.jam \
+   && export CPLUS_INCLUDE_PATH="$CPLUS_INCLUDE_PATH:/usr/include/python3.5m" \
+   && cd /home/jovyan/libs/boost && ./b2 --with=all -j 4 install || echo "Errors in boost installation" \
+   && sh -c 'echo "/usr/local/lib" >> /etc/ld.so.conf.d/local.conf' \
+   && ldconfig \
+   # build and install dakota
+   && cd /home/jovyan/libs/dakota*.src/build \
+   && cmake -DPYTHON_EXECUTABLE:FILEPATH=/usr/bin/python -C BuildDakota.cmake /home/jovyan/libs/dakota*.src \
    && make clean \
    && make \
-   && make install
+   && make install \
+   # remove boost and dakota source
+   && rm -rf /home/jovyan/libs/boost* /home/jovyan/libs/dakota* \
+   # remove build dependencies
+   && apt-get purge -y --auto-remove $buildDeps
   USER jovyan
   ####### END ROOT ########
 
@@ -143,8 +163,11 @@ RUN cd /home/jovyan/libs/dakota*.src/build \
 #         INSTALL DHSVM           #
 ###################################
 
-RUN git clone -b glacier https://github.com/pnnl/DHSVM-PNNL.git /home/jovyan/libs/DHSVM-PNNL
-RUN sed -i '/# CC = gcc/s/^# //' /home/jovyan/libs/DHSVM-PNNL/DHSVM/UFconfig/UFconfig.mk \
+USER root
+RUN buildDeps='liblapack-dev python3-dev cmake' \
+  && git clone -b glacier https://github.com/pnnl/DHSVM-PNNL.git /home/jovyan/libs/DHSVM-PNNL \
+  && apt-get update && apt-get install -y $buildDeps --no-install-recommends \
+  && sed -i '/# CC = gcc/s/^# //' /home/jovyan/libs/DHSVM-PNNL/DHSVM/UFconfig/UFconfig.mk \
   && sed -i '/# CFLAGS = -O3 -fexceptions/s/^# //' /home/jovyan/libs/DHSVM-PNNL/DHSVM/UFconfig/UFconfig.mk \
   && sed -i '/# BLAS = -lgoto -lfrtbegin -lg2c $(XERBLA) -lpthread/s/^# //' /home/jovyan/libs/DHSVM-PNNL/DHSVM/UFconfig/UFconfig.mk \
   && sed -i 's/F77 = gfortran/# &/' /home/jovyan/libs/DHSVM-PNNL/DHSVM/UFconfig/UFconfig.mk \
@@ -154,75 +177,73 @@ RUN sed -i '/# CC = gcc/s/^# //' /home/jovyan/libs/DHSVM-PNNL/DHSVM/UFconfig/UFc
   && sed -i 's/DEFS =  -DHAVE_X11 -DHAVE_GLACIER/DEFS =  -DHAVE_X11/' /home/jovyan/libs/DHSVM-PNNL/DHSVM/sourcecode/makefile \
   && rm /home/jovyan/libs/DHSVM-PNNL/DHSVM/Lib/libcxsparse.a \
   && cd /home/jovyan/libs/DHSVM-PNNL/DHSVM/Lib && make \
-  && cd /home/jovyan/libs/DHSVM-PNNL/DHSVM/sourcecode && make 
+  && cd /home/jovyan/libs/DHSVM-PNNL/DHSVM/sourcecode && make \
+  && mv /home/jovyan/libs/DHSVM-PNNL/DHSVM/sourcecode/DHSVM3.1.3 /usr/local/bin \
+  # remove DHSVM source 
+  && rm -rf /home/jovyan/libs/DHSVM* \
+  # remove build dependencies
+  && apt-get purge -y --auto-remove $buildDeps
+USER jovyan
+
+###################################
+#   INSTALL PYTHON 3 LIBRARIES    #
+###################################
+
+RUN conda install -y -n root \
+  gdal \
+  basemap \
+  landlab -c landlab \
+  && conda clean --all -y
+
+RUN pip3 install --no-cache-dir \
+  ulmo \
+  wget \
+  celery \ 
+  geopandas \ 
+  graphviz \
+  hs_restclient
+
+RUN pip3 install --no-cache-dir \
+  git+https://github.com/cybergis/jupyterlib.git 
+
+###################################
+#   INSTALL PYTHON 2 LIBRARIES    #
+###################################
+
+# Install Python 2 Modules
+RUN pip install --no-cache-dir \ 
+  ulmo \
+  wget \
+  celery \ 
+  geopandas \ 
+  graphviz \
+  hs_restclient
+
+RUN pip install --no-cache-dir \
+  git+https://github.com/cybergis/jupyterlib.git 
+
+RUN conda install -y -n python2 \
+  gdal \
+  basemap \
+  landlab -c landlab \
+  && conda clean --all -y
+
+#RUN pip install ulmo
+RUN conda install -y -n python2 -c odm2 odm2api \
+  && conda clean --all -y
 
 ###################################
 #      INSTALL NBExtensions       #
 ###################################
 
 RUN git clone https://github.com/Castronova/jupyter_contrib_nbextensions.git /home/jovyan/libs/jupyter_contrib_nbextensions
-RUN pip3 install -e /home/jovyan/libs/jupyter_contrib_nbextensions
+RUN pip3 install --no-cache-dir -e /home/jovyan/libs/jupyter_contrib_nbextensions
+USER root
 RUN jupyter contrib nbextension install --system
+USER jovyan
 RUN jupyter nbextension enable recursivedelete/main --user --section=tree
 RUN jupyter nbextensions_configurator disable --user
 RUN chown -R jovyan:users /home/jovyan/.jupyter
-
-###################################
-#   INSTALL PYTHON 3 LIBRARIES    #
-###################################
-
-# update environment
-RUN pip3 install --upgrade pip
-RUN conda update -n root --all -y
-
-# Install Python 3 Modules
-RUN conda install -y -n root \
-  gdal \
-  basemap \
-  landlab -c landlab
-
-RUN pip3 install \
-  ulmo \
-  wget \
-  celery \ 
-  geopandas \ 
-  graphviz \
-  hs_restclient
-
-RUN pip3 install git+https://github.com/cybergis/jupyterlib.git 
-# && pip3 install -e /home/jovyan/libs/hs_restclient --user
-
-
-RUN git clone -b master https://github.com/hydroshare/hs_restclient.git /home/jovyan/libs/hs_restclient
-#RUN cd /home/jovyan/libs/hs_restclient && git checkout tags/1.2.6
-
-###################################
-#   INSTALL PYTHON 2 LIBRARIES    #
-###################################
-
-# update environment
-RUN pip install --upgrade pip
-RUN conda update -n python2 --all -y
-
-# Install Python 2 Modules
-RUN pip install \ 
-  ulmo \
-  wget \
-  celery \ 
-  geopandas \ 
-  graphviz \
-  hs_restclient
-
-RUN pip install git+https://github.com/cybergis/jupyterlib.git 
-#  && pip install -e /home/jovyan/libs/hs_restclient --user
-
-RUN conda install -y -n python2 \
-  gdal \
-  basemap \
-  landlab -c landlab 
-
-#RUN pip install ulmo
-RUN conda install -y -n python2 -c odm2 odm2api
 
 ####################################
 # USER JOVYAN - SET PATH VARIABLES #
@@ -252,18 +273,11 @@ ENV \
 
 RUN mkdir /home/jovyan/.userRLib
 
-RUN conda create -y -n R \
-  && conda install -n R -c r \
+RUN conda install -n R -c r \
   r-essentials \
   r-xml \
-  r-rjsonio
-
-#  ###### BEGIN ROOT #######
-   USER root
-    RUN ln -s /opt/conda/envs/R/bin/R /usr/bin/R
-    RUN ln -s /opt/conda/envs/R/bin/Rscript /usr/bin/Rscript
-   USER jovyan
-#  ####### END ROOT ########
+  r-rjsonio \
+  && conda clean --all -y
 
 RUN echo "options(repos=structure(c(CRAN=\"http://archive.linux.duke.edu/cran\")))" >> /home/jovyan/.Rprofile \
   && Rscript -e "install.packages('devtools', repos='http://archive.linux.duke.edu/cran')" \
@@ -271,9 +285,9 @@ RUN echo "options(repos=structure(c(CRAN=\"http://archive.linux.duke.edu/cran\")
   && Rscript -e "install.packages('WaterML')" 
 
 ####################################
-#         INSTALL R IRODS          #
+#         INSTALL  IRODS           #
 ####################################
-ADD docker/icommands.sh /home/jovyan/libs/icommands.sh 
+ADD icommands.sh /home/jovyan/libs/icommands.sh 
 
 #  ###### BEGIN ROOT #######
    USER root
