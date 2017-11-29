@@ -6,10 +6,6 @@ MAINTAINER Tony Castronova <acastronova@cuahsi.org>
 ######################################################
 
 
-
-
-
-
 ###################################################
 ## End - JupyterHub Development Image Additions ###
 ###################################################

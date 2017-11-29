@@ -53,8 +53,9 @@ RUN wget -q https://raw.githubusercontent.com/jupyterhub/jupyterhub/master/scrip
 ADD singleuser.sh /srv/singleuser/singleuser.sh
 
 # Prepare celery and add celery tasks
-RUN mkdir /home/jovyan/libs/celeryworker
+RUN mkdir /home/jovyan/libs/celeryworker 
 ADD celery/celeryworker  /home/jovyan/libs/celeryworker/
+RUN chown -R jovyan:users /home/jovyan/libs/celeryworker  
 
 # fetch the ecohydro config file
 ADD https://raw.github.com/selimnairb/RHESSysWorkflows/master/docs/config/ecohydro-Linux.cfg /home/jovyan/.ecohydro.cfg
@@ -113,9 +114,9 @@ RUN pip2 install git+https://github.com/leonard-psu/EcohydroLib.git
 RUN pip2 install git+https://github.com/leonard-psu/RHESSysWorkflows.git
 
 # load the rhessys configuration file and modify for the current user
-RUN sed -i -e 's|^ETC.*|ETC = /home/jovyan/libs/RHESSysWorkflows/etc|g' /home/jovyan/.ecohydro.cfg &&\
-sed -i -e 's|^MODULE_PATH.*|MODULE_PATH = /home/jovyan/work/notebooks/.grass6/addons|g' /home/jovyan/.ecohydro.cfg &&\
-sed -i -e 's|^MODULE_ETC.*|MODULE_ETC = /home/jovyan/libs/RHESSysWorkflows/etc/r.soils.texture|g' /home/jovyan/.ecohydro.cfg
+RUN sed -i -e 's|^ETC.*|ETC = /home/jovyan/libs/RHESSysWorkflows/etc|g' /home/jovyan/.ecohydro.cfg \
+ && sed -i -e 's|^MODULE_PATH.*|MODULE_PATH = /home/jovyan/work/notebooks/.grass6/addons|g' /home/jovyan/.ecohydro.cfg \
+ && sed -i -e 's|^MODULE_ETC.*|MODULE_ETC = /home/jovyan/libs/RHESSysWorkflows/etc/r.soils.texture|g' /home/jovyan/.ecohydro.cfg
 
 # prepare grass environment
 ADD ./rhessys_wf.py /home/jovyan/libs/rhessys_wf.py
@@ -192,6 +193,7 @@ USER jovyan
 RUN conda install -y -n root \
   gdal \
   basemap \
+  jupyterhub=0.7.2 \
   landlab -c landlab \
   && conda clean --all -y
 
@@ -225,64 +227,16 @@ RUN pip install --no-cache-dir \
 RUN conda install -y -n python2 \
   gdal \
   basemap \
+  ipykernel \
   landlab -c landlab \
   && conda clean --all -y
+
+# register the python2 kernel  
+RUN python22 -m ipykernel install --user
 
 #RUN pip install ulmo
 RUN conda install -y -n python2 -c odm2 odm2api \
   && conda clean --all -y
-
-###################################
-#      INSTALL NBExtensions       #
-###################################
-
-RUN git clone https://github.com/Castronova/jupyter_contrib_nbextensions.git /home/jovyan/libs/jupyter_contrib_nbextensions
-RUN pip3 install --no-cache-dir -e /home/jovyan/libs/jupyter_contrib_nbextensions
-USER root
-RUN jupyter contrib nbextension install --system
-USER jovyan
-RUN jupyter nbextension enable recursivedelete/main --user --section=tree
-RUN jupyter nbextensions_configurator disable --user
-RUN chown -R jovyan:users /home/jovyan/.jupyter
-
-####################################
-# USER JOVYAN - SET PATH VARIABLES #
-####################################
-
-ENV \
-  PATH=/opt/conda/envs/python2/bin:/home/jovyan/libs/TauDEM:$PATH \
-  PYTHONPATH=/home/jovyan/work/notebooks:$PYTHONPATH \
-  DOCUMENTS=/home/jovyan/work/notebooks/documents \
-  DATA=/home/jovyan/work/notebooks/data \
-  HOME=/home/jovyan \
-  ECOHYDROLIB_CFG=/home/jovyan/.ecohydro.cfg \
-  LD_LIBRARY_PATH=/usr/lib/grass64/lib:$LD_LIBRARY_PATH \
-  NOTEBOOK_HOME=/home/jovyan/work/notebooks \
-  PATH=$PATH:/home/jovyan/libs/DHSVM-PNNL/DHSVM/sourcecode \
-  PATH=/home/jovyan/libs:$PATH \
-  PYTHONPATH=/home/jovyan/libs:$PYTHONPATH \
-  R_LIBS_SITE=/home/jovyan/.userRLib \ 
-  PATH=/home/jovyan/libs/icommands:$PATH \
-  IRODS_PLUGINS_HOME=/home/jovyan/libs/icommands/plugins/ \
-  IRODS_ENVIRONMENT_FILE=/home/jovyan/work/notebooks/data/.irods/irods_environment.json \ 
-  IRODS_AUTHENTICATION_FILE=/home/jovyan/work/notebooks/data/.irods/.irodsA
-
-####################################
-#          INSTALL R KERNEL        #
-####################################
-
-RUN mkdir /home/jovyan/.userRLib
-
-RUN conda install -n R -c r \
-  r-essentials \
-  r-xml \
-  r-rjsonio \
-  && conda clean --all -y
-
-RUN echo "options(repos=structure(c(CRAN=\"http://archive.linux.duke.edu/cran\")))" >> /home/jovyan/.Rprofile \
-  && Rscript -e "install.packages('devtools', repos='http://archive.linux.duke.edu/cran')" \
-  && Rscript -e "IRkernel::installspec(name = 'ir33', displayname = 'R 3.3')" \
-  && Rscript -e "install.packages('WaterML')" 
 
 ####################################
 #         INSTALL  IRODS           #
@@ -295,6 +249,51 @@ ADD icommands.sh /home/jovyan/libs/icommands.sh
      && echo "/home/jovyan/libs" | /home/jovyan/libs/icommands.sh
    USER jovyan
 #  ####### END ROOT ########
+
+####################################
+# USER JOVYAN - SET PATH VARIABLES #
+####################################
+ENV \
+  PATH="/opt/conda/envs/python2/bin:/home/jovyan/libs:/home/jovyan/libs/icommands":$PATH \
+  PYTHONPATH="/home/jovyan/work/notebooks:/home/jovyan/libs":$PYTHONPATH \
+  DOCUMENTS="/home/jovyan/work/notebooks/documents" \
+  DATA="/home/jovyan/work/notebooks/data" \
+  HOME="/home/jovyan" \
+  ECOHYDROLIB_CFG="/home/jovyan/.ecohydro.cfg" \
+  LD_LIBRARY_PATH="/usr/lib/grass64/lib:$LD_LIBRARY_PATH" \
+  NOTEBOOK_HOME="/home/jovyan/work/notebooks" \
+  R_LIBS_SITE="/home/jovyan/.userRLib" \
+  IRODS_PLUGINS_HOME="/home/jovyan/libs/icommands/plugins/" \
+  IRODS_ENVIRONMENT_FILE="/home/jovyan/work/notebooks/data/.irods/irods_environment.json" \
+  IRODS_AUTHENTICATION_FILE="/home/jovyan/work/notebooks/data/.irods/.irodsA"
+
+
+####################################
+#          INSTALL R KERNEL        #
+####################################
+
+RUN mkdir /home/jovyan/.userRLib \
+ && conda install -n R -c r \
+    r-essentials \
+    r-xml \
+    r-rjsonio \
+ && conda clean --all -y
+
+RUN echo "options(repos=structure(c(CRAN=\"http://archive.linux.duke.edu/cran\")))" >> /home/jovyan/.Rprofile \
+  && Rscript -e "install.packages('devtools', repos='http://archive.linux.duke.edu/cran')" \
+  && Rscript -e "IRkernel::installspec(name = 'ir33', displayname = 'R 3.3')" \
+  && Rscript -e "install.packages('WaterML')" 
+
+
+###################################
+#      INSTALL NBExtensions       #
+###################################
+
+RUN pip3 install --no-cache-dir git+https://github.com/Castronova/jupyter_contrib_nbextensions.git \
+ && jupyter contrib nbextension install --user \
+ && jupyter nbextension enable recursivedelete/main --user --section=tree \
+ && jupyter nbextensions_configurator disable --user \
+ && chown -R jovyan:users /home/jovyan/.jupyter
 
 #############################
 # ROOT - CLEANUP            #
