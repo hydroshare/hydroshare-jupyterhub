@@ -54,10 +54,10 @@ RUN wget -q https://raw.githubusercontent.com/jupyterhub/jupyterhub/master/scrip
   && chmod 755 /usr/local/bin/jupyterhub-singleuser
 ADD singleuser.sh /srv/singleuser/singleuser.sh
 
-# Prepare celery and add celery tasks
-RUN mkdir /home/jovyan/libs/celeryworker 
-ADD celery/celeryworker  /home/jovyan/libs/celeryworker/
-RUN chown -R jovyan:users /home/jovyan/libs/celeryworker  
+## Prepare celery and add celery tasks
+#RUN mkdir /home/jovyan/libs/celeryworker 
+#ADD celery/celeryworker  /home/jovyan/libs/celeryworker/
+#RUN chown -R jovyan:users /home/jovyan/libs/celeryworker  
 
 # fetch the ecohydro config file
 ADD https://raw.github.com/selimnairb/RHESSysWorkflows/master/docs/config/ecohydro-Linux.cfg /home/jovyan/.ecohydro.cfg
