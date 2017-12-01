@@ -85,8 +85,8 @@ USER root
 USER jovyan
 
 # update pip environments
-RUN pip3 install --no-cache-dir --upgrade pip \
-  && pip2 install --no-cache-dir --upgrade pip
+#RUN pip3 install --no-cache-dir --upgrade pip \
+#  && pip2 install --no-cache-dir --upgrade pip
 
 ###################################
 #          INSTALL TAUDEM         #
@@ -186,58 +186,6 @@ RUN buildDeps='liblapack-dev python3-dev cmake' \
   && apt-get purge -y --auto-remove $buildDeps
 USER jovyan
 
-###################################
-#   INSTALL PYTHON 3 LIBRARIES    #
-###################################
-
-RUN conda install -y -n root \
-  gdal \
-  basemap \
-  jupyterhub=0.7.2 \
-  landlab -c landlab \
-  && conda clean --all -y
-
-RUN pip3 install --no-cache-dir \
-  ulmo \
-  wget \
-  celery \ 
-  geopandas \ 
-  graphviz \
-  hs_restclient
-
-RUN pip3 install --no-cache-dir \
-  git+https://github.com/cybergis/jupyterlib.git 
-
-###################################
-#   INSTALL PYTHON 2 LIBRARIES    #
-###################################
-
-# Install Python 2 Modules
-RUN pip install --no-cache-dir \ 
-  ulmo \
-  wget \
-  celery \ 
-  geopandas \ 
-  graphviz \
-  hs_restclient
-
-RUN pip install --no-cache-dir \
-  git+https://github.com/cybergis/jupyterlib.git 
-
-RUN conda install -y -n python2 \
-  gdal \
-  basemap \
-  ipykernel \
-  landlab -c landlab \
-  && conda clean --all -y
-
-# register the python2 kernel  
-RUN python22 -m ipykernel install --user
-
-#RUN pip install ulmo
-RUN conda install -y -n python2 -c odm2 odm2api \
-  && conda clean --all -y
-
 ####################################
 #         INSTALL  IRODS           #
 ####################################
@@ -284,6 +232,87 @@ RUN echo "options(repos=structure(c(CRAN=\"http://archive.linux.duke.edu/cran\")
   && Rscript -e "IRkernel::installspec(name = 'ir33', displayname = 'R 3.3')" \
   && Rscript -e "install.packages('WaterML')" 
 
+###################################
+#   INSTALL PYTHON 3 LIBRARIES    #
+###################################
+
+RUN conda config --add channels conda-forge \ 
+ && conda config --add channels landlab \ 
+ && conda config --add channels odm2
+
+RUN conda install -y -n root \
+  gdal \
+  basemap \
+  jupyterhub=0.7.2 \
+  landlab \
+  ulmo \
+  celery \ 
+  geopandas \ 
+  graphviz \
+  && conda clean --all -y
+
+RUN pip3 install --no-cache-dir \
+  hs_restclient \
+  wget \
+  git+https://github.com/cybergis/jupyterlib.git 
+
+
+###################################
+#   INSTALL PYTHON 2 LIBRARIES    #
+###################################
+
+# PYTHON2 LEGACY
+#RUN conda create --name py2legacy --clone python2
+#RUN conda create --name py2legacy python=2.7
+
+#RUN conda install -y -n py2legacy \
+#    pandas=0.19 \
+#    gdal \
+#    basemap \
+#    ipykernel \
+#    ulmo \
+#    geopandas \
+#    graphviz \
+#    wget \
+##=1.19.1=he4ec0ba_0 \
+#    celery \
+# && conda clean --all -y
+#
+#RUN /opt/conda/envs/py2legacy/bin/pip install --no-cache-dir \ 
+#    hs_restclient 
+##    git+https://github.com/cybergis/jupyterlib.git
+#
+#RUN /opt/conda/envs/py2legacy/bin/python -m ipykernel install \ 
+#    --prefix=/opt/conda/envs/py2legacy \
+#    --display-name "Python 2 - Legacy"
+#
+
+# PYTHON 2
+RUN conda install -y -n python2 \
+    pandas \
+    gdal \
+    basemap \
+    ipykernel \
+    ulmo \
+    celery \
+    geopandas \
+    graphviz \
+    statsmodels \
+    odm2api \ 
+    landlab \ 
+ && conda clean --all -y
+
+RUN /opt/conda/envs/python2/bin/python \
+ && pip install --no-cache-dir \ 
+    hs_restclient \
+    wget \
+    git+https://github.com/cybergis/jupyterlib.git
+
+# register the kernels
+RUN python -m ipykernel install \
+    --user \
+    --name "python2" \
+    --display-name "Python 2.7" 
 
 ###################################
 #      INSTALL NBExtensions       #
@@ -295,13 +324,13 @@ RUN pip3 install --no-cache-dir git+https://github.com/Castronova/jupyter_contri
  && jupyter nbextensions_configurator disable --user \
  && chown -R jovyan:users /home/jovyan/.jupyter
 
-#############################
-# ROOT - CLEANUP            #
-#############################
-USER root
-RUN conda clean --all -y
-RUN apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+##############################
+## ROOT - CLEANUP            #
+##############################
+#USER root
+#RUN conda clean --all -y
+#RUN apt-get clean && \
+#    rm -rf /var/lib/apt/lists/*
 
 ########################################
 # SWITCH BACK TO JOVYAN BEFORE LEAVING #
