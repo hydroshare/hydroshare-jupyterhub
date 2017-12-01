@@ -18,7 +18,8 @@ class iCommands(object):
         self.ienv = os.path.join(self.irods_dir, '.irods/irods_environment.json')
 
         if not os.path.exists(self.iauth):
-            print('Configuring iCommands', flush=True)
+            print('Configuring iCommands')
+            sys.stdout.flush()
             time.sleep(.25)
             self._init_icommands()
 
@@ -35,7 +36,8 @@ class iCommands(object):
             username = input('iRODs username: ')
             home_dir = input('iRODs home directory (leave blank if unknown): ') or None
             json = os.path.join(irods_config, 'irods_environment.json')
-            print('Writing irods environment file', flush=True)
+            print('Writing irods environment file')
+            sys.stdout.flush()
             print(json)
             with open(json, 'w') as f:
                 f.write('{\n')
@@ -48,7 +50,8 @@ class iCommands(object):
                 f.write('\n}')
             
             
-        print('Initializing environment', flush=True)
+        print('Initializing environment')
+        sys.stdout.flush()
         p = getpass.getpass('Please enter your iRODS password: ')
         irods_cmd = 'iinit -V %s' % (p)
         cmd = Popen([irods_cmd], stdout=PIPE, stderr=STDOUT, shell=True)
@@ -57,7 +60,8 @@ class iCommands(object):
             print('Failed to fetch irods file: %s' % stdout)
             return []
         else:
-            print('Authentication Successful', flush=True)
+            print('Authentication Successful')
+            sys.stdout.flush()
             
         
     def iinit(self):
