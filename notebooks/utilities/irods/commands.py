@@ -17,11 +17,19 @@ class iCommands(object):
         self.iauth = os.path.join(self.irods_dir, '.irods/.irodsA')
         self.ienv = os.path.join(self.irods_dir, '.irods/irods_environment.json')
 
-        if not os.path.exists(self.iauth):
-            print('Configuring iCommands')
+        if not os.path.exists(self.ienv):
+            print('iRODS not configuration found')
             sys.stdout.flush()
             time.sleep(.25)
             self._init_icommands()
+        else:
+            print('iRODS configuration found:')
+            with open(self.ienv, 'r') as f:
+                for line in f.readlines():
+                    print(line.strip())
+        print('\nTo connect to a different iRODS host use:')
+        print('   iCommands.iinit()')
+
 
     def _init_icommands(self):
         irods_config = os.path.join(self.irods_dir, '.irods')
