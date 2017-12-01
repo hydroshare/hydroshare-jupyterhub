@@ -54,12 +54,18 @@ c.DockerSpawner.volumes = {
    os.environ['JUPYTER_STATIC_DIR']: '/home/jovyan/.jupyter/custom',
 }
 
-# IRODS settings 
+# SSL
+c.NotebookApp.certfile = u'/volume/hydro-develop/cert.pem'
+c.NotebookApp.keyfile = u'/volume/hydro-develop/key.pem'
+
+
+# Spawner configuration/settings 
 # http://stackoverflow.com/questions/37144357/link-containers-with-the-docker-python-api
 c.DockerSpawner.extra_host_config = {
-    'privileged':True,
-    'cap_add':['SYS_ADMIN','MKNOD'],
-    'devices':['/dev/fuse'],
+#    'privileged':True,
+#    'devices':['/dev/fuse'],
+#    'cap_add':['SYS_ADMIN','MKNOD', 'SYS_PTRACE'],
+    'cap_add':['SYS_PTRACE'],
     'security_opt':['apparmor:unconfined'],
     'mem_limit':'5g'
 }

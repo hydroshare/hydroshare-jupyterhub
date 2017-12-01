@@ -34,6 +34,8 @@ RUN apt-get update && apt-get install --fix-missing -y --no-install-recommends \
   libbsd-dev \
   vlc  \
   libx11-dev \
+  man-db \
+  bash-completion \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/
 
@@ -300,13 +302,16 @@ RUN conda install -y -n python2 \
     statsmodels \
     odm2api \ 
     landlab \ 
+    bsddb \ 
  && conda clean --all -y
 
 RUN /opt/conda/envs/python2/bin/python \
  && pip install --no-cache-dir \ 
     hs_restclient \
     wget \
-    git+https://github.com/cybergis/jupyterlib.git
+    sciunit2 \
+    git+https://github.com/cybergis/jupyterlib.git \ 
+ && sciunit post-install 
 
 # register the kernels
 RUN python -m ipykernel install \
