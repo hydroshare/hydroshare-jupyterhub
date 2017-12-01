@@ -121,8 +121,8 @@ RUN sed -i -e 's|^ETC.*|ETC = /home/jovyan/libs/RHESSysWorkflows/etc|g' /home/jo
  && sed -i -e 's|^MODULE_ETC.*|MODULE_ETC = /home/jovyan/libs/RHESSysWorkflows/etc/r.soils.texture|g' /home/jovyan/.ecohydro.cfg
 
 # prepare grass environment
-ADD ./rhessys_wf.py /home/jovyan/libs/rhessys_wf.py
-ADD ./run.py /home/jovyan/libs/run.py
+ADD rhessys_wf.py /home/jovyan/libs/rhessys_wf.py
+ADD run.py /home/jovyan/libs/run.py
 
 ###################################
 #     INSTALL BOOST AND DAKOTA    #
