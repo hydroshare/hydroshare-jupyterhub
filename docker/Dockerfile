@@ -27,10 +27,6 @@ RUN pip install wget
 RUN pip3 install wget 
 RUN pip install ulmo
 
-# patch hs_restclient v1.2.6 
-ADD docker/hs_restclient.patch /home/jovyan/libs/hs_restclient/hs_restclient/hs_restclient.patch
-RUN cd /home/jovyan/libs/hs_restclient/hs_restclient && patch < hs_restclient.patch
-
 # install DHSVM (need to modify UFconfig.mk for linux)
 RUN git clone -b glacier https://github.com/pnnl/DHSVM-PNNL.git /home/jovyan/libs/DHSVM-PNNL
 RUN sed -i '/# CC = gcc/s/^# //' /home/jovyan/libs/DHSVM-PNNL/DHSVM/UFconfig/UFconfig.mk
@@ -96,34 +92,33 @@ RUN pip3 install git+https://github.com/cybergis/jupyterlib.git
   USER root
 
   # register the kernel in the current R installation
-  RUN sh -c 'echo "deb http://cran.rstudio.com/bin/linux/debian jessie-cran3/" >> /etc/apt/sources.list'
-  RUN gpg --keyserver keyserver.ubuntu.com --recv-key E084DAB9
-  RUN gpg -a --export E084DAB9 | apt-key add -
-  RUN apt-key update
+  RUN echo "deb http://cran.stat.ucla.edu/bin/linux/ubuntu xenial/" | tee --append /etc/apt/sources.list.d/cran.list
+  RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E084DAB9
   RUN apt-get update
-  
-  # required libs for installing R packages
-  RUN apt-get -y install \
-      libcurl4-openssl-dev \
-      libssl-dev \
-      make \
-      gcc \
-      g++
-  
-  # install R-base packages (including IRKernel)
-  RUN apt-get install --allow-unauthenticated --no-install-recommends -y r-base=3.3*
-  RUN Rscript -e "install.packages('devtools', repos='http://archive.linux.duke.edu/cran')"
-  RUN Rscript -e "devtools::install_github('IRkernel/IRkernel')"
-  USER jovyan
+  RUN apt-get install --no-install-recommends -y r-base=3.4*
+
+  # install cmdline helpers
+  RUN apt-get install -y man-db
+  RUN apt-get install -y bash-completion
+
   ####### END ROOT ########
 
+  USER jovyan
+
+# install R-base packages (including IRKernel)
+RUN Rscript -e "install.packages('devtools', repos='http://archive.linux.duke.edu/cran')"
+RUN Rscript -e "devtools::install_github('IRkernel/IRkernel')"
 RUN Rscript -e "IRkernel::installspec(name = 'ir33', displayname = 'R 3.3')"
 
-RUN pip install geopandas
-RUN pip3 install geopandas
+RUN pip --no-cache-dir install geopandas
+RUN pip3 --no-cache-dir install geopandas
 
 RUN pip install graphviz
 RUN pip3 install graphviz
+
+RUN conda install -y -n python2 bsddb
+RUN pip install sciunit2
+RUN sciunit post-install
 
 ###################################################
 ## End - JupyterHub Development Image Additions ###

@@ -47,14 +47,16 @@ c.DockerSpawner.volumes = {
 # SSL
 c.NotebookApp.certfile = u'/volume/hydro-develop/cert.pem'
 c.NotebookApp.keyfile = u'/volume/hydro-develop/key.pem'
-# IRODS settings 
+# IRODS and Sciunit settings
 # http://stackoverflow.com/questions/37144357/link-containers-with-the-docker-python-api
-#c.DockerSpawner.extra_host_config = {
+# http://blog.johngoulah.com/2016/03/running-strace-in-docker/
+c.DockerSpawner.extra_host_config = {
 #    'privileged':True,
 #    'cap_add':['SYS_ADMIN','MKNOD'],
+    'cap_add':['SYS_PTRACE'],
 #    'devices':['/dev/fuse'],
-#    'security_opt':['apparmor:unconfined']
-#}
+    'security_opt':['apparmor:unconfined']
+}
 
 #c.NotebookApp.extra_static_paths = ['/home/jovyan/work/notebooks/.ipython/profile_default/static']
 

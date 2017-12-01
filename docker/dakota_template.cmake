@@ -65,7 +65,7 @@
 ##############################################################################
 set( DAKOTA_HAVE_MPI ON
      CACHE BOOL "Build with MPI enabled" FORCE)
-set( MPI_CXX_COMPILER "/usr/bin/mpicc"
+set( MPI_CXX_COMPILER "/usr/bin/mpicxx"
      CACHE FILEPATH "Use MPI compiler wrapper" FORCE)
 
 ##############################################################################
@@ -78,7 +78,7 @@ set( MPI_CXX_COMPILER "/usr/bin/mpicc"
 #ENDIF()
 
 set(BOOST_ROOT
-    "/usr/include"
+    "/usr/local"
     CACHE PATH "Use non-standard Boost install" FORCE)
 #set( Boost_NO_SYSTEM_PATHS TRUE
 #     CACHE BOOL "Supress search paths other than BOOST_ROOT" FORCE)
