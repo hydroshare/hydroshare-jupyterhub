@@ -6,18 +6,28 @@ import sys
 c = get_config()
 
 # set container culling properties
-c.JupyterHub.services = [
-    {
-        'name': 'cull-idle',
-        'admin': True,
-        'command': 'python3 /etc/jupyterhub/cull/cull_idle_servers.py --timeout=3600'.split(),
-    }
-]
+#c.JupyterHub.services = [
+#    {
+#        'name': 'cull-idle',
+#        'admin': True,
+#        'command': 'python3 /etc/jupyterhub/cull/cull_idle_servers.py --timeout=3600'.split(),
+#    }
+#]
+
+ssl_dir = '/etc/ssl/certs/cuahsi.org'
 
 try:
     # spawn with Docker
     c.JupyterHub.spawner_class = 'dockerspawner.DockerSpawner'
     c.JupyterHub.confirm_no_ssl = True
+
+    c.DockerSpawner.extra_host_config = {'mem_limit':'5g'}
+
+    # https on :443
+#    c.JupyterHub.port = 443
+#    c.JupyterHub.ssl_key = join(ssl_dir, 'cuahsi.key')
+#    c.JupyterHub.ssl_cert = join(ssl_dir, 'cuahsi.cer')
+
     c.JupyterHub.port = int(os.environ['JUPYTER_PORT'])
     c.DockerSpawner.hub_ip_connect = os.environ['DOCKER_SPAWNER_IP']
     c.DockerSpawner.remove_containers = True
@@ -47,16 +57,18 @@ c.DockerSpawner.volumes = {
 # SSL
 c.NotebookApp.certfile = u'/volume/hydro-develop/cert.pem'
 c.NotebookApp.keyfile = u'/volume/hydro-develop/key.pem'
-# IRODS and Sciunit settings
+
+
+# Spawner configuration/settings 
 # http://stackoverflow.com/questions/37144357/link-containers-with-the-docker-python-api
-# http://blog.johngoulah.com/2016/03/running-strace-in-docker/
 c.DockerSpawner.extra_host_config = {
 #    'privileged':True,
-#    'cap_add':['SYS_ADMIN','MKNOD'],
-    'cap_add':['SYS_PTRACE'],
 #    'devices':['/dev/fuse'],
-    'security_opt':['apparmor:unconfined']
+#    'cap_add':['SYS_ADMIN','MKNOD', 'SYS_PTRACE'],
+    'cap_add':['SYS_PTRACE'],
+    'security_opt':['apparmor:unconfined'],
+    'mem_limit':'5g'
 }
 
-#c.NotebookApp.extra_static_paths = ['/home/jovyan/work/notebooks/.ipython/profile_default/static']
-
+c.NotebookApp.extra_static_paths = ['/home/jovyan/work/notebooks/.ipython/profile_default/static']
+c.DockerSpawner.notebook_dir = '/home/jovyan/work'
