@@ -60,7 +60,6 @@ $(document).ready(function(){
     foot.appendChild(right);
     
     // insert the footer at the bottom of the page 
-    var insertAfterElement = document.getElementById('pager')
-    insertAfterElement.parentNode.insertBefore(foot, insertAfterElement.nextSibling)
+    document.getElementById('notebook_panel').appendChild(foot);
 
 });
