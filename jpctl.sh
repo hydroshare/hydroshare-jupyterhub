@@ -161,13 +161,77 @@ install() {
     echo -e "--> installing jupyterhub rest server"
     sudo -H pip3 install -e $JUPYTERHUBRESTSERVER
 
+	
+    # install jupyterhub services
+    update_configs
+}
+
+update_configs(){
+    
+   
     # install jupyterhub services
     echo -e "--> installing jupyterhub services"
     echo -e "----> copying config-prod to install directory"
     cp $JUPYTER_PATH/config.py $INSTALL_TMP_DIR/config.py
+
     echo -e "----> copying env to install directory"
     cp $JUPYTER_PATH/env $INSTALL_TMP_DIR/env
+
+    echo -e "----> copying static files to install directory"
+    cp -rf $JUPYTER_PATH/static $INSTALL_TMP_DIR
+
     sudo $INSTALL_TMP_DIR/install-services.sh
+}
+
+create_env_config() {
+
+    echo -e "--> Creating JupyterHub Environment File"  
+    echo -e "---> Printing some info that might be helpful:"
+    echo -e "----------------------------------------------"
+    ifconfig eth0
+    ifconfig docker
+    echo -e "----------------------------------------------"
+    echo -n "JupyterHub IP (usually eth0): "
+    read JH_IP
+    echo -n "JupyterHub REST API port (usually 8080): "
+    read JH_REST_PORT
+    echo -n "Docker Spawner IP (usually docker0): "
+    read DOCKER_IP
+    echo -n "HS Client ID (see hydroshare.org/o/applications): "
+    read HS_CLIENT_ID
+    echo -n "HS Client Secret (see hydroshare.org/o/applications): "
+    read HS_CLIENT_SECRET
+    echo -n "JupyterHub userspace directory: "
+    read JH_USERSPACE
+    echo -n "JupyterHub notebook directory: "
+    read JH_NOTEBOOK
+    echo -n "JupyterHub API token: "
+    read JH_API_TOKEN
+
+    # HydroShare Settings
+    echo "HYDROSHARE_CLIENT_ID=$HS_CLIENT_ID
+HYDROSHARE_CLIENT_SECRET=$HS_CLIENT_SECRET
+OAUTH_CALLBACK_URL=http://$JH_IP/hub/oauth_callback
+HYDROSHARE_USE_WHITELIST=0
+HYDROSHARE_REDIRECT_COOKIE_PATH=/etc/jupyterhub/rest/redirect
+
+# Jupyter Notebook Settings
+JUPYTER_HUB_IP=$JH_IP
+JUPYTER_PORT=80
+JUPYTER_NOTEBOOK_DIR=$JH_NOTEBOOK
+JUPYTER_USERSPACE_DIR=$JH_USERSPACE
+JPY_API_TOKEN=$JH_API_TOKEN
+JUPYTER_USER=root
+JUPYTER_LOG=/etc/jupyterhub/log/jupyter.log
+JUPYTER_STATIC_DIR=/etc/jupyterhub/static/custom
+
+# Jupyterhub REST Settings
+JUPYTER_REST_IP=$JH_IP
+JUPYTER_REST_PORT=$JH_REST_PORT
+
+# Docker Settings
+DOCKER_SPAWNER_IP=$DOCKER_IP
+" > $JUPYTER_PATH/env
 
 }
 
@@ -440,6 +504,9 @@ display_usage() {
    echo "*** JupyterHub Control Script ***"
    echo "usage: $0 install --ubuntu   # install required software and build jupyterhub docker containers (ubuntu)"
    echo "usage: $0 install --rhel     # install required software and build jupyterhub docker containers (RHEL)"
+   echo "usage: $0 restart	      # restart the jupyterhub service" 
+   echo "usage: $0 configure	      # set/update jupyterhub configuration files"
+   echo "usage: $0 config-envs	      # set the JupyterHub environment variables"
    echo "usage: $0 build              # build the jupyter docker images"
    echo "usage: $0 build --clean      # force a clean build the jupyter docker images"
    echo "usage: $0 update             # update the base docker image on a production server (designed to minimize server downtime)"
@@ -474,6 +541,10 @@ case "$1" in
     test) run_tests $1
 	;;
     restart) restart_services 
+        ;;
+    configure) update_configs 
+ 	;;
+    config-envs) create_env_config
         ;;
     *) display_usage
         ;;
