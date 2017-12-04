@@ -141,8 +141,7 @@ class timeseries():
             y = list(self.tsvalues[resids[i-1]]['datavalue'])
             title = res.FeatureActionObj.SamplingFeatureObj.SamplingFeatureName
             col_width = 80/cols - 4
-            subtitle = title[:col_width]+' ...' if len(title) > col_width
-                                                else title
+            subtitle = title[:col_width] + ' ...' if len(title) > col_width else title
             ax.set_title(subtitle, fontsize=14)
 
             ax.plot_date(x, y, '-')
