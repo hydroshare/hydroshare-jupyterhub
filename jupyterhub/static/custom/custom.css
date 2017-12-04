@@ -9,14 +9,11 @@ input.raw_input {
     width: 100px;
 }
 
-#site {
-  height: 77% !important;
-}
-
 #footer {
     display: flex;
     width: 100%;
     background: white;
+    bottom: 0;
 }
 
 #footer-left {
