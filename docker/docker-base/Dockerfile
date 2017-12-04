@@ -34,6 +34,8 @@ RUN apt-get update && apt-get install --fix-missing -y --no-install-recommends \
   libbsd-dev \
   vlc  \
   libx11-dev \
+  man-db \
+  bash-completion \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/
 
@@ -52,10 +54,10 @@ RUN wget -q https://raw.githubusercontent.com/jupyterhub/jupyterhub/master/scrip
   && chmod 755 /usr/local/bin/jupyterhub-singleuser
 ADD singleuser.sh /srv/singleuser/singleuser.sh
 
-# Prepare celery and add celery tasks
-RUN mkdir /home/jovyan/libs/celeryworker 
-ADD celery/celeryworker  /home/jovyan/libs/celeryworker/
-RUN chown -R jovyan:users /home/jovyan/libs/celeryworker  
+## Prepare celery and add celery tasks
+#RUN mkdir /home/jovyan/libs/celeryworker 
+#ADD celery/celeryworker  /home/jovyan/libs/celeryworker/
+#RUN chown -R jovyan:users /home/jovyan/libs/celeryworker  
 
 # fetch the ecohydro config file
 ADD https://raw.github.com/selimnairb/RHESSysWorkflows/master/docs/config/ecohydro-Linux.cfg /home/jovyan/.ecohydro.cfg
@@ -119,8 +121,8 @@ RUN sed -i -e 's|^ETC.*|ETC = /home/jovyan/libs/RHESSysWorkflows/etc|g' /home/jo
  && sed -i -e 's|^MODULE_ETC.*|MODULE_ETC = /home/jovyan/libs/RHESSysWorkflows/etc/r.soils.texture|g' /home/jovyan/.ecohydro.cfg
 
 # prepare grass environment
-ADD ./rhessys_wf.py /home/jovyan/libs/rhessys_wf.py
-ADD ./run.py /home/jovyan/libs/run.py
+ADD rhessys_wf.py /home/jovyan/libs/rhessys_wf.py
+ADD run.py /home/jovyan/libs/run.py
 
 ###################################
 #     INSTALL BOOST AND DAKOTA    #
@@ -300,13 +302,16 @@ RUN conda install -y -n python2 \
     statsmodels \
     odm2api \ 
     landlab \ 
+    bsddb \ 
  && conda clean --all -y
 
 RUN /opt/conda/envs/python2/bin/python \
  && pip install --no-cache-dir \ 
     hs_restclient \
     wget \
-    git+https://github.com/cybergis/jupyterlib.git
+    sciunit2 \
+    git+https://github.com/cybergis/jupyterlib.git \ 
+ && sciunit post-install 
 
 # register the kernels
 RUN python -m ipykernel install \
