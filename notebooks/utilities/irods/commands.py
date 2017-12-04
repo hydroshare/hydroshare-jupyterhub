@@ -17,10 +17,19 @@ class iCommands(object):
         self.iauth = os.path.join(self.irods_dir, '.irods/.irodsA')
         self.ienv = os.path.join(self.irods_dir, '.irods/irods_environment.json')
 
-        if not os.path.exists(self.iauth):
-            print('Configuring iCommands', flush=True)
+        if not os.path.exists(self.ienv):
+            print('iRODS not configuration found')
+            sys.stdout.flush()
             time.sleep(.25)
             self._init_icommands()
+        else:
+            print('iRODS configuration found:')
+            with open(self.ienv, 'r') as f:
+                for line in f.readlines():
+                    print(line.strip())
+        print('\nTo connect to a different iRODS host use:')
+        print('   iCommands.iinit()')
+
 
     def _init_icommands(self):
         irods_config = os.path.join(self.irods_dir, '.irods')
@@ -35,7 +44,8 @@ class iCommands(object):
             username = input('iRODs username: ')
             home_dir = input('iRODs home directory (leave blank if unknown): ') or None
             json = os.path.join(irods_config, 'irods_environment.json')
-            print('Writing irods environment file', flush=True)
+            print('Writing irods environment file')
+            sys.stdout.flush()
             print(json)
             with open(json, 'w') as f:
                 f.write('{\n')
@@ -48,7 +58,8 @@ class iCommands(object):
                 f.write('\n}')
             
             
-        print('Initializing environment', flush=True)
+        print('Initializing environment')
+        sys.stdout.flush()
         p = getpass.getpass('Please enter your iRODS password: ')
         irods_cmd = 'iinit -V %s' % (p)
         cmd = Popen([irods_cmd], stdout=PIPE, stderr=STDOUT, shell=True)
@@ -57,7 +68,8 @@ class iCommands(object):
             print('Failed to fetch irods file: %s' % stdout)
             return []
         else:
-            print('Authentication Successful', flush=True)
+            print('Authentication Successful')
+            sys.stdout.flush()
             
         
     def iinit(self):
