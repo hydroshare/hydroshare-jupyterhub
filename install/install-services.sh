@@ -29,11 +29,11 @@ cp -r $PWD/static $JH
 # server dir
 echo "----> preparing jupyterhub server"
 JHS=/etc/jupyterhub/server
-mkdir -p /etc/jupyterhub/server/redirect
 
 # rest dir
 echo "----> preparing jupyterhub rest"
 JHR=/etc/jupyterhub/rest
+mkdir -p /etc/jupyterhub/rest/redirect
 mkdir -p $JHR
 
 # cull dir

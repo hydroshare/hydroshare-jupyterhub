@@ -3,7 +3,7 @@
 set -eu
 set -o pipefail
 sudo ls > /dev/null # get sudo rights before user walks away
-
+umask 002
 
 # start jupyterhub in individual screens
 REST_PATH="$(pwd)/rest"
@@ -54,7 +54,7 @@ install_base_rhel() {
     # install jupyterhub dependencies
     echo -e "--> installing system requirements"
     sudo yum clean all
-    sudo yum install -y openssh-server wget screen docker tree gcc-c++ make
+    sudo yum install -y openssh-server wget screen tree gcc-c++ make
 
     if ( ! which python3 ); then
         sudo rpm -Uvh https://centos7.iuscommunity.org/ius-release.rpm || true
@@ -86,8 +86,12 @@ install() {
     wget https://bootstrap.pypa.io/get-pip.py
     sudo python3 get-pip.py
     sudo pip3 install ipgetter
-    sudo pip3 install "ipython[notebook]" jupyterhub
+    sudo pip3 install "ipython[notebook]" jupyterhub==0.7.2
     rm get-pip.py
+
+    # update submodules
+    git submodule init
+    git submodule update
 
     # install dockerspawner 
     echo -e "--> installing dockerspawner"
@@ -101,7 +105,6 @@ install() {
     echo -e "--> installing jupyterhub rest server"
     sudo -H pip3 install -e $JUPYTERHUBRESTSERVER
 
-	
     # install jupyterhub services
     update_configs
 }
@@ -128,8 +131,7 @@ create_env_config() {
     echo -e "--> Creating JupyterHub Environment File"  
     echo -e "---> Printing some info that might be helpful:"
     echo -e "----------------------------------------------"
-    ifconfig eth0
-    ifconfig docker
+    ifconfig
     echo -e "----------------------------------------------"
     echo -n "JupyterHub IP (usually eth0): "
     read JH_IP
@@ -145,7 +147,7 @@ create_env_config() {
     read JH_USERSPACE
     echo -n "JupyterHub notebook directory: "
     read JH_NOTEBOOK
-    echo -n "JupyterHub API token: "
+    echo -n "JupyterHub API token (openssl rand -hex 32): "
     read JH_API_TOKEN
 
     # HydroShare Settings

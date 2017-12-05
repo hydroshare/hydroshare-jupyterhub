@@ -21,17 +21,17 @@ try:
     c.JupyterHub.spawner_class = 'dockerspawner.DockerSpawner'
     c.JupyterHub.confirm_no_ssl = True
 
-    c.DockerSpawner.extra_host_config = {'mem_limit':'5g'}
 
     # https on :443
-#    c.JupyterHub.port = 443
-#    c.JupyterHub.ssl_key = join(ssl_dir, 'cuahsi.key')
-#    c.JupyterHub.ssl_cert = join(ssl_dir, 'cuahsi.cer')
+    c.JupyterHub.port = 443
+    c.JupyterHub.ssl_key = join(ssl_dir, 'cuahsi.key')
+    c.JupyterHub.ssl_cert = join(ssl_dir, 'cuahsi.cert')
 
     c.JupyterHub.port = int(os.environ['JUPYTER_PORT'])
     c.DockerSpawner.hub_ip_connect = os.environ['DOCKER_SPAWNER_IP']
     c.DockerSpawner.remove_containers = True
-    c.JupyterHub.hub_ip = os.environ['DOCKER_SPAWNER_IP']
+#    c.JupyterHub.hub_ip = os.environ['DOCKER_SPAWNER_IP']
+    c.JupyterHub.hub_ip = '0.0.0.0'
     c.JupyterHub.extra_log_file = os.environ['JUPYTER_LOG']
     userspace = os.path.join(os.environ['JUPYTER_USERSPACE_DIR'], '{username}')
 except Exception as e:
@@ -55,8 +55,8 @@ c.DockerSpawner.volumes = {
 }
 
 # SSL
-c.NotebookApp.certfile = u'/volume/hydro-develop/cert.pem'
-c.NotebookApp.keyfile = u'/volume/hydro-develop/key.pem'
+#c.NotebookApp.certfile = u'/volume/hydro-develop/cert.pem'
+#c.NotebookApp.keyfile = u'/volume/hydro-develop/key.pem'
 
 
 # Spawner configuration/settings 
