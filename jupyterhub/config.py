@@ -67,7 +67,7 @@ c.DockerSpawner.extra_host_config = {
 #    'cap_add':['SYS_ADMIN','MKNOD', 'SYS_PTRACE'],
     'cap_add':['SYS_PTRACE'],
     'security_opt':['apparmor:unconfined'],
-    'mem_limit':'5g'
+    'mem_limit':'16g'
 }
 
 c.NotebookApp.extra_static_paths = ['/home/jovyan/work/notebooks/.ipython/profile_default/static']
