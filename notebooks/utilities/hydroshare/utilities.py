@@ -41,8 +41,7 @@ def check_for_ipynb(content_files):
     for f, p in content_files.items():
         if f[-5:] == 'ipynb':
             fname = os.path.basename(p)
-            rel_path = os.path.relpath(p, os.environ['NOTEBOOK_HOME'])
-            url = urlencode(rel_path)
+            url = urlencode(p)
             links[fname] = url
     return links
 
