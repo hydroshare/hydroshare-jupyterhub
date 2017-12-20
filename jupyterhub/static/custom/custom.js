@@ -29,7 +29,7 @@ $(document).ready(function(){
     
     var par = document.createElement("p");
     par.className = 'footerpar';
-    par.innerHTML = 'HydroShare-JupyterHub Version 1.2';
+    par.innerHTML = 'HydroShare-JupyterHub Version 1.4';
     par.style.valign='middle';
     right.appendChild(par);
   
@@ -40,20 +40,21 @@ $(document).ready(function(){
     
     var par = document.createElement("p");
     par.className = "footerpar";
-    par.innerHTML = 'Contact us at <a href="mailto:help@cuahsi.org?Subject=JupyterHub">help.cuahsi.org</a>';
+    par.innerHTML = 'Contact us at <a href="mailto:help@cuahsi.org?Subject=JupyterHub">help@cuahsi.org</a>';
     right.appendChild(par);
     
     var img = document.createElement('img');
     img.className = 'footerimg';
-    img.src = 'https://www.cuahsi.org/assets/images/logo.png';
-    img.style.width = "50%";
+    img.src = '../../custom/img/cuahsi-logo.png';
+    img.style.width = "80%";
     left.appendChild(img);
   
     var nimg = document.createElement('img');
     img.className = 'footerimg';
-    nimg.src = 'http://grid.ncsa.illinois.edu/ncsalogo_sm.gif';
-    nimg.style.width = "15%";
-    left.appendChild(nimg);
+    nimg.src = '../../custom/img/renci-logo.png';
+    nimg.style.width = "40%";
+    nimg.style.padding = "0px 0px 20px 0px";
+    center.appendChild(nimg);
     
     foot.appendChild(left);
     foot.appendChild(center);
