@@ -46,14 +46,14 @@ $(document).ready(function(){
         
         var img = document.createElement('img');
         img.className = 'footerimg';
-        img.src = '../custom/img/cuahsi-logo.png';
-        img.style.width = "80%";
+        img.src = '/user/_/custom/img/cuahsi-logo.png';
+        img.style.width = "200px";
         left.appendChild(img);
       
         var nimg = document.createElement('img');
         img.className = 'footerimg';
-        nimg.src = '../custom/img/renci-logo.png';
-        nimg.style.width = "40%";
+        nimg.src = '/user/_/custom/img/renci-logo.png';
+        nimg.style.width = "100px";
         nimg.style.padding = "0px 0px 20px 0px";
         center.appendChild(nimg);
         
