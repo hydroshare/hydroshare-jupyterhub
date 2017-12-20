@@ -10,57 +10,59 @@ $(document).ready(function(){
     div.className = "pull-right"
     header.appendChild(div);
 
-    // add page footer
-    var foot = document.createElement('div');
-    foot.id = 'footer';
-    foot.style.height = '110px';
-  
-    var left = document.createElement('div');
-    left.id = "footer-left";
-    left.className = 'centering';
-    
-    var center = document.createElement('div');
-    center.id = "footer-center";
-    center.className = 'centering';
-    
-    var right = document.createElement('div');
-    right.id = "footer-right";
-    right.className = 'centering';
-    
-    var par = document.createElement("p");
-    par.className = 'footerpar';
-    par.innerHTML = 'HydroShare-JupyterHub Version 1.4';
-    par.style.valign='middle';
-    right.appendChild(par);
-  
-    var par = document.createElement("p");
-    par.className = 'footerpar';
-    par.innerHTML = 'Find us on <a href="https://github.com/hydroshare/hydroshare-jupyterhub" target="_blank">Github</a> ';
-    right.appendChild(par);
-    
-    var par = document.createElement("p");
-    par.className = "footerpar";
-    par.innerHTML = 'Contact us at <a href="mailto:help@cuahsi.org?Subject=JupyterHub">help@cuahsi.org</a>';
-    right.appendChild(par);
-    
-    var img = document.createElement('img');
-    img.className = 'footerimg';
-    img.src = '../../custom/img/cuahsi-logo.png';
-    img.style.width = "80%";
-    left.appendChild(img);
-  
-    var nimg = document.createElement('img');
-    img.className = 'footerimg';
-    nimg.src = '../../custom/img/renci-logo.png';
-    nimg.style.width = "40%";
-    nimg.style.padding = "0px 0px 20px 0px";
-    center.appendChild(nimg);
-    
-    foot.appendChild(left);
-    foot.appendChild(center);
-    foot.appendChild(right);
-    
-    // insert the footer at the bottom of the page 
-    document.getElementById('notebook_panel').appendChild(foot);
+    if ($("#notebook_panel").length > 0) {
+        // add page footer
+        var foot = document.createElement('div');
+        foot.id = 'footer';
+        foot.style.height = '110px';
+      
+        var left = document.createElement('div');
+        left.id = "footer-left";
+        left.className = 'centering';
+        
+        var center = document.createElement('div');
+        center.id = "footer-center";
+        center.className = 'centering';
+        
+        var right = document.createElement('div');
+        right.id = "footer-right";
+        right.className = 'centering';
+        
+        var par = document.createElement("p");
+        par.className = 'footerpar';
+        par.innerHTML = 'HydroShare-JupyterHub Version 1.4';
+        par.style.valign='middle';
+        right.appendChild(par);
+      
+        var par = document.createElement("p");
+        par.className = 'footerpar';
+        par.innerHTML = 'Find us on <a href="https://github.com/hydroshare/hydroshare-jupyterhub" target="_blank">Github</a> ';
+        right.appendChild(par);
+        
+        var par = document.createElement("p");
+        par.className = "footerpar";
+        par.innerHTML = 'Contact us at <a href="mailto:help@cuahsi.org?Subject=JupyterHub">help@cuahsi.org</a>';
+        right.appendChild(par);
+        
+        var img = document.createElement('img');
+        img.className = 'footerimg';
+        img.src = '../custom/img/cuahsi-logo.png';
+        img.style.width = "80%";
+        left.appendChild(img);
+      
+        var nimg = document.createElement('img');
+        img.className = 'footerimg';
+        nimg.src = '../custom/img/renci-logo.png';
+        nimg.style.width = "40%";
+        nimg.style.padding = "0px 0px 20px 0px";
+        center.appendChild(nimg);
+        
+        foot.appendChild(left);
+        foot.appendChild(center);
+        foot.appendChild(right);
+        
+        // insert the footer at the bottom of the page
+        document.getElementById('notebook_panel').appendChild(foot);
+    }
 
 });
