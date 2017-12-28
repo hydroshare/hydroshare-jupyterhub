@@ -127,53 +127,54 @@ update_configs(){
 }
 
 create_env_config() {
+    ./utilities/configure_envars "$(pwd)/jupyterhub/env"
 
-    echo -e "--> Creating JupyterHub Environment File"  
-    echo -e "---> Printing some info that might be helpful:"
-    echo -e "----------------------------------------------"
-    ifconfig
-    echo -e "----------------------------------------------"
-    echo -n "JupyterHub IP (usually eth0): "
-    read JH_IP
-    echo -n "JupyterHub REST API port (usually 8080): "
-    read JH_REST_PORT
-    echo -n "Docker Spawner IP (usually docker0): "
-    read DOCKER_IP
-    echo -n "HS Client ID (see hydroshare.org/o/applications): "
-    read HS_CLIENT_ID
-    echo -n "HS Client Secret (see hydroshare.org/o/applications): "
-    read HS_CLIENT_SECRET
-    echo -n "JupyterHub userspace directory: "
-    read JH_USERSPACE
-    echo -n "JupyterHub notebook directory: "
-    read JH_NOTEBOOK
-    echo -n "JupyterHub API token (openssl rand -hex 32): "
-    read JH_API_TOKEN
-
-    # HydroShare Settings
-    echo "HYDROSHARE_CLIENT_ID=$HS_CLIENT_ID
-HYDROSHARE_CLIENT_SECRET=$HS_CLIENT_SECRET
-OAUTH_CALLBACK_URL=http://$JH_IP/hub/oauth_callback
-HYDROSHARE_USE_WHITELIST=0
-HYDROSHARE_REDIRECT_COOKIE_PATH=/etc/jupyterhub/rest/redirect
-
-# Jupyter Notebook Settings
-JUPYTER_HUB_IP=$JH_IP
-JUPYTER_PORT=80
-JUPYTER_NOTEBOOK_DIR=$JH_NOTEBOOK
-JUPYTER_USERSPACE_DIR=$JH_USERSPACE
-JPY_API_TOKEN=$JH_API_TOKEN
-JUPYTER_USER=root
-JUPYTER_LOG=/etc/jupyterhub/log/jupyter.log
-JUPYTER_STATIC_DIR=/etc/jupyterhub/static/custom
-
-# Jupyterhub REST Settings
-JUPYTER_REST_IP=$JH_IP
-JUPYTER_REST_PORT=$JH_REST_PORT
-
-# Docker Settings
-DOCKER_SPAWNER_IP=$DOCKER_IP
-" > $JUPYTER_PATH/env
+#    echo -e "--> Creating JupyterHub Environment File"  
+#    echo -e "---> Printing some info that might be helpful:"
+#    echo -e "----------------------------------------------"
+#    ifconfig
+#    echo -e "----------------------------------------------"
+#    echo -n "JupyterHub IP (usually eth0): "
+#    read JH_IP
+#    echo -n "JupyterHub REST API port (usually 8080): "
+#    read JH_REST_PORT
+#    echo -n "Docker Spawner IP (usually docker0): "
+#    read DOCKER_IP
+#    echo -n "HS Client ID (see hydroshare.org/o/applications): "
+#    read HS_CLIENT_ID
+#    echo -n "HS Client Secret (see hydroshare.org/o/applications): "
+#    read HS_CLIENT_SECRET
+#    echo -n "JupyterHub userspace directory: "
+#    read JH_USERSPACE
+#    echo -n "JupyterHub notebook directory: "
+#    read JH_NOTEBOOK
+#    echo -n "JupyterHub API token (openssl rand -hex 32): "
+#    read JH_API_TOKEN
+#
+#    # HydroShare Settings
+#    echo "HYDROSHARE_CLIENT_ID=$HS_CLIENT_ID
+#HYDROSHARE_CLIENT_SECRET=$HS_CLIENT_SECRET
+#OAUTH_CALLBACK_URL=http://$JH_IP/hub/oauth_callback
+#HYDROSHARE_USE_WHITELIST=0
+#HYDROSHARE_REDIRECT_COOKIE_PATH=/etc/jupyterhub/rest/redirect
+#
+## Jupyter Notebook Settings
+#JUPYTER_HUB_IP=$JH_IP
+#JUPYTER_PORT=80
+#JUPYTER_NOTEBOOK_DIR=$JH_NOTEBOOK
+#JUPYTER_USERSPACE_DIR=$JH_USERSPACE
+#JPY_API_TOKEN=$JH_API_TOKEN
+#JUPYTER_USER=root
+#JUPYTER_LOG=/etc/jupyterhub/log/jupyter.log
+#JUPYTER_STATIC_DIR=/etc/jupyterhub/static/custom
+#
+## Jupyterhub REST Settings
+#JUPYTER_REST_IP=$JH_IP
+#JUPYTER_REST_PORT=$JH_REST_PORT
+#
+## Docker Settings
+#DOCKER_SPAWNER_IP=$DOCKER_IP
+#" > $JUPYTER_PATH/env
 
 }
 
