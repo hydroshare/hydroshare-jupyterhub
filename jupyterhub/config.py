@@ -19,13 +19,17 @@ ssl_dir = '/etc/ssl/certs/cuahsi.org'
 try:
     # spawn with Docker
     c.JupyterHub.spawner_class = 'dockerspawner.DockerSpawner'
+    
     c.JupyterHub.confirm_no_ssl = True
+    if int(os.environ['SSL_ENABLED']):
+        # https on :443
+        c.JupyterHub.confirm_no_ssl = False
+        c.JupyterHub.port = 443
+        c.JupyterHub.ssl_key = os.environ['SSL_KEY']
+        c.JupyterHub.ssl_cert = os.environ['SSL_CERT']
 
 
-    # https on :443
-    c.JupyterHub.port = 443
-    c.JupyterHub.ssl_key = join(ssl_dir, 'cuahsi.key')
-    c.JupyterHub.ssl_cert = join(ssl_dir, 'cuahsi.cert')
+    
 
     c.JupyterHub.port = int(os.environ['JUPYTER_PORT'])
     c.DockerSpawner.hub_ip_connect = os.environ['DOCKER_SPAWNER_IP']
