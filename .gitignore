@@ -4,3 +4,4 @@ jupyterhub/jupyterhub.sqlite
 jupyterhub/jupyterhub_cookie_secret
 jupyterhub/test
 *.pyc
+*.swp
