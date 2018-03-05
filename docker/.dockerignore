@@ -1,0 +1,7 @@
+*/bck
+*/stages
+*/docker-base
+cleanup.sh
+build-docker
+*.md
+__*
