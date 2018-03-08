@@ -3,7 +3,8 @@
 The HydroShare Jupyterhub Notebook Server is an environment specifically designed to link HydroShare resources to user-generated web computations (e.g. Python notebooks). It extends the FOSS [JupyerHub](https://github.com/jupyterhub/jupyterhub) project to incorporate libraries designed to provided seamless interaction with HydroShare web resources and core functionality.  This project also leverages [docker](https://www.docker.com/) containers to provide users with isolated linux environments where they can build, modify, and store custom Jupyter notebooks and data.  While this software can be deployed as a stand-alone application, it is intended to interact with HydroShare resources via a REST API, e.g. [Jupyer-NCSA](https://www.hydroshare.org/resource/80d9f3b4bc914628a2d1df4ebebcc3fd/) (an instance deployed at the Resourcing Open Geo-spatial Education and Research (ROGER) supercomputer).
 
 
-# Setup 
+## 1. Installation Instructions  
+Note: *These steps have only been tested on CentOS7*  
 
 The repository contains files for setting up and testing the HydroShare-Jupyterhub integration.  The project is subdivided into the following folders:
 
@@ -12,11 +13,7 @@ The repository contains files for setting up and testing the HydroShare-Jupyterh
 3. notebooks - sample ipynbs that are copied into Jupyter userspace
 4. test - test scripts, test website that envokes the rest endpoint
 
-## Installation Instructions  
-Note: *These steps have only been tested on CentOS7*  
-
-
-### Configure Environment Variables**  
+### 1.1 Configure Environment Variables**  
 These environment variables are loaded when the jupyterhub server is started.  To keep the code generic, several additional variables have been added which are used in `jupyter_config.py` to prepare the jupyterhub environment.   
 `cd [project_root]/docker-compose.yml`   
 
@@ -56,7 +53,7 @@ These environment variables are loaded when the jupyterhub server is started.  T
 ```
 
 
-### Start the JupyterHub Service
+### 1.2 Start the JupyterHub Service
 
 1. Create jupyterhub overlay network  
    `docker network create -d overlay jhub`
@@ -75,7 +72,7 @@ These environment variables are loaded when the jupyterhub server is started.  T
        `docker-compose up`
 
 
-### Deploy the JupyterHub Service
+### 1.3 Deploy the JupyterHub Service
 
 1. Make sure JH is not running  
    `docker-compose down`  
@@ -86,8 +83,8 @@ These environment variables are loaded when the jupyterhub server is started.  T
 3. Deploy the JH services  
    `docker stack deploy --compose-file docker-compose.yml jhstack`  
 
-## Helpful commands
+## 2. Helpful commands  
 
-   list   : `docker stack ls`
-   remove : `docker stack rm [stack name]`
-   ps     : `docker stack ps
+   list   : `docker stack ls`  
+   remove : `docker stack rm [stack name]`  
+   ps     : `docker stack ps`  
