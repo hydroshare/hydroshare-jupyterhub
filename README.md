@@ -55,9 +55,12 @@ $ sudo systemctl start docker
 Install docker compose
 
 ```
+
 $ sudo pip install docker-compose
+$ sudo usermod -aG docker $(whoami)
 ```
 
+Logout and log back in for `usermod` to take effect.
 
 ### 1.3 Get Code
 
