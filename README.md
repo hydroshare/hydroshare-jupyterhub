@@ -135,17 +135,20 @@ The "global" userspace directory must be mounted into the JupyterHub container, 
 
 ### 1.5 Start the JupyterHub Service
 
-1. Create jupyterhub overlay network  
-   `docker network create -d overlay jhub`
+1. Initialize the swarm.  This is necessary to use overlay networks  
+   `$ docker swarm init`
 
-2. Build the docker containers  
-   `docker-compose build`
+2. Create jupyterhub overlay network  
+   `$ docker network create -d overlay jhub`
 
-3. Pull the cuahsi singleuser container  
-    `docker pull cuahsi/singleuser` 
+3. Build the docker containers  
+   `$ docker-compose build`
 
-4. Test the services
-    `docker-compose up`
+4. Pull the cuahsi singleuser container  
+    `$ docker pull cuahsi/singleuser` 
+
+5. Test the services  
+   `$ docker-compose up`
 
 
 ### 1.6 Deploy the JupyterHub Service
