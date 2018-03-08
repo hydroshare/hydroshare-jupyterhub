@@ -5,6 +5,7 @@ ADD requirements.txt /app/requirements.txt
 #ADD ./celeryworker/ /app
 #RUN touch /app/utilities/__init__.py
 WORKDIR /app/
+RUN mkdir /app/celeryworker
 RUN pip install -r requirements.txt
 
 # add docker-cli

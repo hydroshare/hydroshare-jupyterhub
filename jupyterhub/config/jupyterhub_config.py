@@ -17,6 +17,9 @@ c = get_config()
 #]
 
 #ssl_dir = '/etc/ssl/certs/cuahsi.org'
+jbase = os.environ['JUPYTER_BASE']
+c.JupyterHub.cookie_secret_file = os.path.join(jbase, 'cookie_secret')
+c.JupyterHub.db_url = os.path.join(jbase, 'jupyterhub.sqlite')
 
 # spawn with Docker
 c.JupyterHub.spawner_class = DockerSpawner
@@ -26,13 +29,13 @@ c.DockerSpawner.network_name = os.environ['DOCKER_NETWORK']
 c.DockerSpawner.image = os.environ['DOCKER_IMAGE_NAME']
 c.DockerSpawner.notebook_dir = '/home/jovyan/work'
 
-#c.JupyterHub.confirm_no_ssl = True
-#if int(os.environ['SSL_ENABLED']):
+c.JupyterHub.confirm_no_ssl = True
+if int(os.environ['SSL_ENABLED']):
     # https on :443
-#    c.JupyterHub.confirm_no_ssl = False
-#    c.JupyterHub.port = 443
-#    c.JupyterHub.ssl_key = os.environ['SSL_KEY']
-#    c.JupyterHub.ssl_cert = os.environ['SSL_CERT']
+    c.JupyterHub.confirm_no_ssl = False
+    c.JupyterHub.port = 443
+    c.JupyterHub.ssl_key = os.environ['SSL_KEY']
+    c.JupyterHub.ssl_cert = os.environ['SSL_CERT']
 
 
 c.JupyterHub.port = int(os.environ['JUPYTER_PORT'])
