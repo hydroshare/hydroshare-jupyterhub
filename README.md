@@ -142,7 +142,7 @@ The "global" userspace directory must be mounted into the JupyterHub container, 
    `docker-compose build`
 
 3. Pull the cuahsi singleuser container  
-    `docker pull cuahsi/singluser` 
+    `docker pull cuahsi/singleuser` 
 
 4. Test the services
     `docker-compose up`
