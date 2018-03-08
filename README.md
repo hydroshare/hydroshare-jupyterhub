@@ -100,6 +100,22 @@ SAMPLE_DATA=<path to sample data>
 JUPYTER_BASE=<base directory of jupyter installation on host>
 ```
 
+#### 1.4.6 Mounting Volumes
+
+The "global" userspace directory must be mounted into the JupyterHub container, same with the hub configuration.  This is done by sepcifiying the source and target paths in the `docker-compose.yml` file which must match those provided as environment variables (above).  Additionally, the docker socket must be mounted as well so that singleuser containers can be launched on demand.  For example, 
+
+```
+- type: bind
+  source: /remote/data/userspace
+  target: /remote/data/userspace
+- type: bind
+  source: ./jupyterhub/config
+  target: /srv/jupyterhub/config
+  read_only: true
+- type: bind
+  source: /var/run/docker.sock
+  target: /var/run/docker.sock
+```
 
 ### 1.5 Start the JupyterHub Service
 
