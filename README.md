@@ -70,28 +70,28 @@ OAUTH_CALLBACK_URL=<jupyterhub url>/hub/oauth_callback
 #### 1.4.2 Server Configurations
 These parameters are specific to each instance of JupyterHub.
 
-```
-HYDROSHARE_REDIRECT_COOKIE_PATH= <path to save cookies>
-JUPYTER_NOTEBOOK_DIR= <path to default notebook directory where sample notebooks are created>
-JUPYTER_USERSPACE_DIR= <path to save users' data>
-JUPYTER_PORT= <public port of the jupyterhub server, usually 80>
-JUPYTER_STATIC_DIR= <path to statics files, i.e. js and css>
-```
+
+- `HYDROSHARE_REDIRECT_COOKIE_PATH` is the location that JupyterHub cookie will be saved.  This is a path on the host that should be accessible to both the Hub and REST containers.  
+- `JUPYTER_NOTEBOOK_DIR` is the location of the sample notebooks and libraries that are provided to each user.  
+- `JUPYTER_USERSPACE_DIR` is the location where all user data will be stored. Often this is a path to a mounted directory.
+- `JUPYTER_PORT` is the port of the jupyterhub server, usually 80
+- `JUPYTER_STATIC_DIR` is the path to static files (i.e. js and css) that will be used by the Hub.  These files initially located in `hydroshare-jupyerhub/jupyterhub/static`
+
 
 #### 1.4.3 Docker Settings            
 
-```
-DOCKER_NETWORK= <docker network to spawn user containers in>
-DOCKER_IMAGE_NAME= <name of the image to spawn for each user, usually cuahsi/singleuser>
-```
+
+- `DOCKER_NETWORK` is the network that singleuser containers will be spawned in.  This network must already exist on the system and can be created via `docker network create -d overlay jhub`.  
+- `DOCKER_IMAGE_NAME` is the name of the image that will be used to spawn each singleuser container, usually `cuahsi/singleuser` which can be obtained via `docker pull cuahsi/singluser` 
+
    
 #### 1.4.4 SSL            
 
-```
-SSL_ENABLED= <indicate of SSL is enabled, 0 or 1>
-SSL_CERT=<path to SSL cert if enabled=1>
-SSL_KEY=<path to SSL key of enabled=1>
-```
+
+- `SSL_ENABLED` indicate if SSL is enabled, 0 or 1  
+- `SSL_CERT` is the path to SSL cert if enabled
+- `SSL_KEY` is the path to SSL key if enabled
+
 
 #### 1.4.5 Other Paths
 ```
