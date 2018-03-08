@@ -16,12 +16,12 @@ The repository contains files for setting up and testing the HydroShare-Jupyterh
 
 ## 1. Installation 
 
-### System Requirements  
+### 1.1 System Requirements  
 
 - Linux CentOS 7
 - Docker version 17.10+.*-ce
 
-### 1.1 Prepare Host
+### 1.2 Prepare Host
 
 Upgrade host libraries
 
@@ -46,7 +46,7 @@ Docker version 17.12.1-ce, build 7390fc6
 ```
 
 
-### 1.2 Get Code
+### 1.3 Get Code
 
 ```
 $ git clone https://github.com/hydroshare/hydroshare-jupyterhub.git
@@ -54,11 +54,11 @@ $ cd hydroshare-jupyterhub
 $ git checkout dockerized
 ```
 
-### 1.2 Configure JupyterHub**  
+### 1.4 Configure JupyterHub**  
 These environment variables are loaded when the jupyterhub server is started.  To keep the code generic, several additional variables have been added which are used in `jupyter_config.py` to prepare the jupyterhub environment.   These environment variables must be properly configured in `docker-compose.yml` for the JupyterHub server to run properly.
 
 
-#### 1.2.1 Authentication Settings
+#### 1.4.1 Authentication Settings
 These parameters are necessary to enable authentication with HydroShare.  They require registering the JupyterHub url via https://www.hydroshare.org/o/applications
 
 ```
@@ -67,7 +67,7 @@ HYDROSHARE_CLIENT_SECRET=<client secret defined by https://www.hydroshare.org/o/
 OAUTH_CALLBACK_URL=<jupyterhub url>/hub/oauth_callback
 ```
 
-#### 1.2.2 Server Configurations
+#### 1.4.2 Server Configurations
 These parameters are specific to each instance of JupyterHub.
 
 ```
@@ -78,14 +78,14 @@ JUPYTER_PORT= <public port of the jupyterhub server, usually 80>
 JUPYTER_STATIC_DIR= <path to statics files, i.e. js and css>
 ```
 
-#### 1.2.3 Docker Settings            
+#### 1.4.3 Docker Settings            
 
 ```
 DOCKER_NETWORK= <docker network to spawn user containers in>
 DOCKER_IMAGE_NAME= <name of the image to spawn for each user, usually cuahsi/singleuser>
 ```
    
-#### 1.2.4 SSL            
+#### 1.4.4 SSL            
 
 ```
 SSL_ENABLED= <indicate of SSL is enabled, 0 or 1>
@@ -93,7 +93,7 @@ SSL_CERT=<path to SSL cert if enabled=1>
 SSL_KEY=<path to SSL key of enabled=1>
 ```
 
-#### Other Paths
+#### 1.4.5 Other Paths
 ```
 PYTHON_LIBS=<path to directory extra of python libraries>
 SAMPLE_DATA=<path to sample data>
@@ -101,7 +101,7 @@ JUPYTER_BASE=<base directory of jupyter installation on host>
 ```
 
 
-### 1.3 Start the JupyterHub Service
+### 1.5 Start the JupyterHub Service
 
 1. Create jupyterhub overlay network  
    `docker network create -d overlay jhub`
@@ -120,7 +120,7 @@ JUPYTER_BASE=<base directory of jupyter installation on host>
        `docker-compose up`
 
 
-### 1.4 Deploy the JupyterHub Service
+### 1.6 Deploy the JupyterHub Service
 
 1. Make sure JH is not running  
    `docker-compose down`  
