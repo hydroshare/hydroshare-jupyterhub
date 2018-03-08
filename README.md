@@ -54,7 +54,7 @@ $ cd hydroshare-jupyterhub
 $ git checkout dockerized
 ```
 
-### 1.4 Configure JupyterHub**  
+### 1.4 Configure JupyterHub  
 These environment variables are loaded when the jupyterhub server is started.  To keep the code generic, several additional variables have been added which are used in `jupyter_config.py` to prepare the jupyterhub environment.   These environment variables must be properly configured in `docker-compose.yml` for the JupyterHub server to run properly.
 
 
