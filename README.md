@@ -59,7 +59,7 @@ These environment variables are loaded when the jupyterhub server is started.  T
 
 
 #### 1.4.1 Authentication Settings
-These parameters are necessary to enable authentication with HydroShare.  They require registering the JupyterHub url via https://www.hydroshare.org/o/applications
+These parameters are necessary to enable user authentication with HydroShare.  They require registering the JupyterHub url via https://www.hydroshare.org/o/applications.  Register a new application using `client type = public`, `authorization grant type = authorization code`, and set the `redirect uris` to the values specified in `docker-compose.yml` (`<jupyterhub url>/hub/oauth_callback`).  Copy the `client id` and `client secret` tokens into the `docker-compose.yml` file and do not share these with anyone. 
 
 ```
 HYDROSHARE_CLIENT_ID=<client id defined by https://www.hydroshare.org/o/applications>
