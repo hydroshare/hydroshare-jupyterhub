@@ -32,7 +32,7 @@ $ sudo yum -y update
 Install Git 
 
 ```
-$ sudo yum install git
+$ sudo yum install git python-pip
 ```
 
 Install Docker
@@ -50,6 +50,12 @@ Enable docker
 ```
 $ sudo systemctl enable docker
 $ sudo systemctl start docker
+```
+
+Install docker compose
+
+```
+$ sudo pip install docker-compose
 ```
 
 
