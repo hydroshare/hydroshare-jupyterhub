@@ -45,6 +45,13 @@ $ docker --version
 Docker version 17.12.1-ce, build 7390fc6
 ```
 
+Enable docker
+
+```
+$ sudo systemctl enable docker
+$ sudo systemctl start docker
+```
+
 
 ### 1.3 Get Code
 
