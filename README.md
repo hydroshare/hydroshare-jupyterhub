@@ -73,6 +73,13 @@ $ git checkout dockerized
 ### 1.4 Configure JupyterHub  
 These environment variables are loaded when the jupyterhub server is started.  To keep the code generic, several additional variables have been added which are used in `jupyter_config.py` to prepare the jupyterhub environment.   These environment variables must be properly configured in `docker-compose.yml` for the JupyterHub server to run properly.
 
+First, make a copy of `docker-compose.template` so that subsequent repository pulls do not overwrite your JupyterHub settings.  Generally speaking, you don't want to share these environment variables with anyone.
+
+```
+$ cp docker-compose.template docker-compose.yml
+```
+
+The remainder of these steps apply to this `docker-compose.yml` file.
 
 #### 1.4.1 Authentication Settings
 These parameters are necessary to enable user authentication with HydroShare.  They require registering the JupyterHub url via https://www.hydroshare.org/o/applications.  Register a new application using `client type = public`, `authorization grant type = authorization code`, and set the `redirect uris` to the values specified in `docker-compose.yml` (`<jupyterhub url>/hub/oauth_callback`).  Copy the `client id` and `client secret` tokens into the `docker-compose.yml` file and do not share these with anyone. 
