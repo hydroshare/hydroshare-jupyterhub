@@ -83,7 +83,7 @@ services:
             - jhub
 
     jupyterhub_rest:
-        image: jh-rest:latest
+        image: cuahsi/jupyterhub-rest:latest
         environment:
             - HYDROSHARE_REDIRECT_COOKIE_PATH=
             - JUPYTER_HUB_IP=
