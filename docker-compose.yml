@@ -70,7 +70,7 @@ services:
             - "80:80"
         volumes:
             - type: bind
-              source: /remote/data/userspace
+              source: [PATH TO USERSPACE ON HOST]
               target: /remote/data/userspace
             - type: bind
               source: ./jupyterhub/config
