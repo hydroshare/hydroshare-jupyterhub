@@ -139,7 +139,7 @@ The "global" userspace directory must be mounted into the JupyterHub container, 
    `$ docker swarm init`
 
 2. Create jupyterhub overlay network  
-   `$ docker network create -d overlay jhub`
+   `$ docker network create -d overlay --attachable jhub`
 
 3. Build the docker containers  
    `$ docker-compose build`
