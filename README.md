@@ -117,10 +117,12 @@ These parameters are specific to each instance of JupyterHub.
 
 
 #### 1.4.5 Other Paths
+
+These paths should be relative to the container's file system.  For instance, if `libs` exists at `/home/libs` on the host and is mounted to `/remote/data/libs` in the container, then the correct path to use it `/remote/data/libs`.  
 ```
 PYTHON_LIBS=<path to directory extra of python libraries>
 SAMPLE_DATA=<path to sample data>
-JUPYTER_BASE=<base directory of jupyter installation on host>
+JUPYTER_BASE=<base directory of jupyter installation>
 ```
 
 #### 1.4.6 Mounting Volumes
