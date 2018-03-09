@@ -105,7 +105,7 @@ These parameters are specific to each instance of JupyterHub.  File paths are us
 
 
 - `DOCKER_NETWORK` is the network that singleuser containers will be spawned in.  This network must already exist on the system and can be created via `docker network create -d overlay jhub`.  
-- `DOCKER_IMAGE_NAME` is the name of the image that will be used to spawn each singleuser container, usually `cuahsi/singleuser` which can be obtained via `docker pull cuahsi/singluser:latest` 
+- `DOCKER_IMAGE_NAME` is the name of the image that will be used to spawn each singleuser container, usually `cuahsi/singleuser` which can be obtained via `docker pull cuahsi/singleuser:latest` 
 
    
 #### 1.4.4 SSL            
