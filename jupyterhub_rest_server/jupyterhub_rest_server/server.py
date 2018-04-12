@@ -28,10 +28,14 @@ class Application(tornado.web.Application):
 def main():
 
     app = Application()
-    http_server = tornado.httpserver.HTTPServer(app, ssl_options={
-        "certfile": "/etc/ssl/certs/cuahsi.org/cuahsi.cer",
-        "keyfile": "/etc/ssl/certs/cuahsi.org/cuahsi.key"
-    })
+    if int(os.environ['SSL_ENABLED']):
+        http_server = tornado.httpserver.HTTPServer(app, ssl_options={
+            "certfile": os.environ['SSL_CERT'],
+            "keyfile": os.environ['SSL_KEY']
+        })
+    else:
+        http_server = tornado.httpserver.HTTPServer(app)
+
     http_server.listen(8080)
     #app.listen(os.environ['JUPYTER_REST_PORT'])
     print('\n'+'-'*60)
