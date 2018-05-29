@@ -6,22 +6,36 @@ import sys
 c = get_config()
 
 # set container culling properties
-c.JupyterHub.services = [
-    {
-        'name': 'cull-idle',
-        'admin': True,
-        'command': 'python3 /etc/jupyterhub/cull/cull_idle_servers.py --timeout=3600'.split(),
-    }
-]
+#c.JupyterHub.services = [
+#    {
+#        'name': 'cull-idle',
+#        'admin': True,
+#        'command': 'python3 /etc/jupyterhub/cull/cull_idle_servers.py --timeout=3600'.split(),
+#    }
+#]
+
+ssl_dir = '/etc/ssl/certs/cuahsi.org'
 
 try:
     # spawn with Docker
     c.JupyterHub.spawner_class = 'dockerspawner.DockerSpawner'
+    
     c.JupyterHub.confirm_no_ssl = True
+    if int(os.environ['SSL_ENABLED']):
+        # https on :443
+        c.JupyterHub.confirm_no_ssl = False
+        c.JupyterHub.port = 443
+        c.JupyterHub.ssl_key = os.environ['SSL_KEY']
+        c.JupyterHub.ssl_cert = os.environ['SSL_CERT']
+
+
+    
+
     c.JupyterHub.port = int(os.environ['JUPYTER_PORT'])
     c.DockerSpawner.hub_ip_connect = os.environ['DOCKER_SPAWNER_IP']
     c.DockerSpawner.remove_containers = True
-    c.JupyterHub.hub_ip = os.environ['DOCKER_SPAWNER_IP']
+#    c.JupyterHub.hub_ip = os.environ['DOCKER_SPAWNER_IP']
+    c.JupyterHub.hub_ip = '0.0.0.0'
     c.JupyterHub.extra_log_file = os.environ['JUPYTER_LOG']
     userspace = os.path.join(os.environ['JUPYTER_USERSPACE_DIR'], '{username}')
 except Exception as e:
@@ -45,16 +59,20 @@ c.DockerSpawner.volumes = {
 }
 
 # SSL
-c.NotebookApp.certfile = u'/volume/hydro-develop/cert.pem'
-c.NotebookApp.keyfile = u'/volume/hydro-develop/key.pem'
-# IRODS settings 
+#c.NotebookApp.certfile = u'/volume/hydro-develop/cert.pem'
+#c.NotebookApp.keyfile = u'/volume/hydro-develop/key.pem'
+
+
+# Spawner configuration/settings 
 # http://stackoverflow.com/questions/37144357/link-containers-with-the-docker-python-api
-#c.DockerSpawner.extra_host_config = {
+c.DockerSpawner.extra_host_config = {
 #    'privileged':True,
-#    'cap_add':['SYS_ADMIN','MKNOD'],
 #    'devices':['/dev/fuse'],
-#    'security_opt':['apparmor:unconfined']
-#}
+#    'cap_add':['SYS_ADMIN','MKNOD', 'SYS_PTRACE'],
+    'cap_add':['SYS_PTRACE'],
+    'security_opt':['apparmor:unconfined'],
+    'mem_limit':'16g'
+}
 
-#c.NotebookApp.extra_static_paths = ['/home/jovyan/work/notebooks/.ipython/profile_default/static']
-
+c.NotebookApp.extra_static_paths = ['/home/jovyan/work/notebooks/.ipython/profile_default/static']
+c.DockerSpawner.notebook_dir = '/home/jovyan/work'

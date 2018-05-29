@@ -1,0 +1,181 @@
+#!/usr/bin/env python3  
+
+import os
+import sys
+from collections import OrderedDict
+
+envars = OrderedDict()
+envars['HYDROSHARE_CLIENT_ID'] = {'value':None, 
+           'prompt':"HydroShare OAuth Client ID",
+           'help': "This provided via hydroshare.org/o/applications.",
+           'default':None,
+           'previous':None}
+
+envars['HYDROSHARE_CLIENT_SECRET'] = {
+           'value':None, 
+           'prompt':"HydroShare OAuth Client Secret",
+           'help': "This is provided via hydroshare.org/o/applications.",
+           'default':None,
+           'previous':None}
+
+envars['HYDROSHARE_USE_WHITELIST'] = {'value':'0', 'prompt': None, 'default':None, 'previous':None}
+envars['HYDROSHARE_REDIRECT_COOKIE_PATH'] = {'value':'/etc/jupyterhub/rest/redirect', 'prompt': None, 'default':None, 'previous':None}
+envars['OAUTH_CALLBACK_URL'] = {'value':None, 'prompt': None, 'default':None, 'previous':None}
+
+envars['JUPYTER_HUB_IP'] = {
+           'value':None, 
+           'prompt': "JupyterHub IP Address",
+           'help': "This is usually the IP address associated with eth0.",
+           'default':None, 
+           'previous':None}
+
+envars['JUPYTER_PORT'] = {'value':'80', 'prompt': None, 'default':None, 'previous':None}
+
+envars['JUPYTER_NOTEBOOK_DIR'] = {
+           'value':None, 
+           'prompt': "JupyterHub Notebook Directory",
+            'help': "This is the location where default notebooks are stored.",
+           'default':None,
+           'previous':None}
+
+envars['JUPYTER_USERSPACE_DIR'] = {
+           'value':None, 
+           'prompt':"JupyterHub Userspace Directory",
+           'help': "This is the location where user documents will be stored.",
+           'default':None,
+           'previous':None}
+
+envars['JPY_API_TOKEN'] = {
+           'value':None, 
+           'prompt': "JupyterHub API Token",
+           'help': "This token can be generated with the following command: 'openssl rand -hex 32'.",
+           'default':None,
+           'previous':None}
+
+envars['JUPYTER_USER'] = {'value':'root', 'prompt': None, 'default':None, 'previous':None}
+envars['JUPYTER_LOG'] = {'value':'/etc/jupyterhub/log/jupyter.log', 'prompt': None, 'default':None, 'previous':None}
+envars['JUPYTER_STATIC_DIR'] = {'value':'/etc/jupyterhub/static/custom', 'prompt': None, 'default':None,'previous':None}
+
+envars['JUPYTER_REST_IP'] = {'value':None, 'prompt': None, 'default':None, 'previous':None}
+envars['JUPYTER_REST_PORT'] = {
+           'value':None, 
+           'prompt':"JupyterHub REST API port",
+           'help':None,
+           'default':'8080',
+           'previous':None}
+
+envars['DOCKER_SPAWNER_IP'] = {
+           'value':None, 
+           'prompt':"Docker Spawner IP",
+           'help': "This is usually the IP address associated with docker0.",
+           'default':None,
+           'previous':None}
+
+
+envars['SSL_ENABLED'] = {'value':None, 'prompt': 'Enable SSL', 'help': 'Specify if SSL should be enabled, 0 or 1', 'default':'0', 'previous':None}
+envars['SSL_CERT'] = {'value':None, 'prompt': 'SSL Certificate', 'help':'Specify the path to the SSL Certificate.\n -> Leave blank if SSL is not enabled.', 'default':None, 'previous':None}
+envars['SSL_KEY'] = {'value':None, 'prompt': 'SSL Key', 'help': 'Specify the path to the SSL Key.\n -> Leave blank if SSL is not enabled.', 'default':None, 'previous':None}
+
+
+
+if __name__ == '__main__':
+
+    args = sys.argv
+    envpath = None
+    if len(args) > 1:
+        envpath = args[1]
+   
+    # read from existing env file
+    if envpath is not None: 
+        with open(envpath, 'r') as f:
+            lines = f.readlines()
+            for line in lines:
+                l = line.strip()
+                if len(l) == 0:
+                    continue 
+                if l[0] == '#':
+                    continue
+                var, val = l.split('=')
+                envars[var]['previous'] = val
+
+    # set variables
+    for k, v in envars.items():
+        isvalid = False
+        p = v['prompt']
+
+        # if a prompt is not provided, move on to the next item
+        if p is None: continue
+
+        # add decorators to the prompt header
+        dec = '-' * len(p)
+        prompt = '\n' + dec + '\n' + p + '\n' + dec
+
+        # add help text
+        if 'help' in v.keys():
+            if v['help'] is not None:
+                prompt += '\n -> ' + v['help'] 
+
+        # add previous and default values
+        default = v['default']
+        previous = v['previous']
+        if default is not None: prompt += '\n -> enter "d" for the default value: %s.' % default
+        if previous is not None: prompt +=  '\n -> enter "p" for the previously used value: %s.' % previous
+        prompt += "\n -> "
+
+        # check for a valid response and set in configuration dictionary
+        while not isvalid:
+            res = input(prompt).strip()
+            isvalid = False
+            if len(res) == 0 and default is None:
+                if (k == 'SSL_CERT' or k == 'SSL_KEY') and not int(envars['SSL_ENABLED']['value']):
+                    value = 'NOT-SPECIFIED'
+                    isvalid = True
+            else:
+                if res.upper() == 'D' or len(res) == 0:
+                    if v['default'] is not None:
+                        isvalid = True
+                        value = v['default']
+                elif res.upper() == 'P':
+                    if v['previous'] is not None:
+                        isvalid = True
+                        value = v['previous']
+                else:
+                    isvalid = True
+                    value = res
+            if isvalid: 
+                v['value'] = value
+                print(' -> using value "%s"' % (value)) 
+
+
+    # set additional vars based on user specified input
+    envars['OAUTH_CALLBACK_URL']['value'] = envars['JUPYTER_HUB_IP']['value']+'/hub/oauth_callback'
+    envars['JUPYTER_REST_IP']['value'] = envars['JUPYTER_HUB_IP']['value']
+
+    # display a summary of the var to be set
+    print('\nThe following environment variables will be set:')
+    for k,v in envars.items():
+        print('  %s -> %s' % (k, v['value']))
+    c = ''
+    while c.upper() != 'Y' and c.upper() != 'N':
+        c = input('Do you want to continue [Y/N]? ')
+
+
+    # save the results
+    if c.upper() == 'Y':
+        
+        # make a copy of the old file
+        if os.path.exists(envpath):
+            fname = envpath
+            inc = 1
+            while os.path.exists(fname):
+                fname = envpath + '_' + str(inc)
+                inc += 1
+            os.rename(envpath, fname)
+            print('renamed existing env file to -> %s' % fname)
+        
+        # write the results
+        with open(envpath, 'w') as f:
+            for k,v in envars.items():
+                f.write('%s=%s\n' % (k, v['value']))
+
+    print('Configuration complete.')
