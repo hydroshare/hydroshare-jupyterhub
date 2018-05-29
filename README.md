@@ -94,9 +94,9 @@ OAUTH_CALLBACK_URL=<jupyterhub url>/hub/oauth_callback
 These parameters are specific to each instance of JupyterHub.  File paths are used inside the JupyterHub docker container, so they must use the container's file path.  Usually this is the path to a mounted volume, see 1.4.6.
 
 
-- `HYDROSHARE_REDIRECT_COOKIE_PATH` is the location that JupyterHub cookie will be saved.  This is a path on the host that should be accessible to both the Hub and REST containers.  
+- `HYDROSHARE_REDIRECT_COOKIE_PATH` is the location that JupyterHub cookie will be saved.  This is a path in the container.
 - `JUPYTER_NOTEBOOK_DIR` is the location of the sample notebooks and libraries that are provided to each user, relative to the filepath inside the container.  
-- `JUPYTER_USERSPACE_DIR` is the location where all user data will be stored, relative to the filepath inside the container. Often this is a path to a mounted directory.
+- `JUPYTER_USERSPACE_DIR` is the location where all user data will be stored on the host filesystem.
 - `JUPYTER_PORT` is the port of the jupyterhub server, usually 80
 - `JUPYTER_STATIC_DIR` is the path to static files (i.e. js and css) that will be used by the Hub.  These files initially located in `hydroshare-jupyerhub/jupyterhub/static`.  These files must be moved into a directory that will be mounted into the container and this path must reflect file path inside the container.  
 
