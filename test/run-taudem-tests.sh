@@ -20,6 +20,6 @@ docker run --rm -u root -ti -v $(pwd)/TauDEM-Test-Data:/tmp -v $(pwd)/prepare-te
 /bin/bash -c "cd /tmp; ./prepare-test-env.sh; cd /tmp/Input; ./taudem-tests.sh"
 
 # remove Testdata
-#rm -rf $(pwd)/TauDEM-Test-Data
+rm -rf $(pwd)/TauDEM-Test-Data
 
 
