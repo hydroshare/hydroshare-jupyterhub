@@ -4,7 +4,7 @@ MAINTAINER Tony Castronova <acastronova@cuahsi.org>
 
 
 ADD install-deps.sh /tmp/install-deps.sh
-ADD utilities.py /tmp/utilities.py
+#ADD utilities.py /tmp/utilities.py
 RUN sh /tmp/install-deps.sh
 
 RUN mkdir /app
