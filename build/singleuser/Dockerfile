@@ -16,14 +16,17 @@ ENV PATH="/opt/conda/envs/python2/bin:/home/jovyan/libs:/home/jovyan/libs/icomma
     PYTHONPATH="/home/jovyan/work/notebooks:/home/jovyan/libs":$PYTHONPATH \
     DOCUMENTS="/home/jovyan/work/notebooks/documents" \
     DATA="/home/jovyan/work/notebooks/data" \
-    HOME="/home/jovyan" \
+    HOME="/home/jovyan/work" \
     ECOHYDROLIB_CFG="/home/jovyan/.ecohydro.cfg" \
-    LD_LIBRARY_PATH="/usr/lib/grass64/lib:$LD_LIBRARY_PATH" \
+    LD_LIBRARY_PATH="/usr/lib/grass72/lib:$LD_LIBRARY_PATH" \
     NOTEBOOK_HOME="/home/jovyan/work/notebooks" \
     R_LIBS_SITE="/home/jovyan/.userRLib" \
     IRODS_PLUGINS_HOME="/home/jovyan/libs/icommands/plugins/" \
     IRODS_ENVIRONMENT_FILE="/home/jovyan/work/notebooks/data/.irods/irods_environment.json" \
     IRODS_AUTHENTICATION_FILE="/home/jovyan/work/notebooks/data/.irods/.irodsA" 
+
+#ENV HOME=/home/jovyan/work
+WORKDIR $HOME
 
 USER root
 ADD install-base.sh /home/install-base.sh
@@ -53,8 +56,11 @@ RUN sh /home/install-irods.sh
 
 USER jovyan
 
-  ADD install-python.sh /home/install-python.sh
-  RUN sh /home/install-python.sh
+  ADD install-python3.sh /home/install-python3.sh
+  RUN sh /home/install-python3.sh
+  
+  ADD install-python2.sh /home/install-python2.sh
+  RUN sh /home/install-python2.sh
 
   ADD install-r.sh /home/install-r.sh
   RUN sh /home/install-r.sh
@@ -79,19 +85,15 @@ ADD install-modflow.sh /home/install-modflow.sh
 ADD modflow.6.0.2-makefile-ubuntu /tmp/makefile
 RUN sh /home/install-modflow.sh
 
-ENV HOME=/home/jovyan/work
-WORKDIR $HOME
-
-ADD install-perm.sh /home/install-perm.sh
-RUN sh /home/install-perm.sh
+ADD modify-permissions.sh /home/modify-permissions.sh
+RUN sh /home/modify-permissions.sh
 
 ADD install-cleanup.sh /home/install-cleanup.sh
 RUN sh /home/install-cleanup.sh
 
-ADD post-build.sh /home/post-build.sh
-RUN sh /home/post-build.sh
-
 USER jovyan
 
-
 CMD ["sh", "/srv/singleuser/singleuser.sh"]
+
+ADD post-build.sh /home/post-build.sh
+RUN sh /home/post-build.sh
