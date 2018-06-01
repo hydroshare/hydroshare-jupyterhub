@@ -1,6 +1,6 @@
 # this file contains utility functions used by the RequestHandlers
 
-import os
+import os, stat
 from pwd import getpwnam
 import grp
 import shutil
@@ -10,7 +10,7 @@ log = logging.getLogger()
 
 
 def set_hydroshare_args(username, resourceid, resourcetype):
-    
+
     userspace_dir = os.environ['JUPYTER_USERSPACE_DIR']
     hs_env = os.path.abspath(os.path.join(userspace_dir, '%s/notebooks/.env' % username.lower()))
     print('ENV_PATH ',hs_env)
@@ -20,7 +20,7 @@ def set_hydroshare_args(username, resourceid, resourcetype):
         f.write('HS_RES_ID=%s\n' % resourceid)
         f.write('HS_RES_TYPE=%s\n' % resourcetype)
         f.write('JUPYTER_HUB_IP=%s\n' % os.environ['JUPYTER_HUB_IP'] )
-    
+
     # get the jupyter username
     user = getpwnam(os.environ['JUPYTER_USER'])
     group = grp.getgrnam('users')
@@ -29,7 +29,7 @@ def set_hydroshare_args(username, resourceid, resourcetype):
     os.chown(hs_env, uid, gid)
 
 def build_userspace(username):
-    
+
     # make all usernames lowercase
     husername = username.lower()
 
@@ -67,9 +67,13 @@ def build_userspace(username):
     print('%s -> modifying userspace permissions' % username, flush=True)
     os.chown(basepath, uid, gid)
     os.chown(os.path.dirname(basepath), uid, gid)
+    os.chmod(os.path.dirname(basepath), stat.S_IRWXG | stat.S_ISGID | stat.S_IRWXU)
 
     for root, dirs, files in os.walk(basepath):
         for d in dirs:
             os.chown(os.path.join(root, d), uid, gid)
+            os.chmod(os.path.join(root, d), stat.S_IRWXG | stat.S_ISGID | stat.S_IRWXU)
+
         for f in files:
             os.chown(os.path.join(root, f), uid, gid)
+            os.chmod(os.path.join(root, f), stat.S_IRWXG | stat.S_ISGID | stat.S_IRWXU)
