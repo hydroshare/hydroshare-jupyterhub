@@ -6,8 +6,8 @@ set -e
 #          INSTALL R KERNEL        #
 ####################################
 
-mkdir /home/jovyan/.userRLib
-echo "options(repos=structure(c(CRAN=\"http://archive.linux.duke.edu/cran\")))" >> /home/jovyan/.Rprofile
+mkdir $HOME/.userRLib
+echo "options(repos=structure(c(CRAN=\"http://archive.linux.duke.edu/cran\")))" >> $HOME/.Rprofile
 conda config --add channels r
 
 conda install -n R -c r \
