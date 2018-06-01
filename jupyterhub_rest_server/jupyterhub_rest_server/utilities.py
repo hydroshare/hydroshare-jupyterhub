@@ -66,17 +66,13 @@ def build_userspace(username):
     # change file ownership so that it can be accessed inside docker container
     print('%s -> modifying userspace permissions' % username, flush=True)
     os.chown(basepath, uid, gid)
-    os.chown(os.path.dirname(basepath), uid, gid)
-#    os.chmod(os.path.dirname(basepath), stat.S_IRWXG | stat.S_ISGID | stat.S_IRWXU)
-    os.chmod(os.path.dirname(basepath), 0o2770)
+    os.chmod(basepath, 0o2770)
 
     for root, dirs, files in os.walk(basepath):
         for d in dirs:
             os.chown(os.path.join(root, d), uid, gid)
-#            os.chmod(os.path.join(root, d), stat.S_IRWXG | stat.S_ISGID | stat.S_IRWXU)
             os.chmod(os.path.join(root, d), 0o2770)
 
         for f in files:
             os.chown(os.path.join(root, f), uid, gid)
-#            os.chmod(os.path.join(root, f), stat.S_IRWXG | stat.S_ISGID | stat.S_IRWXU)
             os.chmod(os.path.join(root, f), 0o2770)

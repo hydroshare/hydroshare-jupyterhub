@@ -12,8 +12,8 @@ apt-get install --fix-missing -y --no-install-recommends \
 
 pip3 install setuptools wheel
 
-cd /tmp
+cd /srv
 git clone https://github.com/hydroshare/hydroshare-jupyterhub.git
-rm hydroshare-jupyterhub/jupyterhub_rest_server/jupyterhub_rest_server/utilities.py
-cp utilities.py hydroshare-jupyterhub/jupyterhub_rest_server/jupyterhub_rest_server/utilities.py
-(cd hydroshare-jupyterhub && pip3 install -e jupyterhub_rest_server)
+#rm hydroshare-jupyterhub/jupyterhub_rest_server/jupyterhub_rest_server/utilities.py
+#cp utilities.py hydroshare-jupyterhub/jupyterhub_rest_server/jupyterhub_rest_server/utilities.py
+(cd hydroshare-jupyterhub; git pull; pip3 install -e jupyterhub_rest_server)
