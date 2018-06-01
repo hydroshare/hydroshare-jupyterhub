@@ -62,6 +62,7 @@ services:
       SPAWNER_HTTP_TIMEOUT: ${SPAWNER_HTTP_TIMEOUT}
       SSL_CERT: ${SSL_CRT}
       SSL_KEY: ${SSL_KEY}
+      JUPYTER_STATIC_DIR_HOST: ${JUPYTER_STATIC_DIR_HOST}
     env_file:
       - secrets/postgres.env
       - secrets/oauth.env

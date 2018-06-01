@@ -55,7 +55,10 @@ c.DockerSpawner.notebook_dir = notebook_dir
 # notebook directory in the container
 #userspace = os.path.join(os.environ['JUPYTER_USERSPACE_DIR'], 'tonycastronova')
 userspace = os.path.join(os.environ['JUPYTER_USERSPACE_DIR_HOST'], '{username}')
-c.DockerSpawner.volumes = {userspace: notebook_dir}
+c.DockerSpawner.volumes = {
+  userspace: notebook_dir,
+  os.environ['JUPYTER_STATIC_DIR_HOST']: '/home/jovyan/work/.jupyter/custom'
+}
 #c.DockerSpawner.volumes = { 'jupyterhub-user-{username}': notebook_dir }
 #c.DockerSpawner.volumes = { 'jupyter-{username}': notebook_dir }
 

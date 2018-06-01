@@ -130,6 +130,8 @@ Deployment Procedure
 	  # set hub and rest ip addresses 
  	  JUPYTER_HUB_IP=[e.g. jupyter.cuahsi.org]
 	  JUPYTER_REST_IP=[e.g. jupyter.cuahsi.org]
+	  
+	  JUPYTER_STATIC_DIR_HOST=[e.g. /remote/data/userspace/_global/jupyterhub/static]
 
 
 	# add jupyterhub api token to .env
