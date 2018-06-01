@@ -1,8 +1,6 @@
-# Copyright (c) Jupyter Development Team.
-# Distributed under the terms of the Modified BSD License.
-
 # Configuration file for JupyterHub
 import os
+from oauthenticator.hydroshare import HydroShareOAuthenticator
 
 c = get_config()
 
@@ -13,7 +11,6 @@ c.JupyterHub.services = [
     'name': 'cull-idle',
     'admin': True,
     'command': cmd.split(),
-#    'command': 'python3 /srv/cull_idle_servers.py --timeout=3600'.split(),
 }]
 
 c.Authenticator.admin_users = {'tonycastronova', 'pdoan'}
@@ -53,14 +50,11 @@ c.DockerSpawner.notebook_dir = notebook_dir
 
 # Mount the real user's Docker volume on the host to the notebook user's
 # notebook directory in the container
-#userspace = os.path.join(os.environ['JUPYTER_USERSPACE_DIR'], 'tonycastronova')
 userspace = os.path.join(os.environ['JUPYTER_USERSPACE_DIR_HOST'], '{username}')
 c.DockerSpawner.volumes = {
   userspace: notebook_dir,
   os.environ['JUPYTER_STATIC_DIR_HOST']: '/home/jovyan/work/.jupyter/custom'
 }
-#c.DockerSpawner.volumes = { 'jupyterhub-user-{username}': notebook_dir }
-#c.DockerSpawner.volumes = { 'jupyter-{username}': notebook_dir }
 
 # volume_driver is no longer a keyword argument to create_container()
 # c.DockerSpawner.extra_create_kwargs.update({ 'volume_driver': 'local' })
@@ -80,12 +74,8 @@ c.JupyterHub.ssl_key = os.environ['SSL_KEY']
 c.JupyterHub.ssl_cert = os.environ['SSL_CERT']
 
 # Authenticate users with HydroShare OAuth
-from oauthenticator.hydroshare import HydroShareOAuthenticator
 c.JupyterHub.authenticator_class = HydroShareOAuthenticator
 c.HydroShareOAuthenticator.oauth_callback_url = os.environ['OAUTH_CALLBACK_URL']
-## Authenticate users with GitHub OAuth
-#c.JupyterHub.authenticator_class = 'oauthenticator.GitHubOAuthenticator'
-#c.GitHubOAuthenticator.oauth_callback_url = os.environ['OAUTH_CALLBACK_URL']
 
 # Persist hub data on volume mounted inside container
 data_dir = os.environ.get('DATA_VOLUME_CONTAINER', '/data')
@@ -99,22 +89,6 @@ c.JupyterHub.db_url = 'postgresql://postgres:{password}@{host}/{db}'.format(
     db=os.environ['POSTGRES_DB'],
 )
 
-# Whitlelist users and admins
-#c.Authenticator.whitelist = whitelist = set()
-#c.Authenticator.admin_users = admin = set()
-#c.JupyterHub.admin_access = True
-#pwd = os.path.dirname(__file__)
-#with open(os.path.join(pwd, 'userlist')) as f:
-#    for line in f:
-#        if not line:
-#            continue
-#        parts = line.split()
-#        name = parts[0]
-#        whitelist.add(name)
-#        if len(parts) > 1 and parts[1] == 'admin':
-#            admin.add(name)
-
-
 # Spawner configuration/settings
 # http://stackoverflow.com/questions/37144357/link-containers-with-the-docker-python-api
 c.DockerSpawner.extra_host_config = {
@@ -127,7 +101,3 @@ c.DockerSpawner.extra_host_config = {
 # spawner timeout
 c.Spawner.start_timeout = int(os.environ['SPAWNER_START_TIMEOUT'])
 c.Spawner.http_timeout = int(os.environ['SPAWNER_HTTP_TIMEOUT'])
-#c.Spawner.start_timeout = 300
-#c.Spawner.http_timeout = 300
-
-#c.DockerSpawner.notebook_dir = '/home/jovyan/work/notebooks'
