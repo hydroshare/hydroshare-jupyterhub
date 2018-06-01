@@ -5,11 +5,16 @@
 # at the end of every build
 ##########################################
 
+#Rscript -e "IRkernel::installspec(name = 'ir34', displayname = 'R 3.4')"
+
 # register conda kernels
-Rscript -e "IRkernel::installspec(name = 'ir34', displayname = 'R 3.4')"
-python -m ipykernel install \
+python3 -m ipykernel install \
     --user \
     --name "python2" \
     --display-name "Python 2.7"
 
+python3 -m ipykernel install \
+    --user \
+    --name "R" \
+    --display-name "R 3.4"
 
