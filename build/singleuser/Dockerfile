@@ -105,3 +105,9 @@ RUN /opt/conda/envs/python2/bin/python -m ipykernel install \
     --display-name "Python 2.7"
 
 RUN Rscript -e "IRkernel::installspec(name = 'ir34', displayname = 'R 3.4', user=FALSE)"
+
+# install jupyter_contrib_nbextensions
+#RUN /opt/conda/bin/pip install --no-cache-dir git+https://github.com/Castronova/jupyter_contrib_nbextensions.git \
+RUN jupyter contrib nbextension install --system \
+&& jupyter nbextension enable recursivedelete/main --system --section=tree \
+&& jupyter nbextensions_configurator disable --system
