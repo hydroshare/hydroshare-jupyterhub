@@ -30,7 +30,7 @@ $(document).ready(function(){
         
         var par = document.createElement("p");
         par.className = 'footerpar';
-        par.innerHTML = 'HydroShare-JupyterHub Version 1.4';
+        par.innerHTML = 'HydroShare-JupyterHub Version 1.3';
         par.style.valign='middle';
         right.appendChild(par);
       
@@ -46,7 +46,7 @@ $(document).ready(function(){
         
         var img = document.createElement('img');
         img.className = 'footerimg';
-        img.src = '/user/_/custom/img/cuahsi-logo.png';
+        img.src = '/user/_/custom/img/cuahsi-logo.jpg';
         img.style.width = "200px";
         left.appendChild(img);
       
