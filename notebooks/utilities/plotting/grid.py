@@ -6,8 +6,8 @@ from osgeo import gdal
 import subprocess
 import shutil
     
-    
-def plot(raster, size=(5,10), aspect=1, title='', cm='gist_earth'):
+
+def plot(raster, size=(5,10), aspect=1, title='', cm='gist_earth', cm_scale=(None, None)):
     """
     Plots raster images
     Args:
@@ -16,11 +16,20 @@ def plot(raster, size=(5,10), aspect=1, title='', cm='gist_earth'):
       aspect: aspect ratio of the plot or subplots
       title: title or list of titles for each individual plot
       cm: matplotlib colormap to use
+      cm_scale: (min, max) to scale the colormap
     """
     
     # convert tiff into list
     tiffs = [raster] if not isinstance(raster, list) else raster
     titles= [title] if not isinstance(title, list) else title
+    cms= [cm]*len(tiffs) if not isinstance(cm, list) else cm
+    
+    if not isinstance(cm_scale, list) and not isinstance(cm_scale, tuple):
+        cm_scale = [(None, None)] * len(tiffs)
+    elif isinstance(cm_scale, tuple):
+        cm_scale = [cm_scale] * len(tiffs)
+    else:
+        cm_scale = cm_scale
         
     # get the total number of plots
     num_plots = len(tiffs)
@@ -54,7 +63,13 @@ def plot(raster, size=(5,10), aspect=1, title='', cm='gist_earth'):
             data[data<0] = 0
 
             # plot the data
-            ax.imshow(data, cmap=cm, aspect=1)
+            img = ax.imshow(data, cmap=cms[i], aspect=1)
+            
+            # set the color scale to match the min and max data
+            if None in cm_scale[i]:
+                img.set_clim(data.min(), data.max())
+            else:
+                img.set_clim(cm_scale[i])
             
             # turn off axes labels
             ax.xaxis.set_visible(False)
