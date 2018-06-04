@@ -14,7 +14,27 @@ def save_script(fname):
 
     print(module.__name__)
 
-   
+def create_workspace(folder_name):
+
+    # get the data directory (this is an environment variable that is provided to you)
+    data_directory = os.path.join(os.environ['DATA'], folder_name)
+    create_dir = True
+    if os.path.exists(data_directory):
+        print('This directory already exists.')
+        tree(data_directory)
+        res = input('\nDo you want to overwrite these data [Y/n]? ')
+        if res != 'n':
+            shutil.rmtree(data_directory)
+        else:
+            create_dir = False
+            print('Directory creation aborted')
+            
+    if create_dir:
+        os.mkdir(data_directory)
+        print('A clean directory has been created')  
+    
+    return data_directory
+
 class heartbeat(object):
 
     def __init__(self, progress_message, finish_message='Finished', error_message='An error has occurred'):
