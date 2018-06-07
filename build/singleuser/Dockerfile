@@ -85,18 +85,14 @@ ADD install-modflow.sh /home/install-modflow.sh
 ADD modflow.6.0.2-makefile-ubuntu /tmp/makefile
 RUN sh /home/install-modflow.sh
 
+ADD install-nbextensions.sh /home/install-nbextensions.sh
+RUN sh /home/install-nbextensions.sh
+
 ADD modify-permissions.sh /home/modify-permissions.sh
 RUN sh /home/modify-permissions.sh
 
 ADD install-cleanup.sh /home/install-cleanup.sh
 RUN sh /home/install-cleanup.sh
-
-#ADD post-build.sh /home/post-build.sh
-#RUN sh /home/post-build.sh
-
-#USER jovyan
-
-#CMD ["sh", "/srv/singleuser/singleuser.sh"]
 
 #USER root
 RUN /opt/conda/envs/python2/bin/python -m ipykernel install \
@@ -106,8 +102,15 @@ RUN /opt/conda/envs/python2/bin/python -m ipykernel install \
 
 RUN Rscript -e "IRkernel::installspec(name = 'ir34', displayname = 'R 3.4', user=FALSE)"
 
-# install jupyter_contrib_nbextensions
-#RUN /opt/conda/bin/pip install --no-cache-dir git+https://github.com/Castronova/jupyter_contrib_nbextensions.git \
-RUN jupyter contrib nbextension install --system \
-&& jupyter nbextension enable recursivedelete/main --system --section=tree \
-&& jupyter nbextensions_configurator disable --system
+RUN apt-get update \
+&& apt-get install -y tzdata \
+&& dpkg-reconfigure tzdata
+
+# create the cache directory so that user installations won't fail the first time
+USER jovyan
+RUN mkdir -p /opt/conda/pkgs/cache
+
+## install jupyter_contrib_nbextensions
+#RUN jupyter contrib nbextension install --system \
+#&& jupyter nbextension enable recursivedelete/main --system --section=tree \
+#&& jupyter nbextensions_configurator disable --system

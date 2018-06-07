@@ -14,6 +14,8 @@ cd /tmp/mf6.0.2/make
 make
 cp /tmp/mf6.0.2/make/mf6.0.2 /usr/local/bin/mf6.0.2
 
+# install mplleaf
+conda install -n root -y mplleaflet
 
 ## compile MODFLOW 2005
 #cd /tmp

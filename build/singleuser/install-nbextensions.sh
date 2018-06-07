@@ -58,8 +58,8 @@ conda install -y -n root \
  traitlets
 
 # install jupyter_contrib_nbextensions
-#/opt/conda/bin/pip install --no-cache-dir git+https://github.com/Castronova/jupyter_contrib_nbextensions.git
-#jupyter contrib nbextension install --system
-#jupyter nbextension enable recursivedelete/main --system --section=tree 
-#jupyter nbextensions_configurator disable --system
+/opt/conda/bin/pip install --no-cache-dir git+https://github.com/Castronova/jupyter_contrib_nbextensions.git
+jupyter contrib nbextension install --system
+jupyter nbextension enable recursivedelete/main --system --section=tree 
+jupyter nbextensions_configurator disable --system
 #chown -R jovyan:users /home/jovyan/.jupyter
