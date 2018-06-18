@@ -110,6 +110,20 @@ RUN apt-get update \
 USER jovyan
 RUN mkdir -p /opt/conda/pkgs/cache
 
+RUN conda install -n root -y holoviews rasterio xlsxwriter
+
+# install modflow dev for SI
+RUN cd /tmp \
+&& /bin/bash -c "wget http://public.cuahsi.org/jupyter/mf6.0.2.32.zip" \
+&& unzip mf6.0.2.32.zip \
+&& cd make \
+&& make 
+USER root
+RUN mv /tmp/make/mf6.0.2.32 /usr/local/bin
+RUN rm -rf /tmp/*
+USER jovyan
+
+
 ## install jupyter_contrib_nbextensions
 #RUN jupyter contrib nbextension install --system \
 #&& jupyter nbextension enable recursivedelete/main --system --section=tree \

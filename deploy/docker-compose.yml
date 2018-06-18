@@ -92,6 +92,32 @@ services:
        SSL_ENABLED: 1
        SSL_CERT: ${SSL_CRT}
        SSL_KEY: ${SSL_KEY}
+ 
+  rabbit:
+    hostname: rabbit
+    image: cuahsi/specs-rabbit
+    container_name: specs_rabbit
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: mypass
+      HOSTNAME: rabbitmq
+      RABBITMQ_NODENAME: rabbitmq
+    ports: 
+      - "5672:5672"
+      - "15672:15672"
+ 
+  worker:
+    image: cuahsi/specs-worker
+    container_name: specs_worker
+    privileged: true
+    volumes:
+      - /root/hydroshare-jupyterhub/build/specs/specworker/:/app/specworker
+      - /var/run/docker/sock:/var/run/docker.sock  
+    links: 
+      - rabbit 
+    depends_on:
+      - rabbit 
+    
 
 volumes:
   data:

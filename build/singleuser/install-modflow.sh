@@ -17,6 +17,9 @@ cp /tmp/mf6.0.2/make/mf6.0.2 /usr/local/bin/mf6.0.2
 # install mplleaf
 conda install -n root -y mplleaflet
 
+# install FloPy from the development branch
+/opt/conda/bin/pip install git+https://github.com/modflowpy/flopy.git
+
 ## compile MODFLOW 2005
 #cd /tmp
 #wget https://water.usgs.gov/ogw/modflow/MODFLOW-2005_v1.12.00/MF2005.1_12u.zip
