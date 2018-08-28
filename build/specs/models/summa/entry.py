@@ -2,6 +2,8 @@
 
 import os
 import shutil
+import argparse
+from argparse import RawTextHelpFormatter
 
 ####################################
 # Author: Tony Castronova
@@ -18,37 +20,24 @@ basedir = '/tmp/summa'
 
 
 def prepare():
-#    print('Preparing execution environment')
 
     # copy summa to temp location
-    
     summa_masterpath = os.environ['MASTERPATH']
 
     # remove leading '/' to make sure path join is correct
-#    print('SUMMA_MASTERPATH: %s' % summa_masterpath)
     if summa_masterpath[0] == '/':
         summa_masterpath = summa_masterpath[1:]
 
-#    print('ABS_SUMMA_MASTERPATH: %s' % summa_masterpath)
     summa_masterpath = os.path.join(basedir, summa_masterpath)
     tmp_fm = summa_masterpath+'_tmp'
-#    tmp_fm = os.path.join(basedir, summa_masterpath+'_tmp')
     assert os.path.exists(summa_masterpath), 'Could not find masterfile at %s' % summa_masterpath
 
     # removing leading '/' to make sure path join is correct
     localbase = os.environ['LOCALBASEDIR']
-#    print('BASEDIR: %s' % localbase)
     if localbase[0] == '/':
         localbase = localbase[1:]
     localbase = os.path.join(basedir, localbase)
-#    print('NEW_BASEDIR: %s' % localbase)
 
-
-#    print('PATH: %s' % basedir)
-#    print('FM PATH: %s' % summa_masterpath)
-#    print('TMP_FM PATH: %s' % tmp_fm)
-
-#    print('Creating the tmp Filemanager')
     args = {}
     with open(tmp_fm, 'w') as w:
         with open(summa_masterpath, 'r') as r:
@@ -68,21 +57,17 @@ def prepare():
     settings_path = args['setting_path'].replace(localbase,'')
     if settings_path[0] == '/':
         settings_path = settings_path[1:]
-#    print('SETTING PATH: %s' % settings_path)
     for k, v in args.items():
         if basedir not in v:
             args[k] = os.path.join(localbase, settings_path, v)
-#            print('%s + %s + %s = %s' %(localbase, settings_path, v, args[k]))
 
     # create the output path, if it doesn't already exist
     if not os.path.exists(args['output_path']):
         os.makedirs(args['output_path'])
 
-
     # make sure all these paths exist
     for k, v in args.items():
         print('{:20s} -> '.format(k), end='')
-#        print('checking %s ->' % k, end='')
         if k in ['fman_ver', 'output_prefix']:
             pass
         elif 'path' in k:
@@ -93,7 +78,6 @@ def prepare():
             assert os.path.exists(p), "Error in masterfile. Could not find " \
                                       "%s: %s" % (k, v)
         print('OK')
-#    print('SUMMA PREP COMPLETE')
     return tmp_fm
 
 
@@ -103,11 +87,9 @@ def rm_tmp_dir(tmp):
         print('Cleaning execution environment')
         shutil.rmtree(tmp)
 
-
 def mk_output_dir(d):
     if not os.path.exists(d):
         os.makedirs(d)
-
 
 def run(masterp):
     print('Running SUMMA simulation')
@@ -116,7 +98,45 @@ def run(masterp):
 def clean(masterp):
     os.remove(masterp)
 
-# entry point steps
-masterp = prepare()
-run(masterp)
-clean(masterp)
+def describe():
+    print('This is the entry script for the SUMMA model container')
+    print('It uses version 0.1 of the SPECS API')
+    return(0.1)
+
+def execute():
+    # entry point steps
+    masterp = prepare()
+    run(masterp)
+    clean(masterp)
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(formatter_class=RawTextHelpFormatter, description=
+"####################################"
+"\n# Author: Tony Castronova"
+"\n# Email:  acastronova.cuahsi.org"
+"\n# Date:   9.17.2017"
+"\n# Org:    CUAHSI"
+"\n# Desc:   Entrypoint for executing the summa model"
+"\n####################################"
+)
+    parser.add_argument('-d', action='store_true',
+                        help='Describe help')
+    parser.add_argument('-m', action='store_true',
+                        help='Methods help')
+    parser.add_argument('-x', action='store_true',
+                        help=
+"\nUSAGE: docker run --rm -v <LOCALEBASEDIR>:/tmp/summa -e LOCALBASEDIR:<LOCALBASEDIR> -e MASTERPATH:<MASTERPATH> ncar/summa -x"
+"\n\nEnvironment Variables: <LOCALBASEDIR>: the base directory of the SUMMA simulation"
+"\n	                 <MASTERPATH>: path to the file_manager"
+"\nFile Mounts: <LOCALBASEDIR> -> /tmp/summa"
+)
+
+    args = parser.parse_args()
+    if args.d:
+        describe()
+    elif args.m:
+        parser.print_help()
+    elif args.x:
+        execute()
+    else:
+        parser.print_help()
