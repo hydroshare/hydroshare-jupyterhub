@@ -1,21 +1,52 @@
 from __future__ import absolute_import, print_function
+import os
 import time
-from .tasks import *
+from . import tasks
 from .compat import *
+from . import progress
 
-registered_images = ['castrona/jhswarm', 'jupyter/scipy-notebook', 'summa']
+__all__ = []
+
+registered_images = ['ncar/summa', 'ncar/summa-test']
 
 def get_registered_images():
 
-    task = task_get_registered_images.delay()
-    task = wait_for_task(task)
-    res = task.result.split('\n')
+    job = tasks.task_get_registered_images.delay()
+    job = wait_for_task(job)
+    res = job.result.split('\n')
     imgs = [res[i].split()[0] for i in range(1,len(res)-1) if res[i].split()[0] in registered_images]
     return imgs
 
-def run(image_name, vol_mount, mount_target, env_vars={}):
+def describe(image_name):
+    invoker_id = os.popen('basename "$(head /proc/1/cgroup)"').read().strip().split('-')[1][:-6]
+    # make sure the image is registered
+    if image_name not in registered_images:
+        print('Cannot run a non-registered container')
+        return None
 
-    invoker_id = os.popen('basename "$(head /proc/1/cgroup)"').read().strip()
+    job = tasks.task_run.delay(image_name, invoker_id, args='-d')
+    job = wait_for_task(job)
+    print('task complete')
+    print(job.result)
+    return job
+    
+def methods(image_name):
+    invoker_id = os.popen('basename "$(head /proc/1/cgroup)"').read().strip().split('-')[1][:-6]
+    # make sure the image is registered
+    if image_name not in registered_images:
+        print('Cannot run a non-registered container')
+        return None
+
+    job = tasks.task_run.delay(image_name, invoker_id, args='-m')
+    job = wait_for_task(job)
+    print('task complete')
+    print(job.result)
+    return job
+
+def run(image_name, vol_mount=None, mount_target=None, env_vars={}):
+
+    # get the id, remove docker- and .scope
+    invoker_id = os.popen('basename "$(head /proc/1/cgroup)"').read().strip().split('-')[1][:-6]
     print('Name: %s' % image_name)
     print('Local Relative Path: %s' % vol_mount)
     print('Mount target: %s' % mount_target)
@@ -26,27 +57,29 @@ def run(image_name, vol_mount, mount_target, env_vars={}):
         print('Cannot run a non-registered container')
         return None
 
-    task = task_run_container.delay(image_name, vol_mount, mount_target, invoker_id, env_vars)
-    task = wait_for_task(task)
+    job = tasks.task_run_container.delay(image_name, vol_mount, mount_target, invoker_id, env_vars)
+#    job = tasks.task_run.delay(image_name, vol_mount, mount_target, invoker_id, env_vars, cmd=args)
+    job = wait_for_task(job)
     print('task complete')
-    print(task.result)
-    return task
+    print(job.result)
+    return job
 
 
 
 def sanity_check(string, async=True):
     if async:
-        task = task.sanity_check(string)
-        res = task.result
+        res = tasks.task_sanity_check(string)
     else:
-        res = task.sanity_check(string)
+        res = tasks.task_sanity_check(string)
     return res
 
-def wait_for_task(task):
-    print('waiting for task to finish', end='')
-    while not task.ready():
-#        print(task.info)
-        print('.', end='')
-        time.sleep(.25)
-    print(' done')
-    return task
+def wait_for_task(job):
+    msg = 'Waiting for task to finish '
+    suc = 'Job finished'
+    pbar = progress.progressBar(msg, type='pulse',
+                                finish_message=suc)
+    while not job.ready():
+        pbar.writeprogress()
+        time.sleep(.05)
+    pbar.success()
+    return job
