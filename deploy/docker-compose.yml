@@ -108,16 +108,16 @@ services:
  
   worker:
     image: cuahsi/specs-worker
-    container_name: specs_worker
+#    container_name: specs_worker
     privileged: true
     volumes:
-      - /root/hydroshare-jupyterhub/build/specs/specworker/:/app/specworker
-      - /var/run/docker/sock:/var/run/docker.sock  
+      - "/root/hydroshare-jupyterhub/build/specs/specworker/:/app/specworker"
+      - "/var/run/docker.sock:/var/run/docker.sock:rw"
     links: 
       - rabbit 
     depends_on:
       - rabbit 
-    
+   
 
 volumes:
   data:
