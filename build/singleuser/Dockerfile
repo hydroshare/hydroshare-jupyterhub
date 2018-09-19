@@ -1,4 +1,4 @@
-FROM jupyter/scipy-notebook
+FROM jupyter/scipy-notebook:137a295ff71b
 MAINTAINER Tony Castronova <acastronova@cuahsi.org>
 
 EXPOSE 8888
