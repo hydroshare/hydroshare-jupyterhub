@@ -14,7 +14,7 @@ conda install -y -n python2 \
     "statsmodels=0.8.0" \
     "odm2api=0.6.0.a0" \
     "landlab=1.4.0" \
-    ogh \
+    "ogh=0.1.11" \
     basemap-data-hires \
     bsddb \
     python-wget

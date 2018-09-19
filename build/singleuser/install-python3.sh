@@ -14,7 +14,7 @@ conda install -y -n root \
 gdal \
 "jupyterhub=0.8.1" \
 "landlab=1.4.0" \
-ogh \
+"ogh=0.1.11" \
 basemap-data-hires \
 ulmo \
 celery \
