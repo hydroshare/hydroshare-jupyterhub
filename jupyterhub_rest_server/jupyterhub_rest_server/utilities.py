@@ -1,6 +1,6 @@
 # this file contains utility functions used by the RequestHandlers
 
-import os
+import os, stat
 from pwd import getpwnam
 import grp
 import shutil
@@ -67,9 +67,13 @@ def build_userspace(username):
     print('%s -> modifying userspace permissions' % username, flush=True)
     os.chown(basepath, uid, gid)
     os.chown(os.path.dirname(basepath), uid, gid)
+    os.chmod(os.path.dirname(basepath), stat.S_IRWXG | stat.S_ISGID | stat.S_IRWXU)
 
     for root, dirs, files in os.walk(basepath):
         for d in dirs:
             os.chown(os.path.join(root, d), uid, gid)
+            os.chmod(os.path.join(root, d), stat.S_IRWXG | stat.S_ISGID | stat.S_IRWXU)
+
         for f in files:
             os.chown(os.path.join(root, f), uid, gid)
+            os.chmod(os.path.join(root, f), stat.S_IRWXG | stat.S_ISGID | stat.S_IRWXU)

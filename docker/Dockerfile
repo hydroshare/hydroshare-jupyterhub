@@ -1,6 +1,5 @@
-FROM castrona/hydroshare-jupyterhub:1.3
+FROM base-04-11-2018:latest
 MAINTAINER Tony Castronova <acastronova@cuahsi.org>
-
 ######################################################
 ### Begin - JupyterHub Development Image Additions ###
 ######################################################
