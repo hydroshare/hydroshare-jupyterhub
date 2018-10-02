@@ -1,3 +1,4 @@
+# coding: utf-8
 from __future__ import print_function
 import os
 import getpass
@@ -13,8 +14,9 @@ from . import threads
 from . import resource
 from . import utilities
 from .compat import *
+from .. import utils
 
-
+                
 class hydroshare():
     def __init__(self, username=None, password=None, cache=True):
         self.hs = None
@@ -205,8 +207,9 @@ class hydroshare():
         # check if the data should be overwritten
         dst_res_folder = os.path.join(dst, resourceid)
         if os.path.exists(dst_res_folder):
-            res = input('This resource already exists in your userspace.'
-                        '\nWould you like to overwrite this data [Y/n]? ')
+            print('This resource already exists in your userspace.')
+            utils.tree(dst_res_folder)
+            res = input('\nDo you want to overwrite these data [Y/n]? ')
             if res != 'n':
                 shutil.rmtree(dst_res_folder)
             else:

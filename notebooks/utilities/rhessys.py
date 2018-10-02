@@ -481,8 +481,8 @@ class RHESSysWorkflow(object):
         #print("End Executing workflow")
 
         # prepare grass environment extensions
-        if not os.path.exists(os.path.join(os.environ['HOME'], '.grassrc6')):
-            print('Preparing grass6 installation... ', end='')
+        if not os.path.exists(os.path.join(os.environ['HOME'], '.grass7')):
+            print('Preparing grass7 installation... ', end='')
             try:
                 prepare_script = os.path.join(os.path.dirname(__file__), 'prepare_grass.sh')
                 my_command = 'sh %s jupyter' % prepare_script

@@ -3,7 +3,7 @@
 # create a new LOCATION from a raster data set
 
 #variables to customize:
-GISBASE=/usr/lib/grass64
+GISBASE=/usr/lib/grass72
 GISDBASE=/home/jovyan/grassdata
 GRASS_ADDON_PATH=/home/jovyan/work/notebooks/.grass6/addons
 
@@ -24,17 +24,17 @@ fi
 TEMPDIR=$$.tmp
 mkdir -p $GISDBASE/$TEMPDIR/temp
 
-#save existing $HOME/.grassrc6
-if test -e $HOME/.grassrc6 ; then
-   mv $HOME/.grassrc6 /tmp/$TEMPDIR.grassrc6
+#save existing $HOME/.grass7
+if test -e $HOME/.grass7 ; then
+   mv $HOME/.grass7 /tmp/$TEMPDIR.grass7
 fi
 
-echo "LOCATION_NAME: $TEMPDIR"  >  $HOME/.grassrc6
-echo "MAPSET: temp"                 >> $HOME/.grassrc6
-echo "DIGITIZER: none"              >> $HOME/.grassrc6
-echo "GISDBASE: $GISDBASE"          >> $HOME/.grassrc6
+echo "LOCATION_NAME: $TEMPDIR"  >  $HOME/.grass7
+echo "MAPSET: temp"                 >> $HOME/.grass7
+echo "DIGITIZER: none"              >> $HOME/.grass7
+echo "GISDBASE: $GISDBASE"          >> $HOME/.grass7
 export GISBASE=$GISBASE
-export GISRC=$HOME/.grassrc6
+export GISRC=$HOME/.grass7
 export PATH=$PATH:$GISBASE/bin:$GISBASE/scripts
 
 # import raster map into new location:
@@ -44,21 +44,21 @@ if [ $? -eq 1 ] ; then
   exit 1
 fi
 
-#restore saved $HOME/.grassrc6
-if test -f /tmp/$TEMPDIR.grassrc6 ; then
-   mv /tmp/$TEMPDIR.grassrc6 $HOME/.grassrc6
+#restore saved $HOME/.grass7
+if test -f /tmp/$TEMPDIR.grass7 ; then
+   mv /tmp/$TEMPDIR.grass7 $HOME/.grass7
 fi
 echo $GRASS_ADDON_PATH
 
-echo "LOCATION_NAME: $LOCATION"  >  $HOME/.grassrc6
-echo "MAPSET: PERMANENT"                 >> $HOME/.grassrc6
-echo "DIGITIZER: none"              >> $HOME/.grassrc6
-echo "GISDBASE: $GISDBASE"          >> $HOME/.grassrc6
-export GISRC=$HOME/.grassrc6
+echo "LOCATION_NAME: $LOCATION"  >  $HOME/.grass7
+echo "MAPSET: PERMANENT"                 >> $HOME/.grass7
+echo "DIGITIZER: none"              >> $HOME/.grass7
+echo "GISDBASE: $GISDBASE"          >> $HOME/.grass7
+export GISRC=$HOME/.grass7
 
-#grass64 -text /home/jovyan/work/notebooks/$LOCATION/PERMANENT
+#grass72 -text /home/jovyan/work/notebooks/$LOCATION/PERMANENT
 g.extension extension=r.soils.texture prefix=$GRASS_ADDON_PATH
 g.extension extension=r.findtheriver prefix=$GRASS_ADDON_PATH
 
 echo "Now launch GRASS with:"
-echo " grass64 $GISDBASE/$LOCATION/PERMANENT"
+echo " grass72 $GISDBASE/$LOCATION/PERMANENT"

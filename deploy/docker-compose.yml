@@ -1,0 +1,133 @@
+# HydroShare-JupyterHub docker-compose configuration file
+version: "2"
+
+services:
+  hub-db:
+    image: postgres:9.5
+    container_name: jupyterhub-db
+    restart: always
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      PGDATA: ${DB_VOLUME_CONTAINER}
+    env_file:
+      - secrets/postgres.env
+    volumes:
+      - "db:${DB_VOLUME_CONTAINER}"
+
+  hub:
+    depends_on:
+      - hub-db
+    restart: always
+    image: ${JUPYTER_NOTEBOOK_IMAGE}
+    container_name: jupyterhub
+    volumes:
+      # Bind Docker socket on the host so we can connect to the daemon from
+      # within the container
+      - "/var/run/docker.sock:/var/run/docker.sock:rw"
+      # Bind Docker volume on host for JupyterHub database and cookie secrets
+      - "data:${DATA_VOLUME_CONTAINER}"
+      # Bind userspace on host to Jupyter container
+      - "${JUPYTER_USERSPACE_DIR_HOST}:${JUPYTER_USERSPACE_DIR}:rw"
+      # Mount jupyter configuration
+      - "./config/jupyterhub_config.py:/srv/jupyterhub/jupyterhub_config.py:ro"
+      # Mount SSL key and cert
+      - "./secrets/jupyterhub.crt:${SSL_CRT}:ro"
+      - "./secrets/jupyterhub.key:${SSL_KEY}:ro"
+    ports:
+      - "443:443"
+    links:
+      - hub-db
+    environment:
+      # All containers will join this network
+      DOCKER_NETWORK_NAME: ${DOCKER_NETWORK_NAME}
+      # JupyterHub will spawn this Notebook image for users
+      DOCKER_NOTEBOOK_IMAGE: ${DOCKER_NOTEBOOK_IMAGE}
+      # Notebook directory inside user image
+      DOCKER_NOTEBOOK_DIR: ${DOCKER_NOTEBOOK_DIR}
+      # Using this run command (optional)
+      DOCKER_SPAWN_CMD: ${DOCKER_SPAWN_CMD}
+      # Postgres db info
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_HOST: hub-db
+      # Extra JupyterHub
+      JUPYTER_USERSPACE_DIR: ${JUPYTER_USERSPACE_DIR}
+      JUPYTER_USER: ${JUPYTER_USER}
+      JUPYTER_NOTEBOOK_DIR: ${JUPYTER_NOTEBOOK_DIR}  
+      JUPYTER_USERSPACE_DIR_HOST: ${JUPYTER_USERSPACE_DIR_HOST}
+      JUPYTERHUB_API_TOKEN: ${JUPYTERHUB_API_TOKEN} 
+      CONTAINER_IDLE_TIMEOUT: ${CONTAINER_IDLE_TIMEOUT}
+      CONTAINER_MAX_AGE: ${CONTAINER_MAX_AGE} 
+      DOCKER_MEM_LIMIT: ${DOCKER_MEM_LIMIT}
+      SPAWNER_START_TIMEOUT: ${SPAWNER_START_TIMEOUT}
+      SPAWNER_HTTP_TIMEOUT: ${SPAWNER_HTTP_TIMEOUT}
+      SSL_CERT: ${SSL_CRT}
+      SSL_KEY: ${SSL_KEY}
+      JUPYTER_STATIC_DIR_HOST: ${JUPYTER_STATIC_DIR_HOST}
+    env_file:
+      - secrets/postgres.env
+      - secrets/oauth.env
+    command: >
+      jupyterhub -f /srv/jupyterhub/jupyterhub_config.py
+
+  jupyterhub_rest:
+    image: cuahsi/jupyterhub-rest:latest
+    container_name: jupyterhub-rest
+    volumes:
+       # Bind userspace on host to Jupyter container (tony)
+       - "${JUPYTER_USERSPACE_DIR_HOST}:${JUPYTER_USERSPACE_DIR}:rw"
+       # Mount SSL key and cert
+       - "./secrets/jupyterhub.crt:${SSL_CRT}:ro"
+       - "./secrets/jupyterhub.key:${SSL_KEY}:ro"
+    ports:
+       - "8080:8080"
+    environment:
+       HYDROSHARE_REDIRECT_COOKIE_PATH: ${JUPYTER_USERSPACE_DIR}/_global/jupyterhub/redirect
+       JUPYTER_HUB_IP: ${JUPYTER_HUB_IP}
+       JUPYTER_PORT: 443
+       JUPYTER_REST_PORT: 8080
+       JUPYTER_NOTEBOOK_DIR: ${JUPYTER_NOTEBOOK_DIR}
+       JUPYTER_USERSPACE_DIR: ${JUPYTER_USERSPACE_DIR}
+       JUPYTER_USER: root
+       JUPYTER_REST_IP: ${JUPYTER_REST_IP}
+       SSL_ENABLED: 1
+       SSL_CERT: ${SSL_CRT}
+       SSL_KEY: ${SSL_KEY}
+ 
+  rabbit:
+    hostname: rabbit
+    image: cuahsi/specs-rabbit
+    container_name: specs_rabbit
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: mypass
+      HOSTNAME: rabbitmq
+      RABBITMQ_NODENAME: rabbitmq
+    ports: 
+      - "5672:5672"
+      - "15672:15672"
+ 
+  worker:
+    image: cuahsi/specs-worker
+#    container_name: specs_worker
+    privileged: true
+    volumes:
+      - "/root/hydroshare-jupyterhub/build/specs/specworker/:/app/specworker"
+      - "/var/run/docker.sock:/var/run/docker.sock:rw"
+    links: 
+      - rabbit 
+    depends_on:
+      - rabbit 
+   
+
+volumes:
+  data:
+    external:
+      name: ${DATA_VOLUME_HOST}
+  db:
+    external:
+      name: ${DB_VOLUME_HOST}
+
+networks:
+  default:
+    external:
+      name: ${DOCKER_NETWORK_NAME}
