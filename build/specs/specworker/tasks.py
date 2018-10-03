@@ -19,8 +19,16 @@ def task_sanity_check(string, wait=1):
 
 @app.task
 def task_get_registered_images():
-    res = os.popen("docker images").read()
-    return res
+
+    try:
+        registered_images = os.environ['IMAGES'].split(':')
+        res = os.popen("docker images").read()
+        res = res.split('\n')
+        imgs = [res[i].split()[0] for i in range(1,len(res)-1) if res[i].split()[0] in registered_images]
+    except Excpetion as e:
+        print('Exception occurred when retrieving image list: %s' % e)
+        return []
+    return imgs
 
 
 @app.task
