@@ -1,0 +1,74 @@
+#!/bin/bash  
+
+
+####################################
+# Author: Tony Castronova
+# Email:  acastronova.cuahsi.org
+# Date:   9.17.2017
+# Org:    CUAHSI
+# Desc:   Entrypoint for executing the summa model
+####################################
+
+
+BASEDIR=/tmp/summa
+
+mk-tmp-dir() {
+
+echo Preparing execution environment
+
+# remove the tmp execution directory if it already exists
+rm-tmp-dir
+
+if [ "`echo -n $MASTERPATH | grep ^$LOCALBASEDIR`" != "" ]; then 
+  LEN=`echo -n $LOCALBASEDIR | wc -c`
+  MLEN=`echo -n $MASTERPATH | wc -c`
+  RELPATH=`echo -n $MASTERPATH | cut -b $((LEN+2))-`
+  echo $RELPATH
+
+  # make a temporary copy of the input data
+  BASE=$(echo "$RELPATH" | cut -d "/" -f1)
+  BASETMP=$BASEDIR/$BASE\_tmp
+  cp -r $BASEDIR/$BASE $BASETMP
+
+  # modify paths relative to the docker environment
+  find $BASETMP -type f | xargs sed -i "s|$LOCALBASEDIR|$BASEDIR|"
+
+  # set the exec path as the path to the copied masterfile
+  MASTERTMP=$(echo "$RELPATH" | cut -d "/" -f2-)
+  EXECPATH=$BASETMP/$MASTERTMP
+
+fi
+}
+
+rm-tmp-dir() {
+ 
+  # remove the temporary directory
+  if [ -d "$BASETMP" ]; then
+    echo Cleaning execution environment
+    rm -rf $BASETMP
+  fi 
+
+}
+
+run() {
+
+    echo Running SUMMA simulation
+
+    /code/bin/summa.exe -m $EXECPATH
+}
+
+mk-output-dir() {
+
+  # remove the temporary directory
+  if [ ! -d "$OUTDIR" ]; then
+    echo Creating output directory
+    mkdir -p $OUTDIR
+  fi 
+
+}
+
+# entry point steps
+mk-tmp-dir
+mk-output-dir
+run
+rm-tmp-dir
