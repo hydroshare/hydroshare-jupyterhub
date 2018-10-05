@@ -31,7 +31,7 @@ def is_registered(image_name):
     image_list = job.result
     if image_name in image_list:
         return True
-    return Fals
+    return False
 
 def describe(image_name):
 
