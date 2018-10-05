@@ -50,7 +50,8 @@ conda install -y -n root \
  traitlets
 
 # install pysumma (pure python)
-/opt/conda/bin/pip install --no-cache-dir git+https://github.com/uva-hydroinformatics/pysumma/tree/develop@e273369ecae6d0209716c35cde20ffde3877332c
+/opt/conda/bin/pip install --no-cache-dir git+https://github.com/uva-hydroinformatics/pysumma.git@e273369ecae6d0209716c35cde20ffde3877332c
+#/opt/conda/bin/pip install --no-cache-dir git+https://github.com/uva-hydroinformatics/pysumma/tree/develop@e273369ecae6d0209716c35cde20ffde3877332c
 
 # cleanup
 conda clean -all -y
