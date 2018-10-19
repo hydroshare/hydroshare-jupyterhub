@@ -12,7 +12,7 @@ log = logging.getLogger()
 def set_hydroshare_args(username, resourceid, resourcetype):
 
     userspace_dir = os.environ['JUPYTER_USERSPACE_DIR']
-    hs_env = os.path.abspath(os.path.join(userspace_dir, '%s/notebooks/.env' % username.lower()))
+    hs_env = os.path.abspath(os.path.join(userspace_dir, '%s/.env' % username.lower()))
     print('ENV_PATH ',hs_env)
 
     with open(hs_env, 'w') as f:
@@ -49,7 +49,7 @@ def build_userspace(username):
         os.makedirs(path)
 
     file_paths = []
-    print('%s -> copying userpace filse' % username, flush=True)
+    print('%s -> copying userpace files' % username, flush=True)
     #ipynb_dir = '../jupyter-rest-endpoint/notebooks'
     for root, dirs, files in os.walk(ipynb_dir):
         for file in files:
@@ -61,6 +61,7 @@ def build_userspace(username):
         dirpath = os.path.dirname(dst)
         if not os.path.exists(dirpath):
             os.makedirs(dirpath)
+        print("Copying %s -> %s" % (src, dst))
         shutil.copyfile(src, dst)
 
     # change file ownership so that it can be accessed inside docker container
