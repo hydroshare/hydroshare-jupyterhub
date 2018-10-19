@@ -4,7 +4,6 @@ import socket
 import logging
 import tornado.auth
 import shutil
-import ipgetter
 from . import utilities
 
 from tornado.log import enable_pretty_logging
@@ -95,7 +94,6 @@ class JupyterHandler(RequestHandler, tornado.auth.OAuth2Mixin):
         except Exception as e:
             print('ERROR %s: %s' % (msg, e))
 
-        print('HERE')
         try:
             msg = '%s -> writing .env' % husername
             print(msg)
