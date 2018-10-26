@@ -122,7 +122,7 @@ class JupyterHandler(RequestHandler, tornado.auth.OAuth2Mixin):
         print('baseurl=' + baseurl)
         print('resourceid=' + resourceid)
         print('resourcetype=' + resourcetype)
-        print('target=' + target)
+        print('target=' + str(target))
         print("URL:" + url)
 
         # save the next url to ensure that the redirect will work
