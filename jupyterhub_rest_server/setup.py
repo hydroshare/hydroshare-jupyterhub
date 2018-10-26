@@ -10,7 +10,6 @@ setup(name='JupyterhubRestServer',
       packages=['jupyterhub_rest_server'],
       install_requires= [
 	'appdirs==1.4.2',
-	'ipgetter==0.6',
 	'pyparsing==2.1.10',
 	'six==1.10.0',
 	'tornado==4.4.2'
