@@ -87,12 +87,12 @@ class JupyterHandler(RequestHandler, tornado.auth.OAuth2Mixin):
             resourcetype = resourcetype.lower()
 
         # build userspace
-        try:
-            msg = '%s -> building userspace' % husername
-            print(msg)
-            utilities.build_userspace(username)
-        except Exception as e:
-            print('ERROR %s: %s' % (msg, e))
+        # try:
+        #     msg = '%s -> building userspace' % husername
+        #     print(msg)
+        #     utilities.build_userspace(username)
+        # except Exception as e:
+        #     print('ERROR %s: %s' % (msg, e))
 
         try:
             msg = '%s -> writing .env' % husername
@@ -118,6 +118,11 @@ class JupyterHandler(RequestHandler, tornado.auth.OAuth2Mixin):
         else:
             url = "%s://%s%s/user/%s/tree/notebooks/Welcome.ipynb" % (proto, baseurl, port, username)
 
+        #url = 'https://jupyterhub-dev.uwrl.usu.edu/hub/user-redirect/hs-pull?id=8caa62c46c424a818899ebeca6f30a83&start=spiro3D.ipynb'
+        print('baseurl=' + baseurl)
+        print('resourceid=' + resourceid)
+        print('resourcetype=' + resourcetype)
+        print('target=' + target)
         print("URL:" + url)
 
         # save the next url to ensure that the redirect will work

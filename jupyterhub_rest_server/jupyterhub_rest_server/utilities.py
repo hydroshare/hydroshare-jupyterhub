@@ -11,10 +11,10 @@ log = logging.getLogger()
 
 def set_hydroshare_args(username, resourceid, resourcetype):
 
-    userspace_dir = os.environ['JUPYTER_USERSPACE_DIR']
-    hs_env = os.path.abspath(os.path.join(userspace_dir, '%s/.env' % username.lower()))
-    print('ENV_PATH ',hs_env)
-
+    #userspace_dir = os.environ['JUPYTER_USERSPACE_DIR']
+    #hs_env = os.path.abspath(os.path.join(userspace_dir, '%s/.env' % username.lower()))
+    #print('ENV_PATH ',hs_env)
+    hs_env = os.path.expanduser('~/.env')
     with open(hs_env, 'w') as f:
         f.write('HS_USR_NAME=%s\n' % username)
         f.write('HS_RES_ID=%s\n' % resourceid)
