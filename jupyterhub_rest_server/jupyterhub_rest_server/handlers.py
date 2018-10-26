@@ -4,7 +4,6 @@ import socket
 import logging
 import tornado.auth
 import shutil
-import ipgetter
 from . import utilities
 
 from tornado.log import enable_pretty_logging
