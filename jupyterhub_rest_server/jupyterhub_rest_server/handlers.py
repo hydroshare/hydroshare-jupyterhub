@@ -96,8 +96,7 @@ class JupyterHandler(RequestHandler, tornado.auth.OAuth2Mixin):
         #     print('ERROR %s: %s' % (msg, e))
 
         try:
-            msg = '%s -> writing .env' % husername
-            print(msg)
+            print(msg = '%s -> writing .env' % husername, file=sys.stderr)
             utilities.set_hydroshare_args(husername, resourceid, resourcetype)
         except Exception as e:
             print('ERROR %s: %s' % (msg, e), flush=True)
