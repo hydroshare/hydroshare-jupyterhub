@@ -92,7 +92,6 @@ def load_environment(env_path=None):
             env_path = os.path.join(os.environ['NOTEBOOK_HOME'], '.env')
 
     if not os.path.exists(env_path):
-        print('\nEnvironment file could not be found.  Make sure that the JUPYTER_ENV variable is set properly')
         return
 
     with open(env_path, 'r') as f:

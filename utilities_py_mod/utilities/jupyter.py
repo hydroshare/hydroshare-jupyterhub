@@ -1,6 +1,5 @@
 from os import environ
-from os.path import relpath, join, dirname, abspath, exists
-
+from os.path import relpath, join, dirname, abspath, exists, expanduser
 
 def get_relative_path(p):
     """
@@ -28,15 +27,15 @@ def get_server_url_for_path(p):
            environ['JPY_BASE_URL'], rel_path)
     return url
 
-def load_environment(env_path=None, silent=True):
 
+def load_environment(env_path=None, silent=True):
     # load the environment path (if it exists)
     if env_path is None:
-        if 'NOTEBOOK_HOME' in environ.keys():
-            env_path = join(environ['NOTEBOOK_HOME'], '.env')
+        env_path = expanduser("~/.env")
+        if not exists(env_path) and 'NOTEBOOK_HOME' in environ.keys():
+            env_path = join(os.environ['NOTEBOOK_HOME'], '.env')
 
     if not exists(env_path):
-        print('\nEnvironment file could not be found.  Make sure that the JUPYTER_ENV variable is set properly')
         return
 
     with open(env_path, 'r') as f:

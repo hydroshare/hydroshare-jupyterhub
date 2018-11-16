@@ -340,4 +340,4 @@ class hydroshare():
 
         path = utilities.find_resource_directory(resourceid)
         if path is not None:
-            return os.path.join(path, resourceid, 'data/contents')
+            return os.path.join(path, 'data/contents')
