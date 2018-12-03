@@ -98,6 +98,7 @@ class JupyterHandler(RequestHandler, tornado.auth.OAuth2Mixin):
         try:
             msg = '%s -> building userspace' % husername
             print(msg, file=sys.stderr)
+            utilities.build_userspace(username)
             utilities.set_hydroshare_args(husername, resourceid, resourcetype)
         except Exception as e:
             print('ERROR %s: %s' % (msg, e), flush=True)
