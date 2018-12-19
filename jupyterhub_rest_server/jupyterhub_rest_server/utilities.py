@@ -33,8 +33,7 @@ def build_userspace(username):
     husername = username.lower()
 
     # get the jupyter username
-    # user = getpwnam(os.environ['JUPYTER_USER'])
-    user = getpwnam('jovyan')
+    user = getpwnam(os.environ['JUPYTER_USER'])
     group = grp.getgrnam('users')
     uid = user.pw_uid
     gid = group.gr_gid
@@ -48,9 +47,9 @@ def build_userspace(username):
     path = basepath
     if not os.path.exists(path):
         os.makedirs(path)
-    # lpath = os.path.join(path, '.local', 'share', 'jupyter')
-    # if not os.path.exists(lpath):
-    #     os.makedirs(lpath)
+    lpath = os.path.join(path, '.local', 'share', 'jupyter')
+    if not os.path.exists(lpath):
+        os.makedirs(lpath)
 
     file_paths = []
     print('%s -> Copying userpace files' % username, flush=True)
