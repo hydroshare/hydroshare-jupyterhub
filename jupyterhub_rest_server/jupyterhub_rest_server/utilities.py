@@ -33,7 +33,8 @@ def build_userspace(username):
     husername = username.lower()
 
     # get the jupyter username
-    user = getpwnam(os.environ['JUPYTER_USER'])
+    # user = getpwnam(os.environ['JUPYTER_USER'])
+    user = getpwnam('jovyan')
     group = grp.getgrnam('users')
     uid = user.pw_uid
     gid = group.gr_gid
@@ -47,9 +48,9 @@ def build_userspace(username):
     path = basepath
     if not os.path.exists(path):
         os.makedirs(path)
-    lpath = os.path.join(path, '.local', 'share', 'jupyter')
-    if not os.path.exists(lpath):
-        os.makedirs(lpath)
+    # lpath = os.path.join(path, '.local', 'share', 'jupyter')
+    # if not os.path.exists(lpath):
+    #     os.makedirs(lpath)
 
     file_paths = []
     print('%s -> Copying userpace files' % username, flush=True)
@@ -71,17 +72,17 @@ def build_userspace(username):
     print('%s -> modifying userspace permissions' % username, flush=True)
     os.chown(basepath, uid, gid)
     os.chown(os.path.dirname(basepath), uid, gid)
-    os.chmod(os.path.dirname(basepath), stat.S_IRWXG | stat.S_ISGID | stat.S_IRWXU)
+    # os.chmod(os.path.dirname(basepath), stat.S_IRWXG | stat.S_ISGID | stat.S_IRWXU)
 #    os.chmod(basepath, 0o2770)
 
-    for root, dirs, files in os.walk(basepath):
-        for d in dirs:
-            os.chown(os.path.join(root, d), uid, gid)
-            os.chmod(os.path.join(root, d), stat.S_IRWXG | stat.S_ISGID | stat.S_IRWXU)
+    # for root, dirs, files in os.walk(basepath):
+    #     for d in dirs:
+    #         os.chown(os.path.join(root, d), uid, gid)
+    #         os.chmod(os.path.join(root, d), stat.S_IRWXG | stat.S_ISGID | stat.S_IRWXU)
 
-        for f in files:
-            os.chown(os.path.join(root, f), uid, gid)
-            os.chmod(os.path.join(root, f), stat.S_IRWXG | stat.S_ISGID | stat.S_IRWXU)
+    #     for f in files:
+    #         os.chown(os.path.join(root, f), uid, gid)
+    #         os.chmod(os.path.join(root, f), stat.S_IRWXG | stat.S_ISGID | stat.S_IRWXU)
 #            os.chmod(os.path.join(root, d), 0o2770)
 #
 #        for f in files:
