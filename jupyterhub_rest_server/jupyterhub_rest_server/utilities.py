@@ -42,7 +42,7 @@ def build_userspace(username):
     ipynb_dir = os.environ['JUPYTER_NOTEBOOK_DIR']
 
     # check to see if user exists
-    basepath = os.path.abspath(os.path.join(userspace_dir, '%s'%husername))
+    basepath = os.path.abspath(os.path.join(userspace_dir, '%s' % husername))
     # path = os.path.abspath(os.path.join(basepath, 'notebooks'))
     path = basepath
     if not os.path.exists(path):
@@ -51,7 +51,6 @@ def build_userspace(username):
     if not os.path.exists(lpath):
         os.makedirs(lpath)
 
-    print('basepath=%s ipynb_dir=%s' % (basepath, ipynb_dir))
     file_paths = []
     print('%s -> Copying userpace files' % username, flush=True)
     #ipynb_dir = '../jupyter-rest-endpoint/notebooks'
@@ -71,9 +70,9 @@ def build_userspace(username):
     # change file ownership so that it can be accessed inside docker container
     print('%s -> modifying userspace permissions' % username, flush=True)
     os.chown(basepath, uid, gid)
+    os.chmod(basepath, stat.S_IRWXG |  stat.S_IRWXU)
     os.chown(os.path.dirname(basepath), uid, gid)
     os.chmod(os.path.dirname(basepath), stat.S_IRWXG | stat.S_IRWXU)
-#    os.chmod(basepath, 0o2770)
 
     for root, dirs, files in os.walk(basepath):
         for d in dirs:
@@ -83,8 +82,3 @@ def build_userspace(username):
         for f in files:
             os.chown(os.path.join(root, f), uid, gid)
             os.chmod(os.path.join(root, f), stat.S_IRWXG | stat.S_IRWXU)
-#            os.chmod(os.path.join(root, d), 0o2770)
-#
-#        for f in files:
-#            os.chown(os.path.join(root, f), uid, gid)
-#            os.chmod(os.path.join(root, f), 0o2770)
