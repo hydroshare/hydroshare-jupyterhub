@@ -51,6 +51,7 @@ def build_userspace(username):
     if not os.path.exists(lpath):
         os.makedirs(lpath)
 
+    print('basepath=%s ipynb_dir=%s' % (basepath, ipynb_dir))
     file_paths = []
     print('%s -> Copying userpace files' % username, flush=True)
     #ipynb_dir = '../jupyter-rest-endpoint/notebooks'
