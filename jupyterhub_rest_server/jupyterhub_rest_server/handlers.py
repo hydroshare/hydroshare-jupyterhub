@@ -120,16 +120,15 @@ class JupyterHandler(RequestHandler, tornado.auth.OAuth2Mixin):
         # else:
         #     url = "%s://%s%s/user/%s/tree/notebooks/Welcome.ipynb" % (proto, baseurl, port, username)
 
-        #url = 'https://jupyterhub-dev.uwrl.usu.edu/hub/user-redirect/hs-pull?id=8caa62c46c424a818899ebeca6f30a83&start=spiro3D.ipynb'
-        print('baseurl=' + baseurl, file=sys.stderr)
-        print('resourceid=' + resourceid, file=sys.stderr)
-        print('resourcetype=' + resourcetype, file=sys.stderr)
-        print('target=' + str(target), file=sys.stderr)
+        # print('baseurl=' + baseurl, file=sys.stderr)
+        # print('resourceid=' + resourceid, file=sys.stderr)
+        # print('resourcetype=' + resourcetype, file=sys.stderr)
+        # print('target=' + str(target), file=sys.stderr)
 
         url = "%s://%s%s/hub/user-redirect/hs-pull?id=%s" % (proto, baseurl, port, resourceid)
         if target:
             url += "&start=%s" % target
-        print("URL:" + url, file=sys.stderr)
+        print("rest server URL:" + url, file=sys.stderr)
 
         # save the next url to ensure that the redirect will work
         p = os.path.join(os.environ['HYDROSHARE_REDIRECT_COOKIE_PATH'], '.redirect_%s' % username)        
