@@ -96,8 +96,9 @@ class JupyterHandler(RequestHandler, tornado.auth.OAuth2Mixin):
         #     print('ERROR %s: %s' % (msg, e))
 
         try:
-            msg = '%s -> writing .env' % husername
-            print(msg)
+            msg = '%s -> building userspace' % husername
+            print(msg, file=sys.stderr)
+            utilities.build_userspace(username)
             utilities.set_hydroshare_args(husername, resourceid, resourcetype)
         except Exception as e:
             print('ERROR %s: %s' % (msg, e), flush=True)
@@ -114,18 +115,20 @@ class JupyterHandler(RequestHandler, tornado.auth.OAuth2Mixin):
             proto = 'http'
             port = ':'+port
         
-        if target is not None:
-            url = "%s://%s%s/user/%s/tree/%s" % (proto, baseurl, port, username, target)
-        else:
-            url = "%s://%s%s/user/%s/tree/notebooks/Welcome.ipynb" % (proto, baseurl, port, username)
+        # if target is not None:
+        #     url = "%s://%s%s/user/%s/tree/%s" % (proto, baseurl, port, username, target)
+        # else:
+        #     url = "%s://%s%s/user/%s/tree/notebooks/Welcome.ipynb" % (proto, baseurl, port, username)
 
-        #url = 'https://jupyterhub-dev.uwrl.usu.edu/hub/user-redirect/hs-pull?id=8caa62c46c424a818899ebeca6f30a83&start=spiro3D.ipynb'
-        print('baseurl=' + baseurl, file=sys.stderr)
-        print('resourceid=' + resourceid, file=sys.stderr)
-        print('resourcetype=' + resourcetype, file=sys.stderr)
-        print('target=' + str(target), file=sys.stderr)
+        # print('baseurl=' + baseurl, file=sys.stderr)
+        # print('resourceid=' + resourceid, file=sys.stderr)
+        # print('resourcetype=' + resourcetype, file=sys.stderr)
+        # print('target=' + str(target), file=sys.stderr)
+
         url = "%s://%s%s/hub/user-redirect/hs-pull?id=%s" % (proto, baseurl, port, resourceid)
-        print("URL:" + url, file=sys.stderr)
+        if target:
+            url += "&start=%s" % target
+        print("rest server URL:" + url, file=sys.stderr)
 
         # save the next url to ensure that the redirect will work
         p = os.path.join(os.environ['HYDROSHARE_REDIRECT_COOKIE_PATH'], '.redirect_%s' % username)        
