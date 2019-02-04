@@ -1,10 +1,10 @@
 import tornado.web
 import os
+import sys
 import socket
 import logging
 import tornado.auth
 import shutil
-import ipgetter
 from . import utilities
 
 from tornado.log import enable_pretty_logging
@@ -88,17 +88,17 @@ class JupyterHandler(RequestHandler, tornado.auth.OAuth2Mixin):
             resourcetype = resourcetype.lower()
 
         # build userspace
+        # try:
+        #     msg = '%s -> building userspace' % husername
+        #     print(msg)
+        #     utilities.build_userspace(username)
+        # except Exception as e:
+        #     print('ERROR %s: %s' % (msg, e))
+
         try:
             msg = '%s -> building userspace' % husername
-            print(msg)
+            print(msg, file=sys.stderr)
             utilities.build_userspace(username)
-        except Exception as e:
-            print('ERROR %s: %s' % (msg, e))
-
-        print('HERE')
-        try:
-            msg = '%s -> writing .env' % husername
-            print(msg)
             utilities.set_hydroshare_args(husername, resourceid, resourcetype)
         except Exception as e:
             print('ERROR %s: %s' % (msg, e), flush=True)
@@ -115,12 +115,20 @@ class JupyterHandler(RequestHandler, tornado.auth.OAuth2Mixin):
             proto = 'http'
             port = ':'+port
         
-        if target is not None:
-            url = "%s://%s%s/user/%s/tree/%s" % (proto, baseurl, port, username, target)
-        else:
-            url = "%s://%s%s/user/%s/tree/notebooks/Welcome.ipynb" % (proto, baseurl, port, username)
+        # if target is not None:
+        #     url = "%s://%s%s/user/%s/tree/%s" % (proto, baseurl, port, username, target)
+        # else:
+        #     url = "%s://%s%s/user/%s/tree/notebooks/Welcome.ipynb" % (proto, baseurl, port, username)
 
-        print("URL:" + url)
+        # print('baseurl=' + baseurl, file=sys.stderr)
+        # print('resourceid=' + resourceid, file=sys.stderr)
+        # print('resourcetype=' + resourcetype, file=sys.stderr)
+        # print('target=' + str(target), file=sys.stderr)
+
+        url = "%s://%s%s/hub/user-redirect/hs-pull?id=%s" % (proto, baseurl, port, resourceid)
+        if target:
+            url += "&start=%s" % target
+        print("rest server URL:" + url, file=sys.stderr)
 
         # save the next url to ensure that the redirect will work
         p = os.path.join(os.environ['HYDROSHARE_REDIRECT_COOKIE_PATH'], '.redirect_%s' % username)        

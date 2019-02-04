@@ -3,7 +3,7 @@ import os
 from jupyterhub_rest_server import server
 
 # check that all the required envvars exist
-args = ['HYDRPSHARE_REDIRECT_COOKIE', 'JUPYTER_HUB_IP',
+args = ['HYDROSHARE_REDIRECT_COOKIE', 'JUPYTER_HUB_IP',
         'JUPYTER_REST_IP', 'JUPYTER_PORT', 'JUPYTER_REST_PORT',
         'JUPYTER_USERSPACE_DIR', 'JUPYTER_USER', 'JUPYTER_NOTEBOOK_DIR']
 for a in args:

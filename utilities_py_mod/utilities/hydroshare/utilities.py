@@ -14,20 +14,31 @@ def sizeof_fmt(num, suffix='B'):
     return "%.1f%s%s" % (num, 'Yi', suffix)
 
 def get_hs_content(resid):
-
     resdir = find_resource_directory(resid)
 
     content = {}
+    for f in glob.glob('%s/data/contents/*' % resdir):
+        fname = os.path.basename(f)
+        content[fname] = f
+    if content != {}:
+        return content
+
+    # backwards compatibility
     for f in glob.glob('%s/*/data/contents/*' % resdir):
         fname = os.path.basename(f)
         content[fname] = f
-
     return content
 
 def find_resource_directory(resid):
-   
+    basedir = os.path.join(os.environ['HOME'], 'Downloads')
+    # loop over all the files in userspace
+    for dirpath, dirnames, filenames in os.walk(basedir):
+        for dirname in [d for d in dirnames]:
+            if dirname == resid:
+                return os.path.join(dirpath, dirname)
+
+    # for backwards-compatibility
     basedir = os.environ['NOTEBOOK_HOME']
-   
     # loop over all the files in userspace
     for dirpath, dirnames, filenames in os.walk(basedir):
         for dirname in [d for d in dirnames]:
@@ -76,11 +87,11 @@ def load_environment(env_path=None):
 
     # load the environment path (if it exists)
     if env_path is None:
-        if 'NOTEBOOK_HOME' in os.environ.keys():
+        env_path = os.path.expanduser("~/.env")
+        if not os.path.exists(env_path) and 'NOTEBOOK_HOME' in os.environ.keys():
             env_path = os.path.join(os.environ['NOTEBOOK_HOME'], '.env')
 
     if not os.path.exists(env_path):
-        print('\nEnvironment file could not be found.  Make sure that the JUPYTER_ENV variable is set properly')
         return
 
     with open(env_path, 'r') as f:
@@ -93,6 +104,7 @@ def load_environment(env_path=None):
         print('\nThese can be accessed using the following command: ')
         print('   os.environ[key]')
         print('\n   (e.g.)\n   os.environ["HS_USR_NAME"]  => %s' % os.environ['HS_USR_NAME'])
+
 
 def get_env_var(varname):
     if varname in os.environ.keys():
