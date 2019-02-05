@@ -131,7 +131,8 @@ class JupyterHandler(RequestHandler, tornado.auth.OAuth2Mixin):
         print("rest server URL:" + url, file=sys.stderr)
 
         # save the next url to ensure that the redirect will work
-        p = os.path.join(os.environ['HYDROSHARE_REDIRECT_COOKIE_PATH'], '.redirect_%s' % username)        
+        p = os.path.join(os.environ['HYDROSHARE_REDIRECT_COOKIE_PATH'], '.redirect_%s' % username)    
+        print("Rest Handler: writing %s to %s" % (url, p), file=sys.stderr) 
         with open(p, 'w') as f:
             f.write(url)
 
