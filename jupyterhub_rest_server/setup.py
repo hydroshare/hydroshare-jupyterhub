@@ -7,6 +7,6 @@ setup(name='JupyterhubRestServer',
       author_email='acastronova@cuahsi.org',
       url='www.cuahsi.org',
       packages=['jupyterhub_rest_server'],
-      install_requires= ['tornado==4.4.2'],
+      install_requires= ['tornado'],
      )
 
