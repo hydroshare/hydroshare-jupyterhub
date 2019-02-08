@@ -4,7 +4,7 @@ import os
 import getpass
 import glob
 from IPython.core.display import display, HTML
-from hs_restclient import HydroShare, HydroShareAuthBasic
+from hs_restclient import HydroShare, HydroShareAuthBasic, HydroShareAuthOAuth2
 from hs_restclient import HydroShareHTTPException
 from datetime import datetime as dt
 import pickle
@@ -22,29 +22,35 @@ class hydroshare():
         self.hs = None
         self.content = {}
 
-        # load the HS environment variables
-        # todo: this should be set as a path variable somehow.
-        #       possibly add JPY_TMP to Dockerfile
-        self.cache = cache
-        if cache:
-            utilities.load_environment(os.path.join(
-                                        os.environ['NOTEBOOK_HOME'], '.env'))
-        self.auth_path = '/home/jovyan/.auth'
-
-        # todo: either use JPY_USR or ask them to
-        #       enter their hydroshare username
-        uname = username
-        if uname is None:
-            if 'HS_USR_NAME' in os.environ.keys():
-                uname = os.environ['HS_USR_NAME']
-
-        if password is None:
-            # get a secure connection to hydroshare
-            auth = self.getSecureConnection(uname)
+        # connect to hydroshare using OAUTH2
+        authfile = os.path.expanduser("~/.hs_auth")
+        if os.path.exists(authfile):
+            with open(authfile, 'rb') as f:
+                token, cid = pickle.load(f)
+            auth = HydroShareAuthOAuth2(cid, '', token=token)
         else:
-            print('WARNING: THIS IS NOT A SECURE METHOD OF CONNECTING TO '
-                  'HYDROSHARE...AVOID TYPING CREDENTIALS AS PLAIN TEXT')
-            auth = HydroShareAuthBasic(username=uname, password=password)
+            # connect to hydroshare using Basic Authentication
+            self.cache = cache
+            if cache:
+                utilities.load_environment(os.path.join(
+                                           os.environ['NOTEBOOK_HOME'],
+                                           '.env'))
+
+            self.auth_path = os.environ.get('NOTEBOOK_HOME',
+                                            '/home/jovyan/.auth')
+
+            uname = username
+            if uname is None:
+                if 'HS_USR_NAME' in os.environ.keys():
+                    uname = os.environ['HS_USR_NAME']
+
+            if password is None:
+                # get a secure connection to hydroshare
+                auth = self.getSecureConnection(uname)
+            else:
+                print('WARNING: THIS IS NOT A SECURE METHOD OF CONNECTING TO '
+                      'HYDROSHARE...AVOID TYPING CREDENTIALS AS PLAIN TEXT')
+                auth = HydroShareAuthBasic(username=uname, password=password)
 
         try:
             self.hs = HydroShare(auth=auth)
