@@ -13,6 +13,7 @@ def sizeof_fmt(num, suffix='B'):
         num /= 1024.0
     return "%.1f%s%s" % (num, 'Yi', suffix)
 
+
 def get_hs_content(resid):
 
     resdir = find_resource_directory(resid)
@@ -24,16 +25,18 @@ def get_hs_content(resid):
 
     return content
 
+
 def find_resource_directory(resid):
-   
-    basedir = os.environ['NOTEBOOK_HOME']
-   
+
+    download_dir = os.environ.get('JUPYTER_DOWNLOADS', 'Downloads')
+
     # loop over all the files in userspace
-    for dirpath, dirnames, filenames in os.walk(basedir):
+    for dirpath, dirnames, filenames in os.walk(download_dir):
         for dirname in [d for d in dirnames]:
             if dirname == resid:
                 return os.path.join(dirpath, dirname)
     return None
+
 
 def check_for_ipynb(content_files):
 
@@ -45,29 +48,31 @@ def check_for_ipynb(content_files):
             links[fname] = url
     return links
 
+
 def display_tree(resid):
 
     # todo: display a tree view of the resource bagit, based on id
     pass
 
+
 def display_resource_content_files(content_file_dictionary,
                                    text='Found the following content when parsing the HydroShare resource:'):
-    
+
     # get ipynb files
     nbs = check_for_ipynb(content_file_dictionary)
     if len(nbs.keys()) > 0:
         display(HTML('<b>Found the following notebook(s) associated with this HydroShare resource.</b><br>Click the link(s) below to launch the notebook.'))
-        
+
         for name, url in nbs.items():
             display(HTML('<a href=%s target="_blank">%s<a>' % (url, name)))
 
     # print the remaining files    
     if len(content_file_dictionary.keys()) > 0:
         display(HTML('<b>Found the following file(s) associated with this HydroShare resource.</b>'))
-        
+
         text = '<br>'.join(content_file_dictionary.keys())
         display(HTML(text))
-    
+
     if (len(content_file_dictionary.keys()) + len(nbs.keys())) > 0:
         display(HTML('These files are stored in a dictionary called <b>hs.content</b> for your convenience.  To access a file, simply issue the following command where MY_FILE is one of the files listed above: <pre>hs.content["MY_FILE"] </pre> '))
 
@@ -109,7 +114,6 @@ def get_server_url_for_path(p):
     """
 
     load_environment()
-    fname = os.path.basename(p)
     rel_path = os.path.relpath(p, os.environ['NOTEBOOK_HOME'])
     url = urlencode(rel_path)
     return url

@@ -96,8 +96,12 @@ c.JupyterHub.db_url = 'postgresql://postgres:{password}@{host}/{db}'.format(
 c.DockerSpawner.extra_host_config = {
     'cap_add':['SYS_PTRACE'],
     'security_opt':['apparmor:unconfined'],
-    'mem_limit':os.environ['DOCKER_MEM_LIMIT']
-#    'mem_limit':'16g'
+    'mem_limit':os.environ['DOCKER_MEM_LIMIT'],
+}
+
+# Set spawner environment variables
+c.DockerSpawner.environment = {
+    'JUPYTER_DOWNLOADS': os.environ['JUPYTER_DOWNLOADS']
 }
 
 # spawner timeout

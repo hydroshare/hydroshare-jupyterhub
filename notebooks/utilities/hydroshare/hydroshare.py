@@ -55,12 +55,16 @@ class hydroshare():
             print('Failed to establish a connection with HydroShare.\n  '
                   'Please check that you provided the correct credentials.\n'
                   '%s' % e)
-
             # remove the cached authentication
             if os.path.exists(self.auth_path):
                 os.remove(self.auth_path)
-
             return None
+
+        # set the HS resource download directory
+        download_dir = os.environ.get('JUPYTER_DOWNLOADS', 'Downloads')
+        if not os.path.isdir(download_dir):
+            os.mkdirs(download_dir)
+        self.download_dir = download_dir
 
     def _addContentToExistingResource(self, resid, content_files):
 
@@ -200,7 +204,7 @@ class hydroshare():
         -- None
         """
 
-        default_dl_path = utilities.get_env_var('DATA')
+        defualt_dl_path =  self.download_dir
         dst = os.path.abspath(os.path.join(default_dl_path, destination))
         download = True
 
@@ -292,11 +296,11 @@ class hydroshare():
                          '<br><br><code>hs.getResourceFromHydroShare(%s)'
                          '</code>.' % (resourceid, resourceid)))
             return
-        
+
         # create search paths.  Need to check 2 paths due to hs_restclient bug #63.
         search_paths = [os.path.join(resdir, '%s/data/contents/*' % resourceid), 
                         os.path.join(resdir, 'data/contents/*')]
-                        
+
         content = {}
         found_content = False
         for p in search_paths:

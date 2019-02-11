@@ -63,6 +63,8 @@ services:
       SSL_CERT: ${SSL_CRT}
       SSL_KEY: ${SSL_KEY}
       JUPYTER_STATIC_DIR_HOST: ${JUPYTER_STATIC_DIR_HOST}
+      HYDROSHARE_REDIRECT_COOKIE_PATH: ${JUPYTER_USERSPACE_DIR}/_global/jupyterhub/redirect
+      JUPYTER_DOWNLOADS: ${JUPYTER_DOWNLOADS}
     env_file:
       - secrets/postgres.env
       - secrets/oauth.env
@@ -98,8 +100,8 @@ services:
     image: cuahsi/specs-rabbit
     container_name: specs_rabbit
     environment:
-      RABBITMQ_DEFAULT_USER: admin
-      RABBITMQ_DEFAULT_PASS: mypass
+      RABBITMQ_DEFAULT_USER: ${RABBIT_USERNAME}
+      RABBITMQ_DEFAULT_PASS: ${RABBIT_PASSWORD}
       HOSTNAME: rabbitmq
       RABBITMQ_NODENAME: rabbitmq
     ports: 
@@ -110,7 +112,7 @@ services:
     image: cuahsi/specs-worker
     privileged: true
     volumes:
-      - "/root/hydroshare-jupyterhub/build/specs/specworker/:/app/specworker"
+      - "${SPECS_SRC}:/app/specworker"
       - "/var/run/docker.sock:/var/run/docker.sock:rw"
     env_file:
       - secrets/specs.env
