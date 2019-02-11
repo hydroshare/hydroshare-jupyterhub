@@ -101,7 +101,8 @@ c.DockerSpawner.extra_host_config = {
 
 # Set spawner environment variables
 c.DockerSpawner.environment = {
-    'JUPYTER_DOWNLOADS': os.environ['JUPYTER_DOWNLOADS']
+    'JUPYTER_DOWNLOADS': os.environ['JUPYTER_DOWNLOADS'],
+    'DATA': '/home/jovyan/work/data'
 }
 
 # spawner timeout

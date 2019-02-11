@@ -210,7 +210,7 @@ class hydroshare():
         -- None
         """
 
-        defualt_dl_path =  self.download_dir
+        default_dl_path =  self.download_dir
         dst = os.path.abspath(os.path.join(default_dl_path, destination))
         download = True
 
