@@ -30,10 +30,13 @@ def main():
     app = Application()
     http_server = tornado.httpserver.HTTPServer(app)
 
-    # ssl_options={
-    #     "certfile": "/etc/ssl/certs/cuahsi.org/cuahsi.cert",
-    #     "keyfile": "/etc/ssl/certs/cuahsi.org/cuahsi.key"
-    # })
+    cert = os.environ.get('SSL_CERT', None)
+    key = os.environ.get('SSL_KEY', None)
+    if (cert is not None) and (key is not None):
+        ssl_options={
+            "certfile": cert,
+            "keyfile": key
+        })
 
     http_server.listen(8080)
     #app.listen(os.environ['JUPYTER_REST_PORT'])
