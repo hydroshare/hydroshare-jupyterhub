@@ -44,7 +44,7 @@ def build_userspace(username):
     # check to see if user exists
     basepath = os.path.abspath(os.path.join(userspace_dir, '%s' % husername))
     # path = os.path.abspath(os.path.join(basepath, 'notebooks'))
-    path = basepath
+    path = os.path.join(basepath, 'notebooks')
     if not os.path.exists(path):
         os.makedirs(path)
 
