@@ -69,7 +69,7 @@ class hydroshare():
         # set the HS resource download directory
         download_dir = os.environ.get('JUPYTER_DOWNLOADS', 'Downloads')
         if not os.path.isdir(download_dir):
-            os.mkdirs(download_dir)
+            os.makedirs(download_dir)
         self.download_dir = download_dir
 
     def _addContentToExistingResource(self, resid, content_files):
