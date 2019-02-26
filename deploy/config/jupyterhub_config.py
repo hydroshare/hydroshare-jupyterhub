@@ -55,7 +55,7 @@ c.DockerSpawner.volumes = {
   userspace: notebook_dir,
 #  os.environ['JUPYTER_STATIC_DIR_HOST']: '/home/jovyan/work/.jupyter/custom'
   os.environ['JUPYTER_STATIC_DIR_HOST']: '/opt/conda/lib/python3.6/site-packages/notebook/static/custom',
-  '/root/hydroshare-jupyterhub/build/specs/specworker': '/home/jovyan/libs/specworker'
+  '/home/acastronova/hydroshare-jupyterhub/build/specs/specworker': '/home/jovyan/libs/specworker'
 }
 
 # volume_driver is no longer a keyword argument to create_container()
@@ -102,7 +102,7 @@ c.DockerSpawner.extra_host_config = {
 # Set spawner environment variables
 c.DockerSpawner.environment = {
     'JUPYTER_DOWNLOADS': os.environ['JUPYTER_DOWNLOADS'],
-    'DATA': '/home/jovyan/work/data'
+    'DATA': '/home/jovyan/work/notebooks/data',
 }
 
 # spawner timeout

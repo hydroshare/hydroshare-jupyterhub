@@ -72,7 +72,7 @@ services:
       jupyterhub -f /srv/jupyterhub/jupyterhub_config.py
 
   jupyterhub_rest:
-    image: cuahsi/jupyterhub-rest:latest
+    image: cuahsi/jupyterhub-rest:1.4.0
     container_name: jupyterhub-rest
     volumes:
        # Bind userspace on host to Jupyter container (tony)
@@ -114,6 +114,8 @@ services:
     volumes:
       - "${SPECS_SRC}:/app/specworker"
       - "/var/run/docker.sock:/var/run/docker.sock:rw"
+    environment:
+      IMAGES: ${SPECS_IMGS}
     env_file:
       - secrets/specs.env
     links: 
