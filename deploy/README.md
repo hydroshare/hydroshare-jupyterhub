@@ -2,6 +2,7 @@
 ## System Setup
 
 *These instructions were tested on CentOS 7*
+All images referenced below can be found at: https://hub.docker.com/u/cuahsi 
 
 ### 1. Install Docker
 
@@ -81,12 +82,12 @@ Run the tests
     $ ./run-taudem-tests.sh  
     $ ./run-modflow-tests.sh  
 
-### Build Specs *(Optional)*
+### Pull Specs Images *(Optional)*
 
-Build the specs containers, i.e. celery and rabbit  
+*Note*: if this step is skipped, celery and rabbit elements must be commented in docker-compose.yml
 
-    $ cd specs
-    $ ./build.sh
+    $ docker pull cuahsi/specs-worker:[tag]
+    $ docker pull cuahsi/specs-rabbit:[tag]
 
 Collect specs model images  
 
