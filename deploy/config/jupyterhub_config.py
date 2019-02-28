@@ -53,9 +53,8 @@ c.DockerSpawner.notebook_dir = notebook_dir
 userspace = os.path.join(os.environ['JUPYTER_USERSPACE_DIR_HOST'], '{username}')
 c.DockerSpawner.volumes = {
   userspace: notebook_dir,
-#  os.environ['JUPYTER_STATIC_DIR_HOST']: '/home/jovyan/work/.jupyter/custom'
   os.environ['JUPYTER_STATIC_DIR_HOST']: '/opt/conda/lib/python3.6/site-packages/notebook/static/custom',
-  '/home/acastronova/hydroshare-jupyterhub/build/specs/specworker': '/home/jovyan/libs/specworker'
+  os.environ['SPECS_SRC']: '/home/jovyan/libs/specworker'
 }
 
 # volume_driver is no longer a keyword argument to create_container()

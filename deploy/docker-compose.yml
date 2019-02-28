@@ -65,6 +65,7 @@ services:
       JUPYTER_STATIC_DIR_HOST: ${JUPYTER_STATIC_DIR_HOST}
       HYDROSHARE_REDIRECT_COOKIE_PATH: ${JUPYTER_USERSPACE_DIR}/_global/jupyterhub/redirect
       JUPYTER_DOWNLOADS: ${JUPYTER_DOWNLOADS}
+      SPECS_SRC: ${SPECS_SRC}
     env_file:
       - secrets/postgres.env
       - secrets/oauth.env
@@ -114,8 +115,6 @@ services:
     volumes:
       - "${SPECS_SRC}:/app/specworker"
       - "/var/run/docker.sock:/var/run/docker.sock:rw"
-    environment:
-      IMAGES: ${SPECS_IMGS}
     env_file:
       - secrets/specs.env
     links: 
