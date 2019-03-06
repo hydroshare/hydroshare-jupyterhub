@@ -4,7 +4,7 @@ import os
 import getpass
 import glob
 from IPython.core.display import display, HTML
-from hs_restclient import HydroShare, HydroShareAuthBasic, HydroShareAuthOAuth2
+from hs_restclient import HydroShare, HydroShareAuthBasic
 from hs_restclient import HydroShareHTTPException
 from datetime import datetime as dt
 import pickle
@@ -22,35 +22,29 @@ class hydroshare():
         self.hs = None
         self.content = {}
 
-        # connect to hydroshare using OAUTH2
-        authfile = os.path.expanduser("~/.hs_auth")
-        if os.path.exists(authfile):
-            with open(authfile, 'rb') as f:
-                token, cid = pickle.load(f)
-            auth = HydroShareAuthOAuth2(cid, '', token=token)
+        # load the HS environment variables
+        # todo: this should be set as a path variable somehow.
+        #       possibly add JPY_TMP to Dockerfile
+        self.cache = cache
+        if cache:
+            utilities.load_environment(os.path.join(
+                                        os.environ['NOTEBOOK_HOME'], '.env'))
+        self.auth_path = '/home/jovyan/.auth'
+
+        # todo: either use JPY_USR or ask them to
+        #       enter their hydroshare username
+        uname = username
+        if uname is None:
+            if 'HS_USR_NAME' in os.environ.keys():
+                uname = os.environ['HS_USR_NAME']
+
+        if password is None:
+            # get a secure connection to hydroshare
+            auth = self.getSecureConnection(uname)
         else:
-            # connect to hydroshare using Basic Authentication
-            self.cache = cache
-            if cache:
-                utilities.load_environment(os.path.join(
-                                           os.environ['NOTEBOOK_HOME'],
-                                           '.env'))
-
-            self.auth_path = os.environ.get('NOTEBOOK_HOME',
-                                            '/home/jovyan/.auth')
-
-            uname = username
-            if uname is None:
-                if 'HS_USR_NAME' in os.environ.keys():
-                    uname = os.environ['HS_USR_NAME']
-
-            if password is None:
-                # get a secure connection to hydroshare
-                auth = self.getSecureConnection(uname)
-            else:
-                print('WARNING: THIS IS NOT A SECURE METHOD OF CONNECTING TO '
-                      'HYDROSHARE...AVOID TYPING CREDENTIALS AS PLAIN TEXT')
-                auth = HydroShareAuthBasic(username=uname, password=password)
+            print('WARNING: THIS IS NOT A SECURE METHOD OF CONNECTING TO '
+                  'HYDROSHARE...AVOID TYPING CREDENTIALS AS PLAIN TEXT')
+            auth = HydroShareAuthBasic(username=uname, password=password)
 
         try:
             self.hs = HydroShare(auth=auth)
@@ -61,16 +55,12 @@ class hydroshare():
             print('Failed to establish a connection with HydroShare.\n  '
                   'Please check that you provided the correct credentials.\n'
                   '%s' % e)
+
             # remove the cached authentication
             if os.path.exists(self.auth_path):
                 os.remove(self.auth_path)
-            return None
 
-        # set the HS resource download directory
-        download_dir = os.environ.get('JUPYTER_DOWNLOADS', 'Downloads')
-        if not os.path.isdir(download_dir):
-            os.makedirs(download_dir)
-        self.download_dir = download_dir
+            return None
 
     def _addContentToExistingResource(self, resid, content_files):
 
@@ -210,7 +200,7 @@ class hydroshare():
         -- None
         """
 
-        default_dl_path =  self.download_dir
+        default_dl_path = utilities.get_env_var('DATA')
         dst = os.path.abspath(os.path.join(default_dl_path, destination))
         download = True
 
@@ -302,11 +292,11 @@ class hydroshare():
                          '<br><br><code>hs.getResourceFromHydroShare(%s)'
                          '</code>.' % (resourceid, resourceid)))
             return
-
+        
         # create search paths.  Need to check 2 paths due to hs_restclient bug #63.
         search_paths = [os.path.join(resdir, '%s/data/contents/*' % resourceid), 
                         os.path.join(resdir, 'data/contents/*')]
-
+                        
         content = {}
         found_content = False
         for p in search_paths:

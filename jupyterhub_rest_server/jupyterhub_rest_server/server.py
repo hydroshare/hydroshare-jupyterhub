@@ -20,18 +20,22 @@ class Application(tornado.web.Application):
         settings = {
             "debug":True,
             "login_url":os.path.join(os.environ['JUPYTER_REST_IP'], ':%s' % os.environ['JUPYTER_PORT']),
-	    "template_path":Settings.TEMPLATE_PATH,
-	    "static_path":Settings.STATIC_PATH,
+        "template_path":Settings.TEMPLATE_PATH,
+        "static_path":Settings.STATIC_PATH,
         }
         tornado.web.Application.__init__(self, handlers, **settings)
 
 def main():
 
     app = Application()
-    http_server = tornado.httpserver.HTTPServer(app, ssl_options={
-        "certfile": "/etc/ssl/certs/cuahsi.org/cuahsi.cert",
-        "keyfile": "/etc/ssl/certs/cuahsi.org/cuahsi.key"
-    })
+
+    cert = os.environ.get('SSL_CERT', None)
+    key = os.environ.get('SSL_KEY', None)
+    if (cert is not None) and (key is not None):
+        http_server = tornado.httpserver.HTTPServer(app, ssl_options={"certfile":cert, "keyfile":key})
+    else:
+        http_server = tornado.httpserver.HTTPServer(app)
+
 
     http_server.listen(8080)
     #app.listen(os.environ['JUPYTER_REST_PORT'])

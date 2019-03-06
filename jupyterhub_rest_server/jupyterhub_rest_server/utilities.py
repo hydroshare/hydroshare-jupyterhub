@@ -1,6 +1,6 @@
 # this file contains utility functions used by the RequestHandlers
 
-import os, stat
+import os, stat, sys
 from pwd import getpwnam
 import grp
 import shutil
@@ -12,9 +12,8 @@ log = logging.getLogger()
 def set_hydroshare_args(username, resourceid, resourcetype):
 
     userspace_dir = os.environ['JUPYTER_USERSPACE_DIR']
-    hs_env = os.path.abspath(os.path.join(userspace_dir, '%s/notebooks/.env' % username.lower()))
-    print('ENV_PATH ',hs_env)
-
+    hs_env = os.path.abspath(os.path.join(userspace_dir, '%s/.env' % username.lower()))
+    print('ENV_PATH ',hs_env, file=sys.stderr)
     with open(hs_env, 'w') as f:
         f.write('HS_USR_NAME=%s\n' % username)
         f.write('HS_RES_ID=%s\n' % resourceid)
@@ -43,13 +42,14 @@ def build_userspace(username):
     ipynb_dir = os.environ['JUPYTER_NOTEBOOK_DIR']
 
     # check to see if user exists
-    basepath = os.path.abspath(os.path.join(userspace_dir, '%s'%husername))
-    path = os.path.abspath(os.path.join(basepath, 'notebooks'))
+    basepath = os.path.abspath(os.path.join(userspace_dir, '%s' % husername))
+    # path = os.path.abspath(os.path.join(basepath, 'notebooks'))
+    path = os.path.join(basepath, 'notebooks')
     if not os.path.exists(path):
         os.makedirs(path)
 
     file_paths = []
-    print('%s -> copying userpace filse' % username, flush=True)
+    print('%s -> Copying userpace files' % username, flush=True)
     #ipynb_dir = '../jupyter-rest-endpoint/notebooks'
     for root, dirs, files in os.walk(ipynb_dir):
         for file in files:
@@ -61,25 +61,21 @@ def build_userspace(username):
         dirpath = os.path.dirname(dst)
         if not os.path.exists(dirpath):
             os.makedirs(dirpath)
+        print("Copying %s -> %s" % (src, dst))
         shutil.copyfile(src, dst)
 
     # change file ownership so that it can be accessed inside docker container
     print('%s -> modifying userspace permissions' % username, flush=True)
     os.chown(basepath, uid, gid)
+    os.chmod(basepath, stat.S_IRWXG |  stat.S_IRWXU)
     os.chown(os.path.dirname(basepath), uid, gid)
-    os.chmod(os.path.dirname(basepath), stat.S_IRWXG | stat.S_ISGID | stat.S_IRWXU)
-#    os.chmod(basepath, 0o2770)
+    os.chmod(os.path.dirname(basepath), stat.S_IRWXG | stat.S_IRWXU)
 
     for root, dirs, files in os.walk(basepath):
         for d in dirs:
             os.chown(os.path.join(root, d), uid, gid)
-            os.chmod(os.path.join(root, d), stat.S_IRWXG | stat.S_ISGID | stat.S_IRWXU)
+            os.chmod(os.path.join(root, d), stat.S_IRWXG |  stat.S_IRWXU)
 
         for f in files:
             os.chown(os.path.join(root, f), uid, gid)
-            os.chmod(os.path.join(root, f), stat.S_IRWXG | stat.S_ISGID | stat.S_IRWXU)
-#            os.chmod(os.path.join(root, d), 0o2770)
-#
-#        for f in files:
-#            os.chown(os.path.join(root, f), uid, gid)
-#            os.chmod(os.path.join(root, f), 0o2770)
+            os.chmod(os.path.join(root, f), stat.S_IRWXG | stat.S_IRWXU)

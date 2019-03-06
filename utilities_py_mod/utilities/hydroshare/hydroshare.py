@@ -22,35 +22,22 @@ class hydroshare():
         self.hs = None
         self.content = {}
 
-        # connect to hydroshare using OAUTH2
-        authfile = os.path.expanduser("~/.hs_auth")
-        if os.path.exists(authfile):
-            with open(authfile, 'rb') as f:
-                token, cid = pickle.load(f)
-            auth = HydroShareAuthOAuth2(cid, '', token=token)
+        # load the HS environment variables
+        # todo: this should be set as a path variable somehow.
+        #       possibly add JPY_TMP to Dockerfile
+        self.cache = cache
+        if cache:
+            utilities.load_environment()
+        
+        self.auth_path = '/home/jovyan/.auth'
+
+        if password is None:
+            # try for secure connection
+            auth = self.getSecureConnection(username)
         else:
-            # connect to hydroshare using Basic Authentication
-            self.cache = cache
-            if cache:
-                utilities.load_environment(os.path.join(
-                                           os.environ['NOTEBOOK_HOME'],
-                                           '.env'))
-
-            self.auth_path = os.environ.get('NOTEBOOK_HOME',
-                                            '/home/jovyan/.auth')
-
-            uname = username
-            if uname is None:
-                if 'HS_USR_NAME' in os.environ.keys():
-                    uname = os.environ['HS_USR_NAME']
-
-            if password is None:
-                # get a secure connection to hydroshare
-                auth = self.getSecureConnection(uname)
-            else:
-                print('WARNING: THIS IS NOT A SECURE METHOD OF CONNECTING TO '
-                      'HYDROSHARE...AVOID TYPING CREDENTIALS AS PLAIN TEXT')
-                auth = HydroShareAuthBasic(username=uname, password=password)
+            print('WARNING: THIS IS NOT A SECURE METHOD OF CONNECTING TO '
+                  'HYDROSHARE...AVOID TYPING CREDENTIALS AS PLAIN TEXT')
+            auth = HydroShareAuthBasic(username=username, password=password)
 
         try:
             self.hs = HydroShare(auth=auth)
@@ -64,16 +51,8 @@ class hydroshare():
             # remove the cached authentication
             if os.path.exists(self.auth_path):
                 os.remove(self.auth_path)
-            return None
-
-        # set the HS resource download directory
-        download_dir = os.environ.get('JUPYTER_DOWNLOADS', 'Downloads')
-        if not os.path.isdir(download_dir):
-            os.makedirs(download_dir)
-        self.download_dir = download_dir
 
     def _addContentToExistingResource(self, resid, content_files):
-
         for f in content_files:
             self.hs.addResourceFile(resid, f)
 
@@ -81,17 +60,30 @@ class hydroshare():
         """Establishes a secure connection with hydroshare.
 
         args:
-        -- email: email address associated with hydroshare
+        -- username: Optional
 
         returns:
-        -- hydroshare api connection
+        -- hydroshare authentication information
         """
+
+        # Use oauth2 if possible
+        authfile = os.path.expanduser("~/.hs_auth")
+        if os.path.exists(authfile):
+            with open(authfile, 'rb') as f:
+                token, cid = pickle.load(f)
+            return HydroShareAuthOAuth2(cid, '', token=token)
+
+        print('\nThe hs_utils library requires a secure connection to '
+              'your HydroShare account.')
 
         if not os.path.exists(self.auth_path):
             print('\nThe hs_utils library requires a secure connection to '
                   'your HydroShare account.')
             if username is None:
-                username = input('Please enter your HydroShare username: ') \
+                if 'HS_USR_NAME' in os.environ.keys():
+                    username = os.environ['HS_USR_NAME']
+                else:
+                    username = input('Please enter your HydroShare username: ') \
                         .strip()
             p = getpass.getpass('Enter the HydroShare password for user '
                                 '\'%s\': ' % username)
@@ -100,12 +92,9 @@ class hydroshare():
             if self.cache:
                 with open(self.auth_path, 'wb') as f:
                     pickle.dump(auth, f, protocol=2)
-
         else:
-
             with open(self.auth_path, 'rb') as f:
                 auth = pickle.load(f)
-
         return auth
 
     def getResourceMetadata(self, resid):
@@ -210,7 +199,7 @@ class hydroshare():
         -- None
         """
 
-        default_dl_path =  self.download_dir
+        default_dl_path = utilities.get_env_var('DATA')
         dst = os.path.abspath(os.path.join(default_dl_path, destination))
         download = True
 
@@ -245,7 +234,7 @@ class hydroshare():
                 return None
 
         # load the resource content
-        outdir = os.path.join(dst, '%s/%s' % (resourceid, resourceid))
+        outdir = os.path.join(dst, '%s' % (resourceid))
         content_files = glob.glob(os.path.join(outdir, 'data/contents/*'))
 
         content = {}
@@ -302,11 +291,11 @@ class hydroshare():
                          '<br><br><code>hs.getResourceFromHydroShare(%s)'
                          '</code>.' % (resourceid, resourceid)))
             return
-
+        
         # create search paths.  Need to check 2 paths due to hs_restclient bug #63.
         search_paths = [os.path.join(resdir, '%s/data/contents/*' % resourceid), 
                         os.path.join(resdir, 'data/contents/*')]
-
+                        
         content = {}
         found_content = False
         for p in search_paths:
@@ -351,4 +340,4 @@ class hydroshare():
 
         path = utilities.find_resource_directory(resourceid)
         if path is not None:
-            return os.path.join(path, resourceid, 'data/contents')
+            return os.path.join(path, 'data/contents')
