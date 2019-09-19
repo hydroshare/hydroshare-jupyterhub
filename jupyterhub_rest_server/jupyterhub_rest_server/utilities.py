@@ -54,6 +54,9 @@ def build_userspace(username):
         os.chown(path, uid, gid)
         os.chmod(path, 0o2770)
 
+        os.chown(basepath, uid, gid)
+        os.chmod(basepath, 0o2770)
+
     file_paths = []
     print('%s -> copying userpace files' % username, flush=True)
     for root, dirs, files in os.walk(ipynb_dir):
