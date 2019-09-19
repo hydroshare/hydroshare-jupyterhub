@@ -45,8 +45,14 @@ def build_userspace(username):
     # check to see if user exists
     basepath = os.path.abspath(os.path.join(userspace_dir, '%s'%husername))
     path = os.path.abspath(os.path.join(basepath, 'notebooks'))
+
+    # make the root directory if it doesn't exist
     if not os.path.exists(path):
         os.makedirs(path)
+
+        # set permissions
+        os.chown(path, uid, gid)
+        os.chmod(path, 0o2770)
 
     file_paths = []
     print('%s -> copying userpace files' % username, flush=True)
